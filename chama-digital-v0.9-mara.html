@@ -365,6 +365,25 @@ table.rt{width:100%;border-collapse:collapse;font-size:.875rem}
 }
 /* ===== v0.7 Mara Enterprise additions ===== */
 [hidden]{display:none!important}
+/* ===== photo slideshow (landing background, banners) ===== */
+.photo-show{position:absolute;inset:0;overflow:hidden;z-index:0;background:var(--teal-900)}
+.photo-show img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.4s ease;transform:scale(1.02)}
+.photo-show img.on{opacity:1}
+.photo-show::after{content:'';position:absolute;inset:0;pointer-events:none}
+.w-left{position:relative;overflow:hidden}
+.w-left>*:not(.photo-show){position:relative;z-index:1}
+.w-left .photo-show::after{background:linear-gradient(160deg,rgba(6,57,60,.94) 0%,rgba(6,57,60,.82) 50%,rgba(6,57,60,.6) 100%)}
+.photo-cap{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.75rem;color:#CFE8E9;margin-top:4px}
+.photo-cap .dots{display:inline-flex;gap:5px}.photo-cap .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35)}.photo-cap .dots i.on{background:#fff}
+.photo-pause{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:99px;font-size:.6875rem;font-weight:600;padding:4px 10px;min-height:28px}
+.photo-banner{position:relative;min-height:170px;border-radius:14px;overflow:hidden;margin-bottom:16px;display:flex;align-items:flex-end}
+.photo-banner .photo-show::after{background:linear-gradient(90deg,rgba(6,57,60,.9) 0%,rgba(6,57,60,.6) 55%,rgba(6,57,60,.25) 100%)}
+.photo-banner .pb-text{position:relative;z-index:1;padding:18px 20px;color:#fff;max-width:620px}
+.photo-banner .pb-text b{display:block;font:600 1.125rem 'Sora',sans-serif;color:#fff}
+.photo-banner .pb-text span{display:block;font-size:.8125rem;color:#D5EDEE;margin-top:4px}
+.photo-banner.small{min-height:130px}
+@media (prefers-reduced-motion:reduce){.photo-show img{transition:none}}
+@media print{.photo-banner,.photo-show{display:none!important}}
 /* ===== v0.8 charts (validated palette: #2a78d6 / #eb6834 / #1baf7a; status #0ca30c / #fab219 / #d03b3b) ===== */
 .viz svg{display:block;overflow:visible;font-family:Inter,system-ui,sans-serif}
 .viz .ax{font-size:11px;fill:#898781;font-variant-numeric:tabular-nums}
@@ -547,6 +566,24 @@ const initials=n=>n.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join(''
 const hash=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)};
 const firstName=n=>n.split(' ')[0];
 const plural=(n,w,p)=>`${n} ${n===1?w:(p||w+'s')}`;
+
+/* ---------- 1b. Programme photos (assets/photos, served next to index.html) ---------- */
+const PHOTOS=[
+  {src:'assets/photos/field-meeting.jpg',cap:'A community group meeting in the field'},
+  {src:'assets/photos/counting-contributions.jpg',cap:'Counting and recording contributions'},
+  {src:'assets/photos/training.jpg',cap:'A training session with members'},
+  {src:'assets/photos/records-officials.jpg',cap:'Group officials updating their records'},
+];
+const PHOTO={paused:false,timer:null,every:6500};
+function photoShow(list=PHOTOS){return `<div class="photo-show" data-photoshow aria-hidden="true">${list.map((p,i)=>`<img src="${p.src}" alt="" ${i?'loading="lazy"':''} class="${i?'':'on'}" data-cap="${esc(p.cap)}" onerror="this.remove()">`).join('')}</div>`}
+function photoCaption(list=PHOTOS){return `<div class="photo-cap"><span class="dots" aria-hidden="true">${list.map((p,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</span><span data-photocap>${esc(list[0].cap)}</span><button type="button" class="photo-pause" data-act="photo-pause" aria-pressed="${PHOTO.paused}">${PHOTO.paused?'Play photos':'Pause photos'}</button></div>`}
+function photoBanner(title,sub,list=PHOTOS,cls=''){return `<div class="photo-banner ${cls}" role="img" aria-label="${esc(list.map(p=>p.cap).join('; '))}">${photoShow(list)}<div class="pb-text"><b>${esc(title)}</b>${sub?`<span>${esc(sub)}</span>`:''}</div></div>`}
+function photoTick(){
+  if(PHOTO.paused||document.visibilityState==='hidden'||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  document.querySelectorAll('[data-photoshow]').forEach(box=>{const imgs=[...box.querySelectorAll('img')];if(imgs.length<2)return;const i=imgs.findIndex(x=>x.classList.contains('on'));const n=(i+1)%imgs.length;imgs.forEach((x,k)=>x.classList.toggle('on',k===n));
+    const wrap=box.parentElement,cap=wrap&&wrap.querySelector('[data-photocap]');if(cap)cap.textContent=imgs[n].dataset.cap||'';const dots=wrap&&wrap.querySelectorAll('.photo-cap .dots i');if(dots)dots.forEach((d,k)=>d.classList.toggle('on',k===n))});
+}
+PHOTO.timer=setInterval(photoTick,PHOTO.every);
 
 /* ---------- 2. Icons (inline SVG, no dependencies) ---------- */
 const ICONS={
@@ -1853,11 +1890,11 @@ const settingsViewObj={title:'Settings',render:()=>settingsView()};
 /* ---------- 21. Welcome / bare screens & registration wizard ---------- */
 function setBare(html){document.body.dataset.mode='bare';$('#bare').innerHTML=html;window.scrollTo(0,0)}
 function welcomeScreen(){
-  setBare(`<div class="welcome"><div class="w-left"><a class="brand" href="#/welcome" onclick="return false">${LOGO}<div><b>CHAMA DIGITAL</b><span>Pilot build · Nairobi, KE</span></div></a>
+  setBare(`<div class="welcome"><div class="w-left">${photoShow()}<a class="brand" href="#/welcome" onclick="return false">${LOGO}<div><b>CHAMA DIGITAL</b><span>Pilot build · Nairobi, KE</span></div></a>
    <h1>Your Chama.<br>Your records.<br>Your future.</h1><p class="pos">Transparent · Accountable · Digital</p>
    <p class="lead">A digital record-keeping system built for Kenyan Chamas: contributions, savings, internal loans and member records, all in one place · replacing the exercise book.</p>
    <div class="chips no-print"><a class="btn btn-primary" href="#/register">${icon('plus')}Register a Chama</a><a class="btn btn-secondary" href="#/demo">${icon('eye')}See a demo Chama</a></div>
-   <p class="tiny" style="opacity:.75;margin-top:8px">Prototype for demonstration. No real accounts, payments or verification.</p></div>
+   <p class="tiny" style="opacity:.75;margin-top:8px">Prototype for demonstration. No real accounts, payments or verification.</p>${photoCaption()}</div>
    <div class="w-right"><h2>What Chama Digital keeps a record of</h2><ul class="flow">
     <li><span class="tile-ic">${icon('deposit')}</span><div><b>Contributions</b><span>Who paid, how much, and when · for every round.</span></div></li>
     <li><span class="tile-ic">${icon('coins')}</span><div><b>Savings</b><span>What each member has saved with the Chama over time.</span></div></li>
@@ -1866,7 +1903,7 @@ function welcomeScreen(){
    <p class="muted small">Chama Digital does not hold money, lend money, or connect to banks, M-Pesa or credit bureaus. It is a record-keeping tool your officials control.</p></div></div>`);
 }
 function demoScreen(){
-  setBare(`<div class="wiz" style="max-width:640px;padding-top:70px"><div class="wiz-card" style="text-align:center">
+  setBare(`<div class="wiz" style="max-width:640px;padding-top:40px">${photoBanner('Mara Enterprise Women Group','Human Practice Foundation (HPF) Micro Enterprise Program · Olemoncho, Mbitin and Nterere',PHOTOS,'small')}<div class="wiz-card" style="text-align:center">
    <div style="width:52px;height:52px;margin:0 auto 14px">${LOGO}</div><h1>See Chama Digital in action</h1>
    <p class="muted" style="margin:10px 0 16px">Explore <b>Mara Enterprise Women Group</b>, part of the <b>Human Practice Foundation (HPF) Micro Enterprise Program</b>, with its three community groups (Olemoncho, Mbitin and Nterere schools), their VSLAs, sample members and a year of sample records: meetings and attendance, Social Fund and School Feeding contributions, savings, welfare payouts, loan applications, repayments and the cash book. Switch roles at the top of the screen to see what each role may see.</p>
    <label class="checkrow" style="text-align:left;max-width:440px;margin:0 auto 18px"><input type="checkbox" id="demo-illus"><span>Fill the group rules with <b>illustrative test values</b> (contribution rates, savings min/max, fines, interest, loan limits) so every workflow can be tried. These are <b>not</b> Mara's confirmed rules and are labelled "Test value" everywhere. Leave unticked to see every unconfirmed rule as "Pending confirmation".</span></label>
@@ -2194,6 +2231,7 @@ function meetingsView(){
   }
   return `${pageHeader({title:own?'Meetings & my attendance':'Meetings & attendance register',desc:'Who attended each meeting of this group. Absence without apology creates an absenteeism fine automatically, using the group\'s own fine rule.',actions:can('manageMeetings')?btn('sched-meeting','Schedule meeting',{ic:'plus'}):''})}
   ${!can('manageMeetings')&&!own?notice('Taking attendance is done by the Secretary. Fine payments are recorded by the Treasurer.',{ic:'lock'}):''}
+  ${photoBanner('Where the records begin','Attendance, contributions and fines are recorded at every meeting.',[PHOTOS[0],PHOTOS[1]],'small')}
   <div class="card" style="padding:12px 16px;margin-bottom:16px">${attLegend()}</div>
   <div class="stats">${statCard({label:'Last meeting',value:ls?ls.pct+'%':'-',sub:ls?`${fmtDate(last.date)} · ✓ ${ls.present} Ⓔ ${ls.apology} X ${ls.absent} of ${ls.total}`:'No meeting held yet',ic:'calendar'})}${statCard({label:own?'My fines generated':'Absenteeism fines generated',value:ksh(ft.generated),sub:`${plural(ft.count,'fine')}${ft.pending?` · ${ft.pending} fine amount not set yet`:''}`,ic:'flag',tone:'amber'})}${statCard({label:'Fines collected',value:ksh(ft.collected),sub:'Recorded payments',ic:'check'})}${statCard({label:'Fines outstanding',value:ksh(ft.outstanding),sub:'Carried forward until paid or waived',ic:'alert',tone:'maroon'})}</div>
   ${tabs('meetings',items,tab)}<div role="tabpanel" aria-labelledby="tab-meetings-${tab}">${body}</div>`;
@@ -3248,6 +3286,7 @@ function actV7(name,el){
     case 'att-all':{const f=el.closest('form');$$('.att-row',f).filter(r=>!$('input[type=hidden]',r).value).forEach(r=>setAttendance($('button.present',r)));break}
     case 'fine-pay':openFinePay(id);break;
     case 'dash-range':UI.f.dashRange=+el.dataset.n;route();break;
+    case 'photo-pause':PHOTO.paused=!PHOTO.paused;document.querySelectorAll('[data-act="photo-pause"]').forEach(b=>{b.setAttribute('aria-pressed',String(PHOTO.paused));b.textContent=PHOTO.paused?'Play photos':'Pause photos'});break;
     case 'import-members':openImport({groupId:UI.group});break;
     case 'add-group':openImport({newGroup:true});break;
     case 'imp-template':downloadTemplate();break;
@@ -3647,6 +3686,7 @@ function orgDashboard(){
   const unassigned=S.members.filter(m=>G.some(g=>g.groupId===m.groupId)&&m.status==='Active'&&!vslaById(m.vslaId)).length;
   return `${pageHeader({title:S.chama.name,crumbs:progLabel()?esc(progFull()):'',desc:`All ${G.length} community groups and their ${V.length} VSLAs on one page, <span id="live-stamp">${liveLabel()}</span>. Each community group keeps the same colour on every chart.`})}
   ${dashTabs('org')}
+  ${photoBanner('Our community groups at work',`${G.map(g=>g.groupName).join(', ')} · ${progLabel()||'Micro Enterprise Program'}`)}
   <div class="stats">${statCard({label:'Members',value:num(sum(per,p=>p.members)),sub:`${G.length} community groups · ${V.length} VSLAs${unassigned?` · ${unassigned} not in a VSLA yet`:''}`,ic:'users',cls:'span-2'})}${statCard({label:'Total savings',value:ksh(sum(per,p=>p.savings)),sub:'All groups',ic:'coins'})}${statCard({label:'Cash balance',value:ksh(sum(per,p=>p.cash)),sub:'Sum of the groups\' cash books',ic:'cash'})}${statCard({label:'Loans outstanding',value:ksh(sum(per,p=>p.loans)),sub:`${sum(per,p=>p.overdue)} overdue`,ic:'loan',tone:'maroon'})}${statCard({label:'Social Fund / Welfare',value:ksh(sum(per,p=>p.welfare)),sub:'All groups',ic:'heart'})}${statCard({label:'School Feeding Programme',value:ksh(sum(per,p=>p.sfp.balance)),sub:`${num(sum(per,p=>p.sfp.meals))} meals recorded`,ic:'building'})}</div>
   <div class="dash-sec"><h2 class="sec-h">Community groups compared</h2>${dashFilterRow()}</div>
   <div class="card" style="padding:12px 16px;margin-bottom:16px">${legend}<p class="muted small" style="margin:0">${gs.map(x=>`<b>${esc(x.name)}</b>${x.g.school?` (${esc(x.g.school)} school)`:''}`).join(' · ')}</p></div>

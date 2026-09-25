@@ -13,6 +13,7 @@ Built for **Mara Enterprise Women Group**, part of the **Human Practice Foundati
 | `chama-digital-v0.8-mara.html` | Previous build (v0.8) |
 | `chama-digital-v0.7-mara.html` | Previous build (v0.7) |
 | `chama-digital-v0.6-fixed.html` | Original prototype (v0.6) |
+| `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
 ## New in v0.9
@@ -22,6 +23,8 @@ Built for **Mara Enterprise Women Group**, part of the **Human Practice Foundati
   and updated; nothing is deleted; problems are listed before anything is saved; every change is in the audit trail.
 - **Live data**: with Supabase connected, every open screen picks up changes from other devices every 15 seconds
   (and immediately when a tab is reopened). Without Supabase, changes appear across tabs of the same browser.
+- **Programme photos**: a slideshow behind the landing page (with a pause button) and photo banners on the demo screen,
+  the all-groups dashboard and the Meetings page. Keep `assets/photos/` next to `index.html`.
 - Sample data now has **15 VSLAs** (5 per community group, names pending) and 15 members per community group.
 
 ## New in v0.8

@@ -1,6 +1,6 @@
--- Chama Digital v0.7 · Supabase schema
+-- Chama Digital v0.8 · Supabase schema
 -- Run in Supabase → SQL Editor. One table per entity; the full record is kept in "data" (jsonb)
--- plus indexed columns for querying.
+-- plus indexed columns for querying. Structure: chama → community group (groups) → VSLA (vslas) → members.
 -- WARNING: the PROTOTYPE POLICIES below let anyone holding the anon key read, change or delete EVERY Chama's records
 -- in this project. Use sample data only, and replace them before storing real member data.
 
@@ -39,6 +39,24 @@ create index if not exists groups_member_idx on public.groups (chama_id, member_
 alter table public.groups enable row level security;
 drop policy if exists "prototype anon access" on public.groups;
 create policy "prototype anon access" on public.groups for all to anon using (true) with check (true);
+
+create table if not exists public.vslas (
+  chama_id text not null,
+  id text not null,
+  group_id text,
+  member_id text,
+  record_date date,
+  amount numeric,
+  status text,
+  data jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (chama_id, id)
+);
+create index if not exists vslas_group_idx on public.vslas (chama_id, group_id);
+create index if not exists vslas_member_idx on public.vslas (chama_id, member_id);
+alter table public.vslas enable row level security;
+drop policy if exists "prototype anon access" on public.vslas;
+create policy "prototype anon access" on public.vslas for all to anon using (true) with check (true);
 
 create table if not exists public.group_rules (
   chama_id text not null,
@@ -201,6 +219,42 @@ create index if not exists cashbook_entries_member_idx on public.cashbook_entrie
 alter table public.cashbook_entries enable row level security;
 drop policy if exists "prototype anon access" on public.cashbook_entries;
 create policy "prototype anon access" on public.cashbook_entries for all to anon using (true) with check (true);
+
+create table if not exists public.sfp_spending (
+  chama_id text not null,
+  id text not null,
+  group_id text,
+  member_id text,
+  record_date date,
+  amount numeric,
+  status text,
+  data jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (chama_id, id)
+);
+create index if not exists sfp_spending_group_idx on public.sfp_spending (chama_id, group_id);
+create index if not exists sfp_spending_member_idx on public.sfp_spending (chama_id, member_id);
+alter table public.sfp_spending enable row level security;
+drop policy if exists "prototype anon access" on public.sfp_spending;
+create policy "prototype anon access" on public.sfp_spending for all to anon using (true) with check (true);
+
+create table if not exists public.contribution_submissions (
+  chama_id text not null,
+  id text not null,
+  group_id text,
+  member_id text,
+  record_date date,
+  amount numeric,
+  status text,
+  data jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (chama_id, id)
+);
+create index if not exists contribution_submissions_group_idx on public.contribution_submissions (chama_id, group_id);
+create index if not exists contribution_submissions_member_idx on public.contribution_submissions (chama_id, member_id);
+alter table public.contribution_submissions enable row level security;
+drop policy if exists "prototype anon access" on public.contribution_submissions;
+create policy "prototype anon access" on public.contribution_submissions for all to anon using (true) with check (true);
 
 create table if not exists public.sms_outbox (
   chama_id text not null,

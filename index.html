@@ -366,7 +366,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:.875rem}
 /* ===== v0.7 Mara Enterprise additions ===== */
 [hidden]{display:none!important}
 .tracker{display:flex;list-style:none;margin:6px 0 0;padding:0;overflow-x:auto}
-.tracker li{flex:1 1 0;min-width:84px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;padding:0 4px}
+.tracker li{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;padding:0 4px}
 .tracker li:not(:first-child)::before{content:"";position:absolute;top:13px;right:50%;width:100%;height:3px;background:#e2ddd3;z-index:0}
 .tracker li.t-done:not(:first-child)::before,.tracker li.t-now:not(:first-child)::before,.tracker li.t-bad:not(:first-child)::before{background:#1baf7a}
 .tracker .t-dot{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:#fff;border:2px solid #cfc8bb;color:#6b6356}
@@ -374,7 +374,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:.875rem}
 .tracker .t-now .t-dot{border-color:#2a78d6;color:#2a78d6;box-shadow:0 0 0 4px rgba(42,120,214,.15)}
 .tracker .t-bad .t-dot{background:#c4453a;border-color:#c4453a;color:#fff}
 .tracker .t-skip{opacity:.45}
-.tracker .t-l{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:12.5px;line-height:1.25}
+.tracker .t-l{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:11.5px;line-height:1.25;overflow-wrap:anywhere}
 .elig-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:8px}
 .elig-ok{background:#e6f6ef}.elig-warn{background:#fdf3dc}.elig-bad{background:#fbe7e4}
 .elig-count{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:6px}
@@ -4777,7 +4777,7 @@ function removeMeetingDoc(mid,did){
   confirmDialog({title:'Remove this document?',text:`${esc(d.name)} will be removed from the meeting of ${fmtDate(m.date)}. The audit trail keeps a record that it was uploaded and removed.`,confirmLabel:'Remove',tone:'btn-maroon',onConfirm:()=>{
     m.documents=m.documents.filter(x=>x.id!==did);m.updatedAt=nowStamp();
     logAudit({action:'Meeting document removed',target:m.id,detail:`${d.kind}: ${d.name} · meeting of ${fmtDate(m.date)}`,kind:'meeting',groupId:m.groupId,prev:d.name});
-    saveState();closeOverlay();const box=document.querySelector(`[data-mtgdocs="${m.id}"]`);if(box)box.outerHTML=meetingDocsCard(m);toast('Document removed.')}});
+    saveState();const box=document.querySelector(`[data-mtgdocs="${m.id}"]`);if(box)box.outerHTML=meetingDocsCard(m);toast('Document removed.')}});
 }
 
 /* ---------- dispatch ---------- */

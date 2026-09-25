@@ -27,19 +27,21 @@ Changes requested from the client's field notes.
 - **Qualification results** are shown with a plain-language heading (Qualifies / Needs review / Does not qualify yet)
   and a met / needs review / not met count, alongside the full reasons list.
   A **loan application tracker** (Submitted → Guarantors → Qualification → Decision → Disbursed → Repaying) appears
-  on the application, on the member's own Loan Applications page and on the member dashboard.
+  on the application and on the member's own Loan Applications page.
 - **Savings statements** can now be run over the last 12 months, 5 years or 10 years (running balance plus a
   year-by-year total), alongside the existing report ranges.
 - **Reminders** (Communications → Reminders): send-now buttons for late loan repayments, unpaid fines and the next
   meeting (with its agenda and venue), plus an in-app notice and an improved SMS when a loan is approved. Each group
-  can turn on an automatic daily run (default off); repeat messages are skipped for members reminded recently.
-  **Every reminder can be sent in English, Kiswahili or Maa (Maasai)** — a member chooses their own language, an
+  has an automatic daily run (on by default, can be turned off); repeat messages are skipped for members reminded
+  in the last 7 days (adjustable). Guarantors also get a request message when they are named.
+  **Every reminder can be sent in English, Kiswahili or Maa (Maasai)**: a member chooses their own language, an
   official can set a group default, and the Maa wording is marked as a draft for a Maa-speaking official to check
   and correct (edits are logged in the audit trail).
 - The **Secretary can record a meeting that has already taken place**: choose "Already took place", pick the past
   date, and the register opens immediately (no meeting-reminder SMS is sent for a meeting that is already over).
   **Meeting documents** (a photo of the paper register, minutes or a receipt, or a PDF) can be attached to any
-  meeting; images are compressed automatically, and every upload is in the audit trail.
+  meeting; images are compressed automatically, PDFs are limited to 1.5 MB, a meeting holds up to 6 documents,
+  and every upload or removal is in the audit trail.
 
 ## New in v0.9.1
 - Renamed to **HPF Micro Enterprise Program**.

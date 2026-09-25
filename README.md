@@ -1,7 +1,7 @@
 # CHAMA DIGITAL
 
 Front-end HTML prototype of Chama Digital: digital record-keeping for Kenyan Chamas.
-Built for **Mara Enterprise Women Group**: three community groups at three schools
+Built for **Mara Enterprise Women Group**, part of the **Human Practice Foundation (HPF) Micro Enterprise Program**: three community groups at three schools
 (**Olemoncho, Mbitin and Nterere**), each made up of several VSLAs (Village Savings and Loans Associations).
 
 **Live prototype:** https://georgetipango88-dev.github.io/CHAMA-DIGITAL/

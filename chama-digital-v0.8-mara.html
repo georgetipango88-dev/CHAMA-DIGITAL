@@ -504,7 +504,8 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
    • supabase · optional. Project URL + anon/publishable key of YOUR Supabase project.
      You can also enter these in Settings → Database. See supabase-schema.sql. */
 const CLIENT_DATA={
-  organization:{chamaId:'CHAMA-MARA-001',name:'Mara Enterprise Women Group',location:null},
+  organization:{chamaId:'CHAMA-MARA-001',name:'Mara Enterprise Women Group',location:null,
+    program:{programId:'HPF-MEP',name:'Micro Enterprise Program',partner:'Human Practice Foundation',partnerShort:'HPF'}},
   /* Community groups, one per school (confirmed by the client). Each contains several VSLAs.
      vslas: list the confirmed VSLA names, e.g. ['Enkaji VSLA','Osotua VSLA']; empty = sample VSLAs marked "name pending".
      members[].vsla: the VSLA name the member belongs to. */
@@ -678,7 +679,7 @@ function seedDemo(opts={}){
   const t=todayISO(),curKey=monthKey(t),todayDay=parseISO(t).getDate();
   const startKey=keyAdd(curKey,-11),DUE=10;
   const chamaId=CLIENT_DATA.organization.chamaId;
-  const groups=CLIENT_DATA.groups.map((g,i)=>({groupId:g.groupId,code:g.code,chamaId,groupName:g.name||`Group ${i+1} (Name Pending)`,namePending:!g.name,school:g.school||null,status:'Active',createdAt:startKey+'-01T09:00'}));
+  const groups=CLIENT_DATA.groups.map((g,i)=>({groupId:g.groupId,code:g.code,chamaId,programId:CLIENT_DATA.organization.program.programId,groupName:g.name||`Group ${i+1} (Name Pending)`,namePending:!g.name,school:g.school||null,status:'Active',createdAt:startKey+'-01T09:00'}));
   const vslas=[];groups.forEach((g,gi)=>{const cfg=CLIENT_DATA.groups[gi]||{};const names=cfg.vslas&&cfg.vslas.length?cfg.vslas.map(n=>({n,p:false})):Array.from({length:[3,2,2][gi]||2},(_,j)=>({n:`${g.groupName} VSLA ${j+1}`,p:true}));names.forEach(x=>vslas.push({vslaId:'VSLA-'+String(vslas.length+1).padStart(3,'0'),chamaId,groupId:g.groupId,name:x.n,namePending:x.p,status:'Active',createdAt:startKey+'-01T09:30'}))});
   const rules={};groups.forEach((g,i)=>{rules[g.groupId]=opts.illustrative?illustrativeRules(g.groupId,i):defaultRules(g.groupId);if(g.school)rules[g.groupId].schoolFeeding.schools=[g.school]});
   const members=[];
@@ -878,7 +879,7 @@ function seedDemo(opts={}){
 
   return{
     demo:true,schema:'v0.7',
-    chama:{chamaId,organizationId:chamaId,tenantKey:chamaId,name:CLIENT_DATA.organization.name,type:'Women enterprise group · 3 community groups with VSLAs',location:CLIENT_DATA.organization.location||'',formed:startKey+'-01',meetingPlace:'',meetingRule:'Set per group in Group Rules',registration:'',
+    chama:{chamaId,organizationId:chamaId,program:{...CLIENT_DATA.organization.program},tenantKey:chamaId,name:CLIENT_DATA.organization.name,type:'Women enterprise group · 3 community groups with VSLAs',location:CLIENT_DATA.organization.location||'',formed:startKey+'-01',meetingPlace:'',meetingRule:'Set per group in Group Rules',registration:'',
       contribution:{amount:null,dueDay:null},loanRules:{enabled:true,interestPct:null,limitMultiple:null,maxMonths:null}},
     groups,vslas,rules,members,ledger,meetings,fines,welfare,loanApps,cashbook,sfpSpend,submissions,sms:[],audit,
     actors:{Chairperson:CHAIR,Treasurer:TREAS,Secretary:SEC,Member:MEMBER1,'Platform Owner/Admin':CHAIR},
@@ -914,7 +915,9 @@ function logAudit({action,target,detail,kind,memberId='',status='Completed',reas
 /* ---------- v0.7 data normalisation, groups & access scope ---------- */
 function ensureV07Data(){
   if(!S)return;
-  S.chama.chamaId=S.chama.chamaId||'CHAMA-LOCAL-001';S.chama.organizationId=S.chama.chamaId;S.chama.tenantKey=S.chama.chamaId;
+  S.chama.chamaId=S.chama.chamaId||'CHAMA-LOCAL-001';
+  if(!S.chama.program&&S.chama.chamaId===CLIENT_DATA.organization.chamaId)S.chama.program={...CLIENT_DATA.organization.program};
+  if(S.chama.program&&S.groups)S.groups.forEach(g=>{g.programId=g.programId||S.chama.program.programId});S.chama.organizationId=S.chama.chamaId;S.chama.tenantKey=S.chama.chamaId;
   if(!S.groups||!S.groups.length){
     const gid='GRP-01';
     S.groups=[{groupId:gid,code:'G1',chamaId:S.chama.chamaId,groupName:(S.chama.name||'Chama')+' (main group)',namePending:false,status:'Active',createdAt:nowStamp()}];
@@ -953,6 +956,9 @@ function ensureV07Data(){
   recomputeActors();syncGroup();
 }
 const isPlatformOwner=()=>UI.role==='Platform Owner/Admin';
+const progLabel=()=>{const p=S&&S.chama.program;return p?`${p.partnerShort} ${p.name}`:''};
+const progFull=()=>{const p=S&&S.chama.program;return p?`${p.partner} (${p.partnerShort}) ${p.name}`:''};
+const orgCrumb=()=>esc(S.chama.name)+(progLabel()?' · '+esc(progLabel()):'');
 function allowedGroups(){
   if(!S||!S.groups)return[];
   if(isPlatformOwner())return S.groups;
@@ -1238,7 +1244,7 @@ function renderNav(){
   const flat=groups.flatMap(g=>g.items);const ids=preferred.filter(id=>flat.some(x=>x.id===id));
   $('#bottomnav').innerHTML=ids.map(id=>{const it=flat.find(x=>x.id===id);return `<a href="#/${id}" ${currentPage===id?'aria-current="page"':''}>${icon(it.icon)}<span>${esc(it.short||navLabel(it))}</span></a>`}).join('')+`<button type="button" data-act="more-nav">${icon('more')}<span>More</span></button>`;
   $('#chip-name').textContent=S.chama.name;
-  $('#chip-sub').textContent=`${S.groups.length} community groups · ${(S.vslas||[]).length} VSLAs · ${S.members.filter(m=>m.chamaId===S.chama.chamaId).length} members`;
+  $('#chip-sub').textContent=(progLabel()?progLabel()+' · ':'')+`${S.groups.length} community groups · ${(S.vslas||[]).length} VSLAs · ${S.members.filter(m=>m.chamaId===S.chama.chamaId).length} members`;
   const gs=$('#group-select');if(gs){const ag=allowedGroups();gs.innerHTML=ag.map(g=>`<option value="${g.groupId}" ${g.groupId===UI.group?'selected':''}>${esc(g.groupName)}</option>`).join('');gs.disabled=ag.length<2;gs.title=ag.length<2?'Your role can only see this group':'Switch group'}
   const sel=$('#role-select');
   sel.innerHTML=ROLES.map(r=>{const p=byId(S.actors[r]);return `<option value="${r}" ${r===UI.role?'selected':''}>${r}${p?' · '+esc(firstName(p.name)):''}</option>`}).join('');
@@ -1308,7 +1314,7 @@ function dashOfficial(){
   const openLoans=T.loans.filter(l=>l.status!=='Repaid').sort((a,b)=>(a.status==='Overdue'?0:1)-(b.status==='Overdue'?0:1));
   const acts6=visibleAudit().slice().sort((a,b)=>a.ts<b.ts?1:-1).slice(0,6);
   const empty=GL().length===0;
-  return `${pageHeader({title:curGroup().groupName,crumbs:esc(S.chama.name),desc:`What is happening in this community group${curGroup().school?` (${esc(curGroup().school)} school)`:''} and its ${plural(vslasOf(UI.group).length,'VSLA')}, as of ${fmtDate(todayISO())}. All figures are calculated from the records your officials have entered.`,actions:acts})}
+  return `${pageHeader({title:curGroup().groupName,crumbs:orgCrumb(),desc:`What is happening in this community group${curGroup().school?` (${esc(curGroup().school)} school)`:''} and its ${plural(vslasOf(UI.group).length,'VSLA')}, as of ${fmtDate(todayISO())}. All figures are calculated from the records your officials have entered.`,actions:acts})}
   ${dashTabs('group')}
   ${rulesBanner()}
   ${more?`<div class="chips no-print" style="margin:-8px 0 18px">${more}</div>`:''}
@@ -1715,7 +1721,7 @@ function buildReport(r){
 }
 function reportPaper(R,r){
   const ref='RPT-'+todayISO().replace(/-/g,'')+'-'+String(hash(R.title+R.from+R.to+(r.memberId||''))%900+100);
-  return `<article class="paper" aria-label="${esc(R.title)} preview"><div class="p-head"><div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px">${LOGO}</div><div><div class="small muted">${esc(S.chama.name)} · ${esc(curGroup().groupName)}</div><h2>${esc(R.title)}</h2>${R.subject?`<div><b>${esc(R.subject)}</b></div>`:''}</div></div>
+  return `<article class="paper" aria-label="${esc(R.title)} preview"><div class="p-head"><div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px">${LOGO}</div><div><div class="small muted">${esc(S.chama.name)} · ${esc(curGroup().groupName)}${progLabel()?' · '+esc(progLabel()):''}</div><h2>${esc(R.title)}</h2>${R.subject?`<div><b>${esc(R.subject)}</b></div>`:''}</div></div>
    <div class="p-meta">Period: ${fmtDate(R.from)} to ${fmtDate(R.to)}<br>Generated ${fmtDate(todayISO())} by ${esc(me().name)}<br>Reference ${ref}</div></div>
    ${R.note?`<p class="small muted" style="margin-bottom:8px">${esc(R.note)}</p>`:''}${R.sections}
    <div class="foot"><b>How to read this document.</b> It is prepared from records entered by Chama officials in Chama Digital. Corrected and reversed entries are left out; they remain in the audit trail. Chama Digital does not hold the Chama's money and this is not a bank statement or credit report.${S.demo?'<br><b>Demonstration data:</b> the people and amounts shown are fictional.':''}<br>YOUR CHAMA. YOUR RECORDS. YOUR FUTURE.</div></article>`;
@@ -1862,7 +1868,7 @@ function welcomeScreen(){
 function demoScreen(){
   setBare(`<div class="wiz" style="max-width:640px;padding-top:70px"><div class="wiz-card" style="text-align:center">
    <div style="width:52px;height:52px;margin:0 auto 14px">${LOGO}</div><h1>See Chama Digital in action</h1>
-   <p class="muted" style="margin:10px 0 16px">Explore <b>Mara Enterprise Women Group</b> with its three community groups (Olemoncho, Mbitin and Nterere schools), their VSLAs, sample members and a year of sample records: meetings and attendance, Social Fund and School Feeding contributions, savings, welfare payouts, loan applications, repayments and the cash book. Switch roles at the top of the screen to see what each role may see.</p>
+   <p class="muted" style="margin:10px 0 16px">Explore <b>Mara Enterprise Women Group</b>, part of the <b>Human Practice Foundation (HPF) Micro Enterprise Program</b>, with its three community groups (Olemoncho, Mbitin and Nterere schools), their VSLAs, sample members and a year of sample records: meetings and attendance, Social Fund and School Feeding contributions, savings, welfare payouts, loan applications, repayments and the cash book. Switch roles at the top of the screen to see what each role may see.</p>
    <label class="checkrow" style="text-align:left;max-width:440px;margin:0 auto 18px"><input type="checkbox" id="demo-illus"><span>Fill the group rules with <b>illustrative test values</b> (contribution rates, savings min/max, fines, interest, loan limits) so every workflow can be tried. These are <b>not</b> Mara's confirmed rules and are labelled "Test value" everywhere. Leave unticked to see every unconfirmed rule as "Pending confirmation".</span></label>
    <div class="fld" style="max-width:280px;margin:0 auto 18px;text-align:left">${field({label:'Enter viewing as',name:'demoRole',opts:ROLES,value:'Treasurer'})}</div>
    <button type="button" class="btn btn-primary" style="width:100%" data-act="enter-demo">${icon('right')}Enter demo dashboard</button>
@@ -3044,7 +3050,7 @@ function loadIllustrative(){
 }
 function groupsSettings(){
   const ed=can('editChama');
-  return `<div class="grid-eq">${card({title:'Organization',body:`<dl class="kv"><dt>Name</dt><dd>${esc(S.chama.name)}</dd><dt>Chama ID</dt><dd class="num">${esc(S.chama.chamaId)}</dd><dt>Location</dt><dd>${S.chama.location?esc(S.chama.location):PEND}</dd><dt>Community groups</dt><dd>${S.groups.map(g=>esc(g.groupName)).join(', ')}</dd><dt>VSLAs</dt><dd>${(S.vslas||[]).length}</dd><dt>Members (all groups)</dt><dd>${S.members.filter(m=>m.chamaId===S.chama.chamaId).length}</dd></dl>`})}
+  return `<div class="grid-eq">${card({title:'Organization',body:`<dl class="kv"><dt>Name</dt><dd>${esc(S.chama.name)}</dd>${S.chama.program?`<dt>Program</dt><dd>${esc(progFull())}</dd>`:''}<dt>Chama ID</dt><dd class="num">${esc(S.chama.chamaId)}</dd><dt>Location</dt><dd>${S.chama.location?esc(S.chama.location):PEND}</dd><dt>Community groups</dt><dd>${S.groups.map(g=>esc(g.groupName)).join(', ')}</dd><dt>VSLAs</dt><dd>${(S.vslas||[]).length}</dd><dt>Members (all groups)</dt><dd>${S.members.filter(m=>m.chamaId===S.chama.chamaId).length}</dd></dl>`})}
   ${card({title:'How records are kept apart',body:'<ul class="small stack" style="list-style:disc;padding-left:18px"><li>Every record carries a <b>chamaId</b> and a <b>groupId</b>; screens only show the selected group.</li><li>Officials can be limited to one group in Users & roles.</li><li>Members see only their own records plus what their group shares.</li><li>In production this must be enforced by the server (see Database).</li></ul>'})}</div>
   ${card({flush:true,title:'Community groups',sub:'One community group per school',body:table({caption:'Community groups',cols:[{label:'Community group',render:g=>`<span class="who"><i class="gdot" style="background:${groupColor(g.groupId)}"></i><span><b>${esc(g.groupName)}</b> ${g.namePending?'<span class="pend">Name pending</span>':''}<span>${g.school?esc(g.school)+' school · ':''}${esc(g.groupId)} · member numbers ${esc(g.code)}-###</span></span></span>`},{label:'VSLAs',cls:'r',render:g=>vslasOf(g.groupId).length},{label:'Members',cls:'r',render:g=>S.members.filter(m=>m.groupId===g.groupId).length},{label:'Assisted / offline',cls:'r',render:g=>S.members.filter(m=>m.groupId===g.groupId&&m.accessMode==='Assisted / Offline').length},{label:'Rules',render:g=>{const n=pendingRuleCount(g.groupId);return rules(g.groupId).source==='illustrative'?pill('info','Test values'):n?pill('warn',`${n} pending`):pill('ok','Set','check')}},{label:'',nolabel:true,cls:'r',render:g=>ed?`<button type="button" class="btn btn-secondary btn-sm" data-act="edit-group" data-id="${g.groupId}">Rename</button>`:''}],rows:S.groups})})}
   <div style="height:16px"></div>${vslaSettingsCard()}
@@ -3193,7 +3199,7 @@ function printReceipt(kind,id){
   else if(kind==='welfare'){const w=S.welfare.find(x=>x.id===id);if(!w)return;mid=w.memberId;title='Welfare payout voucher';rows=[['Payout',w.id],['Date',fmtDate(w.date)],['Beneficiary',w.beneficiary],['Reason',w.category],['Details',w.details],['Voucher / reference',w.ref||'-'],['Amount given',ksh(w.amount)],['Approved by',mName(w.approvedBy)]]}
   if(!canSeeMember(mid)){toast('You can only print receipts for records you are allowed to see.','error');return}
   const m=byId(mid);
-  const ok=printDoc(title,`<h1>${esc(title)}</h1><div class="m">${esc(S.chama.name)} · ${esc(groupName(m.groupId))}</div><div class="box"><table><tr><td>Member</td><td>${esc(m.name)} (${esc(m.id)})</td></tr><tr><td>Access type</td><td>${esc(m.accessMode)}</td></tr>${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table></div><div class="m" style="margin-top:10px">Printed ${fmtDT(nowStamp())} by ${esc(me().name)} (${esc(UI.role)})</div><div class="sig"><div>Received by (member)</div><div>Official</div></div>`);
+  const ok=printDoc(title,`<h1>${esc(title)}</h1><div class="m">${esc(S.chama.name)} · ${esc(groupName(m.groupId))}${progLabel()?' · '+esc(progLabel()):''}</div><div class="box"><table><tr><td>Member</td><td>${esc(m.name)} (${esc(m.id)})</td></tr><tr><td>Access type</td><td>${esc(m.accessMode)}</td></tr>${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table></div><div class="m" style="margin-top:10px">Printed ${fmtDT(nowStamp())} by ${esc(me().name)} (${esc(UI.role)})</div><div class="sig"><div>Received by (member)</div><div>Official</div></div>`);
   if(ok){logAudit({action:'Receipt printed',target:no,detail:`${title} for ${m.name}`,kind:'statement',memberId:m.id});saveState()}
 }
 
@@ -3455,7 +3461,7 @@ function dashSecretary(){
   const kyc=['Verified','Under Review','Submitted','Needs Correction','Not Started'].map(s=>({label:s,value:people.filter(p=>p.kycStatus===s).length,series:'Members'}));
   const ls=last6.length?meetingStats(last6[last6.length-1]):null;
   const quick=[['sched-meeting','Schedule meeting','calendar','manageMeetings'],['add-member','Add member','userplus','manageMembers']].filter(q=>can(q[3]));
-  return `${pageHeader({title:curGroup().groupName,crumbs:esc(S.chama.name),desc:`Group lead view for the Secretary: meetings, attendance and members. Financial details are kept for the Treasurer and Chairperson.`,actions:quick.map((q,i)=>btn(q[0],q[1],{ic:q[2],cls:i?'btn-secondary':'btn-primary'})).join('')})}
+  return `${pageHeader({title:curGroup().groupName,crumbs:orgCrumb(),desc:`Group lead view for the Secretary: meetings, attendance and members. Financial details are kept for the Treasurer and Chairperson.`,actions:quick.map((q,i)=>btn(q[0],q[1],{ic:q[2],cls:i?'btn-secondary':'btn-primary'})).join('')})}
   <div class="stats">${statCard({label:'Active members',value:num(people.length),sub:`${acc[1][1]} assisted / offline`,ic:'users'})}${statCard({label:'Last meeting attendance',value:ls?ls.pct+'%':'-',sub:ls?`✓ ${ls.present} · Ⓔ ${ls.apology} · X ${ls.absent}`:'No meeting held yet',ic:'calendar'})}${statCard({label:'Meetings held',value:num(heldMeetings().length),sub:`${mts.length} in the last ${n} months`,ic:'check'})}${statCard({label:'Next meeting',value:nm?fmtDate(nm.date).replace(/ \d{4}$/,''):'-',sub:nm?`${esc(nm.time)} · ${esc(nm.location)}`:'Not scheduled',ic:'clock'})}</div>
   <div class="dash-sec"><h2 class="sec-h">Group analytics</h2>${dashFilterRow()}</div>
   <div class="grid-eq">
@@ -3629,7 +3635,7 @@ function orgDashboard(){
   const vRow=(s,val)=>({label:s.v.name,group:groupName(s.v.groupId),value:val,color:groupColor(s.v.groupId)});
   const legend=vizLegend(gs.map(x=>({name:x.name,color:x.color})));
   const unassigned=S.members.filter(m=>G.some(g=>g.groupId===m.groupId)&&m.status==='Active'&&!vslaById(m.vslaId)).length;
-  return `${pageHeader({title:S.chama.name,desc:`All ${G.length} community groups and their ${V.length} VSLAs on one page, as of ${fmtDate(todayISO())}. Each community group keeps the same colour on every chart.`})}
+  return `${pageHeader({title:S.chama.name,crumbs:progLabel()?esc(progFull()):'',desc:`All ${G.length} community groups and their ${V.length} VSLAs on one page, as of ${fmtDate(todayISO())}. Each community group keeps the same colour on every chart.`})}
   ${dashTabs('org')}
   <div class="stats">${statCard({label:'Members',value:num(sum(per,p=>p.members)),sub:`${G.length} community groups · ${V.length} VSLAs${unassigned?` · ${unassigned} not in a VSLA yet`:''}`,ic:'users',cls:'span-2'})}${statCard({label:'Total savings',value:ksh(sum(per,p=>p.savings)),sub:'All groups',ic:'coins'})}${statCard({label:'Cash balance',value:ksh(sum(per,p=>p.cash)),sub:'Sum of the groups\' cash books',ic:'cash'})}${statCard({label:'Loans outstanding',value:ksh(sum(per,p=>p.loans)),sub:`${sum(per,p=>p.overdue)} overdue`,ic:'loan',tone:'maroon'})}${statCard({label:'Social Fund / Welfare',value:ksh(sum(per,p=>p.welfare)),sub:'All groups',ic:'heart'})}${statCard({label:'School Feeding Programme',value:ksh(sum(per,p=>p.sfp.balance)),sub:`${num(sum(per,p=>p.sfp.meals))} meals recorded`,ic:'building'})}</div>
   <div class="dash-sec"><h2 class="sec-h">Community groups compared</h2>${dashFilterRow()}</div>

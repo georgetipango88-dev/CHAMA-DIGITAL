@@ -35,12 +35,32 @@ VSLA names and member lists, contribution rates, savings minimum/maximum, absent
 thresholds, late-payment rules, welfare payout rules, school feeding targets and enterprise arrangements.
 They show as "Pending confirmation" until entered. The demo can optionally load clearly labelled test values.
 
-## Supabase (optional)
-1. Create a project at supabase.com.
-2. Run `supabase-schema.sql` in the SQL Editor.
-3. In the app: Settings → Database, paste the Project URL and the anon / publishable key.
+## Database: GitHub → Supabase
+The repo is set up so GitHub creates and updates the Supabase database, and the live website stores its records there.
 
-The included policies are for prototype testing only (anyone with the anon key can read and change the data).
-Add Supabase Auth and proper row-level security before storing real member data.
+| File | Purpose |
+|---|---|
+| `supabase/migrations/20260925120000_chama_digital_schema.sql` | The database tables (16, one per record type) and their access rules |
+| `supabase/config.toml` | Supabase CLI project settings |
+| `.github/workflows/supabase-migrations.yml` | GitHub Action that applies the migrations to your Supabase project |
+| `supabase-config.js` | Connects the live website to your project (empty until you fill it in) |
+| `supabase-schema.sql` | Same schema, for pasting into the Supabase SQL Editor by hand |
+
+**One-time setup (about 10 minutes):**
+1. Create a free project at https://supabase.com and note the database password you choose.
+2. In this GitHub repo: **Settings → Secrets and variables → Actions → New repository secret**, add:
+   - `SUPABASE_ACCESS_TOKEN`: create one at https://supabase.com/dashboard/account/tokens
+   - `SUPABASE_DB_PASSWORD`: the database password from step 1
+   - `SUPABASE_PROJECT_REF`: the `abcd1234` part of your project URL `https://abcd1234.supabase.co`
+3. **Actions → Supabase database migrations → Run workflow.** It creates all tables in your project.
+   (No-code alternative: paste `supabase-schema.sql` into Supabase → SQL Editor and run it.)
+4. Edit `supabase-config.js` on GitHub and fill in `url` (Project URL) and `anonKey` (the anon / publishable key from
+   Supabase → Project Settings → API). **Never** use the service_role / secret key. Commit, and within a minute the live site
+   shows "Synced to Supabase" in the top bar.
+
+Future schema changes go in new files under `supabase/migrations/`; the Action applies them automatically when pushed to `main`.
+
+**Security note:** `supabase-config.js` is public, so the anon key is visible to anyone. The prototype rules let the key read,
+add and update records but not delete them. Use sample data only until Supabase Auth sign-in and per-group rules are added.
 
 All people and amounts in the demo are fictional. There are no payment, SMS/USSD, bank or ID-verification integrations.

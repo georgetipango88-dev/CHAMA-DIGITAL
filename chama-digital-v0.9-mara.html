@@ -365,6 +365,8 @@ table.rt{width:100%;border-collapse:collapse;font-size:.875rem}
 }
 /* ===== v0.7 Mara Enterprise additions ===== */
 [hidden]{display:none!important}
+.pend-btn{border:1px solid #EFD48A;cursor:pointer;font-family:inherit;min-height:28px}.pend-btn:hover{background:#FCE3A4}
+.row-fines{flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap}.row-fines:empty{display:none}
 /* ===== photo slideshow (landing background, banners) ===== */
 .photo-show{position:absolute;inset:0;overflow:hidden;z-index:0;background:var(--teal-900)}
 .photo-show img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.4s ease;transform:scale(1.02)}
@@ -473,19 +475,19 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
 <div class="app">
   <div class="scrim" id="scrim"></div>
   <nav class="sidebar" id="sidebar" aria-label="Main navigation">
-    <a class="brand" href="#/dashboard"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:38px;height:38px"><rect width="40" height="40" rx="11" fill="#0BB6BC"/><g fill="#fff"><circle cx="20" cy="9.5" r="3"/><circle cx="29.1" cy="14.75" r="3"/><circle cx="29.1" cy="25.25" r="3"/><circle cx="20" cy="30.5" r="3"/><circle cx="10.9" cy="25.25" r="3"/><circle cx="10.9" cy="14.75" r="3"/></g><circle cx="20" cy="20" r="4.6" fill="#910F3D" stroke="#fff" stroke-width="1.6"/></svg><div><b>CHAMA DIGITAL</b><span>Your Chama. Your records.</span></div></a>
+    <a class="brand" href="#/welcome" title="Back to the landing page"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:38px;height:38px"><rect width="40" height="40" rx="11" fill="#0BB6BC"/><g fill="#fff"><circle cx="20" cy="9.5" r="3"/><circle cx="29.1" cy="14.75" r="3"/><circle cx="29.1" cy="25.25" r="3"/><circle cx="20" cy="30.5" r="3"/><circle cx="10.9" cy="25.25" r="3"/><circle cx="10.9" cy="14.75" r="3"/></g><circle cx="20" cy="20" r="4.6" fill="#910F3D" stroke="#fff" stroke-width="1.6"/></svg><div><b>CHAMA DIGITAL</b><span>Your Chama. Your records.</span></div></a>
     <div class="chama-chip"><b id="chip-name"></b><span id="chip-sub"></span><div class="group-pick"><label for="group-select">Community group</label><select id="group-select" aria-label="Select group"></select></div></div>
     <div id="nav"></div>
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9 (Mara Enterprise Women Group: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
     <header class="topbar">
       <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-label="Open menu"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <a class="m-brand" href="#/dashboard"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:38px;height:38px"><rect width="40" height="40" rx="11" fill="#0BB6BC"/><g fill="#fff"><circle cx="20" cy="9.5" r="3"/><circle cx="29.1" cy="14.75" r="3"/><circle cx="29.1" cy="25.25" r="3"/><circle cx="20" cy="30.5" r="3"/><circle cx="10.9" cy="25.25" r="3"/><circle cx="10.9" cy="14.75" r="3"/></g><circle cx="20" cy="20" r="4.6" fill="#910F3D" stroke="#fff" stroke-width="1.6"/></svg><span>Chama Digital</span></a>
+      <a class="m-brand" href="#/welcome" title="Back to the landing page"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:38px;height:38px"><rect width="40" height="40" rx="11" fill="#0BB6BC"/><g fill="#fff"><circle cx="20" cy="9.5" r="3"/><circle cx="29.1" cy="14.75" r="3"/><circle cx="29.1" cy="25.25" r="3"/><circle cx="20" cy="30.5" r="3"/><circle cx="10.9" cy="25.25" r="3"/><circle cx="10.9" cy="14.75" r="3"/></g><circle cx="20" cy="20" r="4.6" fill="#910F3D" stroke="#fff" stroke-width="1.6"/></svg><span>Chama Digital</span></a>
       <div class="search" role="search">
         <span class="ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></span>
         <label class="sr-only" for="global-search">Search members and records</label>
@@ -515,7 +517,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
    • All people and amounts are fictional demonstration data.
    • Nothing is sent to a server. Changes live only in this browser tab.
    • No payment, bank, ID-verification or lender integrations exist.
-   • v0.7 adapts the prototype to Mara Enterprise Women Group (3 groups).
+   • v0.7+ adapts the prototype to the HPF Micro Enterprise Program (3 community groups).
    ===================================================================== */
 
 /* ---------- 0. CLIENT CONFIGURATION (edit here when Mara confirms data) ----------
@@ -527,7 +529,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
    • supabase · optional. Project URL + anon/publishable key of YOUR Supabase project.
      You can also enter these in Settings → Database. See supabase-schema.sql. */
 const CLIENT_DATA={
-  organization:{chamaId:'CHAMA-MARA-001',name:'Mara Enterprise Women Group',location:null,
+  organization:{chamaId:'CHAMA-MARA-001',name:'HPF Micro Enterprise Program',location:null,
     program:{programId:'HPF-MEP',name:'Micro Enterprise Program',partner:'Human Practice Foundation',partnerShort:'HPF'}},
   /* Community groups, one per school (confirmed by the client). Each contains several VSLAs.
      vslas: list the confirmed VSLA names, e.g. ['Enkaji VSLA','Osotua VSLA']; empty = sample VSLAs marked "name pending".
@@ -657,7 +659,7 @@ const PERMS={
  manageRoles:{roles:['Platform Owner/Admin','Chairperson'],label:'Change member roles'},
  editChama:{roles:['Platform Owner/Admin','Chairperson'],label:'Edit Chama details and group rules'},
  waive:{roles:['Chairperson'],label:'Waive a fine (with a reason)'},
- approve:{roles:['Chairperson'],label:'Approve or reject loan applications and flagged welfare payouts'},
+ approve:{roles:['Chairperson','Treasurer'],label:'Approve or reject loan applications and flagged welfare payouts (never one you submitted or recorded yourself)'},
  submitContrib:{roles:['Member'],label:'Submit own contribution for Treasurer confirmation'},
  applyLoan:{roles:['Member','Treasurer'],label:'Submit a loan application (members for themselves; Treasurer for assisted members)'},
 };
@@ -711,6 +713,14 @@ const SAMPLE_NAMES={
  'GRP-02':[['Seleyian Tobiko'],['Naipanoi Kaelo'],['Kasaine Nkoitoi'],['Naeku Mpaayei'],['Soila Letoya'],['Nasieku Keriako'],['Semeyian Tipis'],['Namelok Konchella'],['Nkadayo Nkoyo'],['Nairowua Lengete'],['Naishorua Meliyio'],['Enole Kuyo'],['Ntanin Nchoe'],['Kilelu Mpoke'],['Nooseuri Tome']],
  'GRP-03':[['Nashilu Kisemei'],['Naanyu Kamuaro'],['Nairesiae Tunai'],['Nenkai Moinket'],['Talash Parmuat'],['Nalotuesha Sakuda'],['Maiyani Kereto'],['Nanyori Leshan'],['Nasha Kasura'],['Naisiae Nkaiserry'],['Sitoya Lenkoitoi'],['Paita Mpakasi'],['Mairo Seki'],['Nenkoitoi Saruni'],['Nkeri Lesuuda']],
 };
+const SAMPLE_FIRST=['Naserian','Nashipai','Naisula','Nalangu','Namunyak','Sintamei','Nosim','Resiato','Seleyian','Naipanoi','Kasaine','Naeku','Soila','Nasieku','Semeyian','Namelok','Nashilu','Naanyu','Nairesiae','Nenkai','Talash','Nalotuesha','Maiyani','Nanyori','Nemayian','Noonkishu','Silanoi','Nayiani','Seneiyian','Kisaruni','Nalepo','Nkadayo','Nairowua','Naishorua','Enole','Ntanin','Kilelu','Nooseuri','Nasha','Naisiae','Sitoya','Paita','Mairo','Nenkoitoi','Nkeri'];
+const SAMPLE_LAST=['Sankale','Parsimei','Tiampati','Saitoti','Ntimama','Kipeen','Sironka','Lemayian','Tobiko','Kaelo','Nkoitoi','Mpaayei','Letoya','Keriako','Tipis','Konchella','Kisemei','Kamuaro','Tunai','Moinket','Parmuat','Sakuda','Kereto','Leshan','Kores','Nkaissery','Ntutu','Koikai','Nkedianye','Sadera','Kishoyian','Nkoyo','Lengete','Meliyio','Kuyo','Nchoe','Mpoke','Tome','Kasura','Lenkoitoi','Mpakasi','Seki','Saruni','Lesuuda'];
+const SAMPLE_PER_GROUP=70;
+function sampleNames(gid,gi,used){
+  Object.values(SAMPLE_NAMES).forEach(l=>l.forEach(x=>used.add(x[0])));const base=SAMPLE_NAMES[gid].map(x=>[...x]);
+  let j=0;while(base.length<SAMPLE_PER_GROUP&&j<5000){const n=`${SAMPLE_FIRST[(j*7+gi*11)%SAMPLE_FIRST.length]} ${SAMPLE_LAST[(j*13+gi*5+Math.floor(j/SAMPLE_LAST.length))%SAMPLE_LAST.length]}`;if(!used.has(n)){used.add(n);base.push([n])}j++}
+  return base;
+}
 const APOLOGY_REASONS=['Sick','Travelling','Family matter','At work','Attending a funeral'];
 
 function seedDemo(opts={}){
@@ -723,11 +733,11 @@ function seedDemo(opts={}){
   const groups=CLIENT_DATA.groups.map((g,i)=>({groupId:g.groupId,code:g.code,chamaId,programId:CLIENT_DATA.organization.program.programId,groupName:g.name||`Group ${i+1} (Name Pending)`,namePending:!g.name,school:g.school||null,status:'Active',createdAt:startKey+'-01T09:00'}));
   const vslas=[];groups.forEach((g,gi)=>{const cfg=CLIENT_DATA.groups[gi]||{};const names=cfg.vslas&&cfg.vslas.length?cfg.vslas.map(n=>({n,p:false})):Array.from({length:[5,5,5][gi]||5},(_,j)=>({n:`${g.groupName} VSLA ${j+1}`,p:true}));names.forEach(x=>vslas.push({vslaId:'VSLA-'+String(vslas.length+1).padStart(3,'0'),chamaId,groupId:g.groupId,name:x.n,namePending:x.p,status:'Active',createdAt:startKey+'-01T09:30'}))});
   const rules={};groups.forEach((g,i)=>{rules[g.groupId]=opts.illustrative?illustrativeRules(g.groupId,i):defaultRules(g.groupId);if(g.school)rules[g.groupId].schoolFeeding.schools=[g.school]});
-  const members=[];
+  const members=[],usedNames=new Set();
   groups.forEach((g,gi)=>{
     const cfg=CLIENT_DATA.groups[gi]||{};
     const real=cfg.members&&cfg.members.length;
-    const list=real?cfg.members.map(x=>({...x,placeholder:false})):SAMPLE_NAMES[g.groupId].map(([name,role],j)=>({name,role:role||'Member',placeholder:true,off:[0,0,0,1,2,3,5,8,1,2,4,6,7,9,10][j]||0}));
+    const list=real?cfg.members.map(x=>({...x,placeholder:false})):sampleNames(g.groupId,gi,usedNames).map(([name,role],j)=>({name,role:role||'Member',placeholder:true,off:j<15?([0,0,0,1,2,3,5,8,1,2,4,6,7,9,10][j]||0):(j*5)%11}));
     const gv=vslas.filter(v=>v.groupId===g.groupId);
     list.forEach((x,j)=>{
       const id=`${g.code}-${String(j+1).padStart(3,'0')}`;
@@ -901,7 +911,8 @@ function seedDemo(opts={}){
   A(startKey+'-01T10:00',CHAIR,'Chama created',CLIENT_DATA.organization.name,`Organization with ${groups.length} community groups (${groups.map(g=>g.groupName).join(', ')}) created; group rules pending confirmation`,'settings','');
   vslas.forEach(v=>A(v.createdAt,CHAIR,'VSLA registered',v.vslaId,`${v.name} in ${groups.find(g=>g.groupId===v.groupId).groupName}`,'settings','','Completed','',{groupId:v.groupId}));
   members.forEach(m=>A(m.joined+'T11:'+pad(hash(m.id)%50),SEC,'Member registered',m.id,`${m.name} added as ${m.role} (${m.accessMode})`,'member',m.id));
-  ledger.forEach(e=>{
+  groups.forEach(g=>{const L=ledger.filter(e=>e.groupId===g.groupId&&!e.correctionOf);A(startKey+'-01T09:45',TREAS,'Sample records loaded',g.groupName,`${L.filter(e=>e.type==='contribution').length} contributions, ${L.filter(e=>e.type==='saving').length} savings, ${L.filter(e=>e.type==='loan').length} loans, ${L.filter(e=>e.type==='repayment').length} repayments (fictional sample data)`,'record','','Completed','',{groupId:g.groupId})});
+  [].forEach(e=>{
     if(e.correctionOf)return;
     const act={contribution:'Contribution recorded',saving:'Savings recorded',loan:'Loan disbursement recorded',repayment:'Loan repayment recorded'}[e.type];
     A(e.at,e.by,act,e.id,`${ksh(e.amount)} · ${members.find(m=>m.id===e.memberId).name}`,'record',e.memberId);
@@ -935,8 +946,15 @@ const FORMS={}; /* form handlers, keyed by data-form */
 const UI={role:'Treasurer',group:null,tab:{},f:{},report:null,reg:null,focus:null};
 function resetDemo(opts={}){S=seedDemo(opts);ensureV07Data();saveState()}
 const byId=id=>S.members.find(m=>m.id===id);
-const mName=id=>byId(id)?.name||'Unknown member';
-function me(){return byId(S.actors[UI.role])||S.members.find(m=>m.role===UI.role)||S.members[0]}
+const mName=id=>id==='ledger-import'?'Ledger import':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
+function me(){
+  const a=byId(S.actors[UI.role]);
+  if(a&&(a.role===UI.role||UI.role==='Member'||UI.role==='Platform Owner/Admin'&&a.role!=='Member'))return a;
+  const f=S.members.find(m=>m.role===UI.role);if(f)return f;
+  if(UI.role==='Member')return S.members[0];
+  /* no one holds this office yet: act as an unassigned official, never as a real member */
+  return{id:'unassigned-'+UI.role,name:UI.role+' (not assigned)',role:UI.role,groupAccess:'ALL',groupId:(S.groups&&S.groups[0]||{}).groupId,status:'Active',accessMode:'',phone:''};
+}
 const isOwn=e=>e.memberId===me().id;
 function recomputeActors(){
   ROLES.forEach(r=>{if(r==='Platform Owner/Admin'&&byId(S.actors[r]))return;const cur=byId(S.actors[r]);if(!cur||cur.role!==r){const f=S.members.find(m=>m.role===r);S.actors[r]=f?f.id:(S.actors[r]||S.members[0].id)}});
@@ -947,10 +965,11 @@ function nextId(type){
   return p+'-'+String(mx+1).padStart(4,'0');
 }
 function nextSeq(arr,prefix,len=4){let mx=0;(arr||[]).forEach(x=>{if(String(x.id).startsWith(prefix+'-'))mx=Math.max(mx,+String(x.id).split('-')[1]||0)});return prefix+'-'+String(mx+1).padStart(len,'0')}
-function logAudit({action,target,detail,kind,memberId='',status='Completed',reason='',prev='',next='',groupId}){
+function logAudit({action,target,detail,kind,memberId='',status='Completed',reason='',prev='',next='',groupId,userId,ts}){
   const mx=S.audit.reduce((m,x)=>Math.max(m,+x.id.split('-')[1]),0);
   const gid=groupId!==undefined?groupId:(memberId&&byId(memberId)?byId(memberId).groupId:(UI.group||''));
-  S.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:me().id,role:UI.role,chamaId:S.chama.chamaId,groupId:gid,action,target,detail,kind,memberId,status,reason,prev:String(prev||''),next:String(next||'')});
+  const u=me();
+  S.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:ts||nowStamp(),userId:userId||(u?u.id:'system'),role:userId==='ledger-import'?'Import':UI.role,chamaId:S.chama.chamaId,groupId:gid,action,target,detail,kind,memberId,status,reason,prev:String(prev||''),next:String(next||'')});
 }
 
 /* ---------- v0.7 data normalisation, groups & access scope ---------- */
@@ -958,6 +977,7 @@ function ensureV07Data(){
   if(!S)return;
   S.chama.chamaId=S.chama.chamaId||'CHAMA-LOCAL-001';
   if(!S.chama.program&&S.chama.chamaId===CLIENT_DATA.organization.chamaId)S.chama.program={...CLIENT_DATA.organization.program};
+  if(S.chama.chamaId===CLIENT_DATA.organization.chamaId&&S.chama.name==='Mara Enterprise Women Group'){S.chama.name=CLIENT_DATA.organization.name;S.audit.push({id:'AU-'+String(S.audit.reduce((m,x)=>Math.max(m,+String(x.id).split('-')[1]||0),0)+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:S.chama.chamaId,groupId:'',action:'Organization renamed',target:S.chama.chamaId,detail:'Mara Enterprise Women Group → '+S.chama.name,kind:'settings',memberId:'',status:'Completed',reason:'Renamed at the client\'s request',prev:'Mara Enterprise Women Group',next:S.chama.name})}
   if(S.chama.program&&S.groups)S.groups.forEach(g=>{g.programId=g.programId||S.chama.program.programId});S.chama.organizationId=S.chama.chamaId;S.chama.tenantKey=S.chama.chamaId;
   if(!S.groups||!S.groups.length){
     const gid='GRP-01';
@@ -966,7 +986,7 @@ function ensureV07Data(){
   }
   S.rules=S.rules||{};
   S.groups.forEach(g=>{g.chamaId=g.chamaId||S.chama.chamaId;if(!S.rules[g.groupId])S.rules[g.groupId]=defaultRules(g.groupId);if(!S.rules[g.groupId].schoolFeeding)S.rules[g.groupId].schoolFeeding={target:null,targetPeriod:'Month',schools:[]}});
-  ['fines','welfare','loanApps','cashbook','sms','generated','meetings','ledger','audit','sfpSpend','submissions','vslas'].forEach(k=>{S[k]=S[k]||[]});
+  ['fines','welfare','loanApps','cashbook','sms','generated','meetings','ledger','audit','sfpSpend','submissions','vslas','ledgerIssues'].forEach(k=>{S[k]=S[k]||[]});
   const g0=S.groups[0].groupId;
   S.members.forEach(m=>{
     m.chamaId=m.chamaId||S.chama.chamaId;m.memberId=m.memberId||m.id;m.memberNumber=m.memberNumber||m.id;m.groupId=m.groupId||g0;
@@ -997,14 +1017,17 @@ function ensureV07Data(){
   recomputeActors();syncGroup();
 }
 const isPlatformOwner=()=>UI.role==='Platform Owner/Admin';
-const progLabel=()=>{const p=S&&S.chama.program;return p?`${p.partnerShort} ${p.name}`:''};
+const progLabel=()=>{const p=S&&S.chama.program;const l=p?`${p.partnerShort} ${p.name}`:'';return l&&S.chama.name!==l?l:''};
 const progFull=()=>{const p=S&&S.chama.program;return p?`${p.partner} (${p.partnerShort}) ${p.name}`:''};
+const orgSub=()=>{const p=S&&S.chama.program;return p?`${p.partner} (${p.partnerShort})`:''};
 const orgCrumb=()=>esc(S.chama.name)+(progLabel()?' · '+esc(progLabel()):'');
 function allowedGroups(){
   if(!S||!S.groups)return[];
   if(isPlatformOwner())return S.groups;
   const u=me();
   if(UI.role==='Member')return S.groups.filter(g=>g.groupId===u.groupId);
+  if(!u)return S.groups;
+  if(u.role==='Member')return S.groups; /* no official assigned to this role yet: prototype shows all groups */
   const ga=u.groupAccess;
   if(ga==='ALL')return S.groups;
   return S.groups.filter(g=>(Array.isArray(ga)?ga:[u.groupId]).includes(g.groupId));
@@ -1014,8 +1037,21 @@ const curGroup=()=>S.groups.find(g=>g.groupId===UI.group)||S.groups[0];
 const groupName=id=>(S.groups.find(g=>g.groupId===id)||{}).groupName||'-';
 const rules=(gid=UI.group)=>S.rules[gid]||defaultRules(gid);
 const inGroup=x=>x.groupId===UI.group&&(!x.chamaId||x.chamaId===S.chama.chamaId);
-const GM=()=>S.members.filter(inGroup);
-const GL=()=>S.ledger.filter(inGroup);
+/* Per-render memo and indexes. Cleared on every save (DATA_REV), on any change in collection sizes,
+   and whenever S itself is replaced (reset, import, database reload). */
+let DATA_REV=0;
+const MEMO={s:null,k:'',c:new Map(),byMember:null,byLoan:null};
+function memoFresh(){
+  if(!S)return;
+  const k=DATA_REV+'|'+S.ledger.length+'|'+S.fines.length+'|'+(S.cashbook||[]).length+'|'+(S.welfare||[]).length+'|'+(S.sfpSpend||[]).length+'|'+S.members.length+'|'+S.meetings.length;
+  if(MEMO.s!==S||MEMO.arr!==S.ledger||MEMO.k!==k){MEMO.s=S;MEMO.arr=S.ledger;MEMO.k=k;MEMO.c=new Map();MEMO.byMember=null;MEMO.byLoan=null}
+}
+function memo(key,fn){memoFresh();if(MEMO.c.has(key))return MEMO.c.get(key);const v=fn();MEMO.c.set(key,v);return v}
+function bumpData(){DATA_REV++}
+function ledgerOf(mid){memoFresh();if(!MEMO.byMember){MEMO.byMember=new Map();for(const e of S.ledger){let a=MEMO.byMember.get(e.memberId);if(!a)MEMO.byMember.set(e.memberId,a=[]);a.push(e)}}return MEMO.byMember.get(mid)||[]}
+function repaysOf(lid){memoFresh();if(!MEMO.byLoan){MEMO.byLoan=new Map();for(const e of S.ledger)if(e.type==='repayment'){let a=MEMO.byLoan.get(e.loanId);if(!a)MEMO.byLoan.set(e.loanId,a=[]);a.push(e)}}return MEMO.byLoan.get(lid)||[]}
+const GM=()=>memo('GM|'+UI.group,()=>S.members.filter(inGroup));
+const GL=()=>memo('GL|'+UI.group,()=>S.ledger.filter(inGroup));
 const GMT=()=>S.meetings.filter(inGroup);
 const GF=()=>S.fines.filter(inGroup);
 const GW=()=>S.welfare.filter(inGroup);
@@ -1046,7 +1082,7 @@ const catsOf=gid=>rules(gid).contributionCategories||[];
 const catObj=(id,gid=UI.group)=>catsOf(gid).find(c=>c.id===id);
 const catName=(id,gid=UI.group)=>(catObj(id,gid)||{}).name||id||'Contribution';
 function memberBasis(memberId,basis,before){
-  return sum(S.ledger.filter(e=>e.memberId===memberId&&valid(e)&&e.type===(basis==='contributions'?'contribution':'saving')&&(!before||e.date<before)));
+  return sum(ledgerOf(memberId).filter(e=>valid(e)&&e.type===(basis==='contributions'?'contribution':'saving')&&(!before||e.date<before)));
 }
 /* Contribution rate for one member in one category: chosen from the group's tier table by the member's savings (or contributions) to date */
 function expectedFor(memberId,cat,key){
@@ -1062,7 +1098,7 @@ function expectedTotal(memberId,key){
 }
 function periodStatus(memberId,key,catId){
   const m=byId(memberId);if(!m||monthKey(m.joined)>key)return{state:'na'};
-  const recs=S.ledger.filter(e=>e.type==='contribution'&&valid(e)&&e.memberId===memberId&&e.period===key&&(!catId||e.category===catId)).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  const recs=ledgerOf(memberId).filter(e=>e.type==='contribution'&&valid(e)&&e.period===key&&(!catId||e.category===catId)).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
   /* the rate stored on the record when it was entered wins, so later rule changes never rewrite history */
   const expCat=c=>{const r=recs.find(x=>x.category===c.id&&isNum(x.expected));return r?+r.expected:expectedFor(memberId,c,key)};
   let exp;
@@ -1098,7 +1134,7 @@ const totals=()=>{
 function loanInfo(loan){
   const ratePending=!isNum(loan.interestPct),rate=ratePending?0:+loan.interestPct;
   const total=Math.round(loan.amount*(1+rate/100)),inst=Math.ceil(total/loan.months);
-  const reps=S.ledger.filter(e=>e.type==='repayment'&&e.loanId===loan.id&&valid(e)).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.at<b.at?-1:1);
+  const reps=repaysOf(loan.id).filter(valid).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.at<b.at?-1:1);
   const repaid=sum(reps),outstanding=Math.max(0,total-repaid),t=todayISO();
   const sched=[];let cum=0;
   for(let i=1;i<=loan.months;i++){const amt=i<loan.months?inst:total-inst*(loan.months-1);cum+=amt;sched.push({n:i,due:addMonths(loan.date,i),amount:amt,cum,paid:repaid>=cum,partial:repaid<cum&&repaid>cum-amt})}
@@ -1125,7 +1161,7 @@ function loanInfo(loan){
 function memberStats(id){
   const m=byId(id),cons=periodKeysFor(m).map(k=>periodStatus(id,k));
   const paid=cons.filter(c=>c.state==='paid'||c.state==='late').length,onTime=cons.filter(c=>c.state==='paid').length;
-  const rc=S.ledger.filter(e=>e.memberId===id&&valid(e));
+  const rc=ledgerOf(id).filter(valid);
   const contribs=rc.filter(e=>e.type==='contribution'),sav=rc.filter(e=>e.type==='saving');
   const loans=rc.filter(e=>e.type==='loan').map(loanInfo);
   return{periods:cons.length,paid,onTime,missed:cons.length-paid,contribTotal:sum(contribs),savingsTotal:sum(sav),loans,loanOutstanding:sum(loans,l=>l.outstanding),lastContrib:contribs.map(c=>c.date).sort().pop()||null,recs:rc};
@@ -1166,7 +1202,7 @@ const who=(id,sub)=>`<span class="who">${avatar(id)}<span><b>${esc(mName(id))}</
 const pill=(tone,text,ic)=>`<span class="pill pill-${tone}">${ic?icon(ic):''}${esc(text)}</span>`;
 const PAY={paid:['ok','Paid on time','check'],late:['warn','Paid late','clock'],partial:['warn','Partial','clock'],overdue:['bad','Overdue','alert'],due:['neutral','Unpaid','clock'],na:['neutral','Not yet a member','']};
 const payPill=s=>pill(...PAY[s]);
-const recPill=e=>e.status==='Corrected'?pill('info','Corrected','edit'):e.status==='Reversed'?pill('maroon','Reversed','undo'):pill('ok','Recorded','check');
+const recPill=e=>(e.status==='Corrected'?pill('info','Corrected','edit'):e.status==='Reversed'?pill('maroon','Reversed','undo'):pill('ok','Recorded','check'))+(e.flag?' '+pill('warn','Check ledger','flag'):'');
 const loanPill=s=>s==='Repaid'?pill('ok','Repaid','check'):s==='Overdue'?pill('bad','Overdue','alert'):s==='Interest pending'?pill('warn','Principal repaid · interest rate pending','clock'):pill('teal','Active','clock');
 const rolePill=r=>pill(r==='Member'?'neutral':r==='Chairperson'?'maroon':'teal',r);
 const TYPE_LABEL={contribution:'Contribution',saving:'Savings',loan:'Internal loan',repayment:'Internal repayment'};
@@ -1285,10 +1321,10 @@ function renderNav(){
   const flat=groups.flatMap(g=>g.items);const ids=preferred.filter(id=>flat.some(x=>x.id===id));
   $('#bottomnav').innerHTML=ids.map(id=>{const it=flat.find(x=>x.id===id);return `<a href="#/${id}" ${currentPage===id?'aria-current="page"':''}>${icon(it.icon)}<span>${esc(it.short||navLabel(it))}</span></a>`}).join('')+`<button type="button" data-act="more-nav">${icon('more')}<span>More</span></button>`;
   $('#chip-name').textContent=S.chama.name;
-  $('#chip-sub').textContent=(progLabel()?progLabel()+' · ':'')+`${S.groups.length} community groups · ${(S.vslas||[]).length} VSLAs · ${S.members.filter(m=>m.chamaId===S.chama.chamaId).length} members`;
+  $('#chip-sub').textContent=(progLabel()?progLabel()+' · ':orgSub()?orgSub()+' · ':'')+`${S.groups.length} community groups · ${(S.vslas||[]).length} VSLAs · ${S.members.filter(m=>m.chamaId===S.chama.chamaId).length} members`;
   const gs=$('#group-select');if(gs){const ag=allowedGroups();gs.innerHTML=ag.map(g=>`<option value="${g.groupId}" ${g.groupId===UI.group?'selected':''}>${esc(g.groupName)}</option>`).join('');gs.disabled=ag.length<2;gs.title=ag.length<2?'Your role can only see this group':'Switch group'}
   const sel=$('#role-select');
-  sel.innerHTML=ROLES.map(r=>{const p=byId(S.actors[r]);return `<option value="${r}" ${r===UI.role?'selected':''}>${r}${p?' · '+esc(firstName(p.name)):''}</option>`}).join('');
+  sel.innerHTML=ROLES.map(r=>{const p=byId(S.actors[r]);return `<option value="${r}" ${r===UI.role?'selected':''}>${r}${p&&(p.role===r||r==='Member'||r==='Platform Owner/Admin'&&p.role!=='Member')?' · '+esc(firstName(p.name)):r==='Member'?'':' · not assigned'}</option>`}).join('');
   const viewerLine=$('#viewer-line');if(viewerLine)viewerLine.textContent=`DEMO ONLY · ${UI.role} · ${S.chama.chamaId} · ${UI.group}`;
   updateSyncChip();
   const lockBtn=$('#lock-btn');if(lockBtn)lockBtn.hidden=!lockInfo();
@@ -1433,9 +1469,9 @@ function membersList(){
 }
 function membersView(){
   const f=memberFilters();
-  return `${pageHeader({title:can('viewAll')?'Members':'Member directory',desc:can('viewAll')?'Everyone in the Chama, their role and whether they have paid this month. Open a member to see their full record.':'Who is in the Chama and whether each member has paid this month.',actions:(canImport()?btn('import-members','Import from Excel',{ic:'download',cls:'btn-secondary'}):'')+(can('manageMembers')?btn('add-member','Add member',{ic:'userplus'}):'')})}
+  return `${pageHeader({title:can('viewAll')?'Members':'Member directory',desc:can('viewAll')?'Everyone in the Chama, their role and whether they have paid this month. Open a member to see their full record.':'Who is in the Chama and whether each member has paid this month.',actions:(canImport()?btn('ledger-import','Import VSLA ledger',{ic:'book',cls:'btn-secondary'})+btn('import-members','Import from Excel',{ic:'download',cls:'btn-secondary'}):'')+(can('manageMembers')?btn('add-member','Add member',{ic:'userplus'}):'')})}
   ${!can('manageMembers')&&can('viewAll')?notice('Adding and editing members is done by the Secretary.',{ic:'lock'}):''}
-  ${GM().some(m=>m.placeholder)?notice('These are <b>sample members</b> used to demonstrate the workflow. They will be replaced with the member list confirmed by Mara Enterprise Women Group (see CLIENT_DATA at the top of the file).',{ic:'info',tone:'warn',title:'Sample data.'}):''}
+  ${GM().some(m=>m.placeholder)?notice('These are <b>sample members</b> used to demonstrate the workflow. They will be replaced with the confirmed member lists (use Import from Excel or Import VSLA ledger).',{ic:'info',tone:'warn',title:'Sample data.'}):''}
   ${notice('Members without a smartphone are full members. Officials record their contributions, savings, attendance and repayments, and can print receipts and statements for them. SMS / USSD can become their main digital channel later.',{ic:'phone',tone:'teal',title:'Assisted / Offline members.'})}
   <section class="card"><div class="filters no-print">
    <div class="fld grow"><label for="mq">Search</label><input id="mq" type="search" placeholder="Name, member number or phone" value="${esc(f.q)}" data-input="filter" data-scope="members" data-key="q" autocomplete="off"></div>
@@ -1610,7 +1646,7 @@ function loansView(){
   ${repayBenefitsCard()}
   <div class="stats">${statCard({label:'Lent by the Chama',value:ksh(sum(L,l=>l.amount)),sub:plural(L.length,'loan')+' recorded',ic:'loan',tone:'maroon'})}${statCard({label:'Repaid so far',value:ksh(sum(L,l=>l.repaid)),sub:'Including the Chama\'s own interest',ic:'check'})}${statCard({label:'Outstanding',value:ksh(sum(L,l=>l.outstanding)),sub:`${cnt('Active')+cnt('Overdue')} open`,ic:'clock',tone:'amber'})}${statCard({label:'Overdue',value:ksh(sum(L,l=>l.overdueAmt)),sub:plural(cnt('Overdue'),'loan'),ic:'alert',tone:'maroon'})}</div>
   <section class="card"><div class="filters no-print" style="align-items:flex-end"><div class="chips" role="group" aria-label="Filter by status">${items.map(([id,l,n])=>`<button type="button" class="chip" aria-pressed="${f.status===id}" data-act="loan-filter" data-status="${id}">${l} (${n})</button>`).join('')}</div>${all?`<div class="fld grow"><label for="lq" class="sr-only">Search loans</label><input id="lq" type="search" placeholder="Search member or loan number" value="${esc(f.q)}" data-input="filter" data-scope="loans" data-key="q" autocomplete="off"></div>`:''}</div><div data-list="loans">${loansList()}</div></section>
-  <div style="height:16px"></div>${repaymentDeadlinesCard()}<div style="height:16px"></div>${repaymentRecordsCard()}`;
+  <div style="height:16px"></div>${loanRoundsCard()}${repaymentDeadlinesCard()}<div style="height:16px"></div>${repaymentRecordsCard()}`;
 }
 const loansViewObj={title:'Internal loans',render:loansView};
 function openLoan(id){
@@ -1854,7 +1890,7 @@ function auditList(){
     {label:'Action',render:a=>`<b>${esc(a.action)}</b><div class="muted small">${esc(a.detail)}</div>${a.prev||a.next?`<div class="small muted">Previous: ${esc(a.prev||'-')} → New: ${esc(a.next||'-')}</div>`:''}${a.reason?`<div class="small" style="margin-top:2px"><b>Reason:</b> ${esc(a.reason)}</div>`:''}`},
     {label:'Date and time',render:a=>fmtDT(a.ts)},{label:'User',render:a=>`${esc(mName(a.userId))}<div class="muted tiny">${esc(a.role||byId(a.userId)?.role||'')}</div>`},{label:'Member',render:a=>a.memberId?esc(mName(a.memberId)):'-'},
     {label:'Affected record',render:a=>S.ledger.some(e=>e.id===a.target)?idBtn(a.target):esc(a.target)},
-    {label:'Status',render:a=>a.status==='Corrected'?pill('info','Correction','edit'):a.status==='Reversed'?pill('maroon','Reversal','undo'):pill('ok','Completed','check')}],rows:shown}):emptyState({ic:'activity',title:'No activity matches',text:'Try a different search or clear the filters.',action:`<button type="button" class="btn btn-secondary" data-act="clear-filters" data-scope="audit">Clear filters</button>`});
+    {label:'Status',render:a=>a.status==='Corrected'?pill('info','Correction','edit'):a.status==='Reversed'?pill('maroon','Reversal','undo'):a.status==='Flagged'?pill('warn','Check ledger','flag'):a.status==='Open'?pill('warn','Open issue','alert'):pill('ok','Completed','check')}],rows:shown}):emptyState({ic:'activity',title:'No activity matches',text:'Try a different search or clear the filters.',action:`<button type="button" class="btn btn-secondary" data-act="clear-filters" data-scope="audit">Clear filters</button>`});
   return `${t}<div class="list-meta" aria-live="polite"><span>${rows.length} ${rows.length===1?'entry':'entries'}</span>${rows.length>shown.length?`<button type="button" class="link-btn" data-act="more" data-scope="audit">Show more</button>`:''}</div>`;
 }
 function auditView(){
@@ -1894,7 +1930,8 @@ const settingsViewObj={title:'Settings',render:()=>settingsView()};
 /* ---------- 21. Welcome / bare screens & registration wizard ---------- */
 function setBare(html){document.body.dataset.mode='bare';$('#bare').innerHTML=html;window.scrollTo(0,0)}
 function welcomeScreen(){
-  setBare(`<div class="welcome"><div class="w-left">${photoShow()}<a class="brand" href="#/welcome" onclick="return false">${LOGO}<div><b>CHAMA DIGITAL</b><span>Pilot build · Nairobi, KE</span></div></a>
+  document.body.classList.remove('nav-open');
+  setBare(`<div class="welcome"><div class="w-left">${photoShow()}<a class="brand" href="#/welcome" title="Back to the landing page">${LOGO}<div><b>CHAMA DIGITAL</b><span>Pilot build · Nairobi, KE</span></div></a>
    <p class="w-prog" title="Human Practice Foundation (HPF) Micro Enterprise Program">HPF Micro Enterprise Program</p><h1>Your Chama.<br>Your records.<br>Your future.</h1><p class="pos">Transparent · Accountable · Digital</p>
    <p class="lead">A digital record-keeping system built for Kenyan Chamas: contributions, savings, internal loans and member records, all in one place · replacing the exercise book.</p>
    <div class="chips no-print w-actions"><a class="btn btn-primary" href="#/register">${icon('plus')}Register a Chama</a><a class="btn btn-secondary" href="#/demo">${icon('eye')}See a demo Chama</a></div>
@@ -1907,9 +1944,9 @@ function welcomeScreen(){
    <p class="muted small">Chama Digital does not hold money, lend money, or connect to banks, M-Pesa or credit bureaus. It is a record-keeping tool your officials control.</p></div></div>`);
 }
 function demoScreen(){
-  setBare(`<div class="wiz" style="max-width:640px;padding-top:40px">${photoBanner('Mara Enterprise Women Group','Human Practice Foundation (HPF) Micro Enterprise Program · Olemoncho, Mbitin and Nterere',PHOTOS,'small')}<div class="wiz-card" style="text-align:center">
-   <div style="width:52px;height:52px;margin:0 auto 14px">${LOGO}</div><h1>See Chama Digital in action</h1>
-   <p class="muted" style="margin:10px 0 16px">Explore <b>Mara Enterprise Women Group</b>, part of the <b>Human Practice Foundation (HPF) Micro Enterprise Program</b>, with its three community groups (Olemoncho, Mbitin and Nterere schools), their VSLAs, sample members and a year of sample records: meetings and attendance, Social Fund and School Feeding contributions, savings, welfare payouts, loan applications, repayments and the cash book. Switch roles at the top of the screen to see what each role may see.</p>
+  setBare(`<div class="wiz" style="max-width:640px;padding-top:40px">${photoBanner('HPF Micro Enterprise Program','Human Practice Foundation · Olemoncho, Mbitin and Nterere community groups',PHOTOS,'small')}<div class="wiz-card" style="text-align:center">
+   <a href="#/welcome" title="Back to the landing page" aria-label="Chama Digital: back to the landing page" style="display:block;width:52px;height:52px;margin:0 auto 14px">${LOGO}</a><h1>See Chama Digital in action</h1>
+   <p class="muted" style="margin:10px 0 16px">Explore the <b>Human Practice Foundation (HPF) Micro Enterprise Program</b> with its three community groups (Olemoncho, Mbitin and Nterere schools), their VSLAs, sample members and a year of sample records: meetings and attendance, Social Fund and School Feeding contributions, savings, welfare payouts, loan applications, repayments and the cash book. Switch roles at the top of the screen to see what each role may see.</p>
    <label class="checkrow" style="text-align:left;max-width:440px;margin:0 auto 18px"><input type="checkbox" id="demo-illus"><span>Fill the group rules with <b>illustrative test values</b> (contribution rates, savings min/max, fines, interest, loan limits) so every workflow can be tried. These are <b>not</b> Mara's confirmed rules and are labelled "Test value" everywhere. Leave unticked to see every unconfirmed rule as "Pending confirmation".</span></label>
    <div class="fld" style="max-width:280px;margin:0 auto 18px;text-align:left">${field({label:'Enter viewing as',name:'demoRole',opts:ROLES,value:'Treasurer'})}</div>
    <button type="button" class="btn btn-primary" style="width:100%" data-act="enter-demo">${icon('right')}Enter demo dashboard</button>
@@ -1927,7 +1964,7 @@ function regState(){return UI.reg||(UI.reg={step:1,name:'',type:'Savings group',
 const REG_STEPS=['Chama details','Officials & members','Contribution settings','Review','Done'];
 function regWrap(inner,{back,next,nextLabel='Continue',nextDisabled=false}={}){
   const r=regState();
-  return `<div class="wiz"><div class="wiz-top"><a class="brand" href="#/welcome" style="padding:0" onclick="return false">${LOGO}<div><b style="color:var(--teal-900)">CHAMA DIGITAL</b></div></a><span class="muted small">Step ${Math.min(r.step,4)} of 4</span></div>
+  return `<div class="wiz"><div class="wiz-top"><a class="brand" href="#/welcome" style="padding:0" title="Back to the landing page">${LOGO}<div><b style="color:var(--teal-900)">CHAMA DIGITAL</b></div></a><span class="muted small">Step ${Math.min(r.step,4)} of 4</span></div>
    <ul class="steps" role="list" aria-label="Registration progress">${REG_STEPS.slice(0,4).map((s,i)=>`<li class="${i+1<r.step?'done':i+1===r.step?'now':''}"></li>`).join('')}</ul>
    <div class="wiz-card"><h1>${REG_STEPS[r.step-1]}</h1>${inner}
    <div class="wiz-foot">${back?`<button type="button" class="btn btn-secondary" data-act="reg-back">${icon('left')}Back</button>`:'<span></span>'}${next?`<button type="button" class="btn btn-primary" data-act="${next}" ${nextDisabled?'disabled':''}>${nextLabel}${nextLabel==='Continue'?icon('right'):''}</button>`:''}</div></div>
@@ -2000,7 +2037,7 @@ function kycView(){
    ===================================================================== */
 
 /* ---------- shared helpers ---------- */
-const accessPill=m=>m.accessMode==='Assisted / Offline'?pill('warn','Assisted / Offline','user'):pill('teal','Smartphone / Digital','phone');
+const accessPill=m=>m.accessMode==='Not recorded'?pill('neutral','Access not recorded'):m.accessMode==='Assisted / Offline'?pill('warn','Assisted / Offline','user'):pill('teal','Smartphone / Digital','phone');
 const ATT={present:{sym:'✓',label:'Present'},apology:{sym:'Ⓔ',label:'Absent with apology'},absent:{sym:'X',label:'Absent without apology'}};
 const attSym=st=>`<span class="att-sym ${ATT[st]?st:'none'}" role="img" aria-label="${ATT[st]?ATT[st].label:'Not marked'}" title="${ATT[st]?ATT[st].label:'Not marked'}">${ATT[st]?ATT[st].sym:'–'}</span>`;
 const finePill=s=>({Paid:pill('ok','Paid','check'),'Partially Paid':pill('warn','Partially Paid','clock'),Outstanding:pill('bad','Outstanding','alert'),Waived:pill('neutral','Waived'),Cancelled:pill('neutral','Cancelled'),'Amount pending':pill('warn','Fine amount not set yet','clock')}[s]||pill('neutral',s));
@@ -2026,7 +2063,7 @@ function pendingRuleCount(gid){
 }
 function rulesBanner(){
   const r=rules();
-  if(r.source==='illustrative')return notice(`This group is using <b>illustrative test values</b> for its rules. They are <b>not</b> Mara Enterprise Women Group's confirmed rules and are marked "Test value". <a href="#/settings">Review group rules</a>.`,{ic:'info',tone:'warn',title:'Test values in use.'});
+  if(r.source==='illustrative')return notice(`This group is using <b>illustrative test values</b> for its rules. They are <b>not</b> the program's confirmed rules and are marked "Test value". <a href="#/settings">Review group rules</a>.`,{ic:'info',tone:'warn',title:'Test values in use.'});
   const n=pendingRuleCount(UI.group);
   if(n)return notice(`${plural(n,'group rule')} (for example contribution rates, savings minimum/maximum, absenteeism fine, interest rate) ${n===1?'is':'are'} still <b>pending confirmation</b> from the client. Anything that depends on them is shown as pending. <a href="#/settings">See group rules</a>.`,{ic:'info',tone:'warn',title:'Rules pending.'});
   return '';
@@ -2064,7 +2101,7 @@ function cashEntries(gid=UI.group){
   S.fines.filter(f=>f.groupId===gid).forEach(f=>(f.payments||[]).filter(p=>!p.status||p.status==='Recorded').forEach(p=>rows.push({date:p.date,at:p.at||p.date,ref:p.ref||p.id,src:f.id,by:p.by,memberId:f.memberId,groupId:gid,desc:`${f.type} fine payment · ${mName(f.memberId)}`,in:p.amount,out:0,cat:'Fine payment',fund:'Fines',manual:false})));
   S.welfare.filter(w=>w.groupId===gid&&w.status==='Paid').forEach(w=>rows.push({date:w.date,at:w.createdAt||w.date,ref:w.ref||w.id,src:w.id,by:w.recordedBy,memberId:w.memberId,groupId:gid,desc:`Welfare payout (${w.category}) · ${mName(w.memberId)}`,in:0,out:w.amount,cat:'Welfare payout',fund:WELFARE_FUND,manual:false}));
   (S.sfpSpend||[]).filter(x=>x.groupId===gid&&x.status==='Recorded').forEach(x=>rows.push({date:x.date,at:x.at||x.date,ref:x.ref,src:x.id,by:x.by,memberId:'',groupId:gid,desc:`School feeding: ${x.description} (${x.school})`,in:0,out:x.amount,cat:'Programme spending',fund:SFP_FUND,manual:false}));
-  S.cashbook.filter(c=>c.groupId===gid&&c.status==='Recorded').forEach(c=>rows.push({date:c.date,at:c.at||c.date,ref:c.ref,src:c.id,by:c.by,memberId:'',groupId:gid,desc:c.description,in:c.direction==='in'?c.amount:0,out:c.direction==='out'?c.amount:0,cat:c.category,fund:'General',manual:true}));
+  S.cashbook.filter(c=>c.groupId===gid&&c.status==='Recorded').forEach(c=>rows.push({date:c.date,at:c.at||c.date,ref:c.ref,src:c.id,by:c.by,memberId:'',groupId:gid,desc:c.description,in:c.direction==='in'?c.amount:0,out:c.direction==='out'?c.amount:0,cat:c.category,fund:c.category===LOAN_ROUND_CAT?'Loans':'General',manual:true}));
   rows.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.at<b.at?-1:a.at>b.at?1:0);
   const r=rules(gid),opening=isNum(r.cashbook.openingBalance)?+r.cashbook.openingBalance:0;
   let bal=opening;rows.forEach(x=>{bal+=x.in-x.out;x.balance=bal});
@@ -2130,7 +2167,7 @@ function savingsCheck(gid,amount){
   if(isNum(s.max)&&amount>+s.max)return{ok:false,msg:`${ksh(amount)} is above this group's maximum saving of ${ksh(s.max)}. The entry is rejected.`};
   return{ok:true,msg:!isNum(s.min)&&!isNum(s.max)?'No minimum or maximum confirmed for this group yet, so the entry will be accepted.':`Within the group's range (${isNum(s.min)?ksh(s.min):'no minimum'} to ${isNum(s.max)?ksh(s.max):'no maximum'}).`};
 }
-const monthSaved=(memberId,key)=>sum(S.ledger.filter(e=>e.memberId===memberId&&e.type==='saving'&&valid(e)&&monthKey(e.date)===key));
+const monthSaved=(memberId,key)=>sum(ledgerOf(memberId).filter(e=>e.type==='saving'&&valid(e)&&monthKey(e.date)===key));
 function savingsBelowMin(key){const mn=rules().savings.min;if(!isNum(mn)||key>=curKey())return 0;return activeMembers().filter(m=>monthKey(m.joined)<=key&&monthSaved(m.id,key)<mn).length}
 function monthlyAssessment(memberId,key){
   const m=byId(memberId),r=rules(m.groupId);
@@ -2177,7 +2214,7 @@ function dashKPIs(){
     statCard({label:`Savings, ${keyLabel(k)}`,value:ksh(savM),sub:`${ksh(T.savings)} total savings`,ic:'coins'}),
     statCard({label:'Attendance, last meeting',value:la?la.pct+'%':'-',sub:la?`✓ ${la.present} · Ⓔ ${la.apology} · X ${la.absent} · ${fmtDate(lastM.date)}`:'No meeting held yet',ic:'calendar'}),
     statCard({label:'Outstanding fines',value:ksh(ft.outstanding),sub:`${ksh(ft.collected)} collected${ft.pending?` · ${ft.pending} fine amount not set yet`:''}`,ic:'flag',tone:'amber'}),
-    statCard({label:'Loans outstanding',value:ksh(T.outstanding),sub:`${plural(T.activeLoans,'active loan')}${T.overdueLoans?` · ${T.overdueLoans} overdue`:' · none overdue'}`,ic:'loan',tone:'maroon'}),
+    statCard({label:'Loans outstanding',value:ksh(T.outstanding),sub:`${plural(T.activeLoans,'active loan')}${T.overdueLoans?` · ${T.overdueLoans} overdue`:' · none overdue'}${loanRoundsTotal(UI.group)?` · ${ksh(loanRoundsTotal(UI.group))} issued in ledger loan rounds (borrowers not named)`:''}`,ic:'loan',tone:'maroon'}),
     statCard({label:'Social Fund / Welfare',value:ksh(ws.balance),sub:`${ksh(ws.payouts)} paid out${ws.openingPending?' · opening balance pending':''}`,ic:'heart'}),
   ].join('');
 }
@@ -2190,6 +2227,7 @@ function dashAttention(){
   GW().filter(w=>w.status==='Pending Review').forEach(w=>items.push([`Welfare payout ${w.id} needs review`,`${ksh(w.amount)} · ${w.category}`,'#/welfare','warn']));
   const out=GF().map(fineInfo).filter(f=>f.outstanding>0);
   if(out.length)items.push([`${plural(new Set(out.map(f=>f.memberId)).size,'member')} with unpaid fines`,`${ksh(sum(out,f=>f.outstanding))} outstanding`,'#/meetings','warn']);
+  const li=(S.ledgerIssues||[]).filter(i=>i.status==='Open'&&(i.groupId===UI.group||!i.groupId)).length;if(li)items.push([`${plural(li,'ledger issue')} to confirm with the treasurer`,'From the ledger transcription (Settings → Chama & groups)','#/settings','warn']);
   const pf=GF().map(fineInfo).filter(f=>f.status==='Amount pending').length;
   if(pf)items.push([`${plural(pf,'fine')} waiting for the absenteeism fine amount`,'Set the fine in Group rules; the amount is then applied and logged','#/settings','warn']);
   const below=savingsBelowMin(curKey());
@@ -2242,8 +2280,8 @@ function meetingsView(){
 }
 function registerGrid(ms){
   if(!ms.length)return '';
-  const people=activeMembers();
-  return card({cls:'reg-grid',title:'Register book',sub:'Last meetings at a glance, using the same symbols the group uses on paper',flush:true,body:`<div class="tbl-wrap"><table class="rt"><caption class="sr-only">Attendance register grid</caption><thead><tr><th scope="col">Member</th>${ms.map(m=>`<th scope="col" class="c">${fmtDate(m.date).replace(/ \d{4}$/,'')}</th>`).join('')}</tr></thead><tbody>${people.map(p=>`<tr><td data-label="Member" class="cell-main">${who(p.id,esc(p.id))}</td>${ms.map(m=>`<td class="c" data-label="${fmtDate(m.date)}">${p.joined>m.date?'<span class="muted tiny">not yet a member</span>':attSym(attStatus(m.attendance[p.id]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`});
+  const allP=activeMembers(),miss=p=>ms.filter(m=>attStatus(m.attendance[p.id])!=='present').length,people=allP.length>30?allP.slice().sort((a,b)=>miss(b)-miss(a)).slice(0,30):allP;
+  return card({cls:'reg-grid',title:'Register book',sub:allP.length>30?`The 30 members with the most absences, of ${allP.length}. Open a meeting to see everyone.`:'Last meetings at a glance, using the same symbols the group uses on paper',flush:true,body:`<div class="tbl-wrap"><table class="rt"><caption class="sr-only">Attendance register grid</caption><thead><tr><th scope="col">Member</th>${ms.map(m=>`<th scope="col" class="c">${fmtDate(m.date).replace(/ \d{4}$/,'')}</th>`).join('')}</tr></thead><tbody>${people.map(p=>`<tr><td data-label="Member" class="cell-main">${who(p.id,esc(p.id))}</td>${ms.map(m=>`<td class="c" data-label="${fmtDate(m.date)}">${p.joined>m.date?'<span class="muted tiny">not yet a member</span>':attSym(attStatus(m.attendance[p.id]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`});
 }
 function openMeeting(id){
   const m=S.meetings.find(x=>x.id===id);if(!m)return;
@@ -2259,7 +2297,7 @@ function openMeeting(id){
       const fnote=ex?`Fine ${esc(ex.id)} already linked: ${fineInfo(ex).status}.`:`An absenteeism fine of <b>${isNum(fineAmt)?ksh(fineAmt)+(rules(m.groupId).source==='illustrative'?' (test value)':''):'(fine amount not set yet)'}</b> will be created automatically when this register is saved and the meeting is marked held.`;
       return `<div class="att-row ${s?'is-'+s:''}" data-row="${p.id}">${who(p.id,`${esc(p.id)} · ${esc(p.accessMode)}`)}<div class="grow"></div>
         <div class="att-seg" role="group" aria-label="Attendance for ${esc(p.name)}">${['present','apology','absent'].map(x=>`<button type="button" class="${x}" data-act="att-set" data-member="${p.id}" data-st="${x}" aria-pressed="${s===x}" title="${ATT[x].label}" aria-label="${ATT[x].label}">${ATT[x].sym}</button>`).join('')}</div>
-        <input type="hidden" name="att-${p.id}" value="${s}">
+        <input type="hidden" name="att-${p.id}" value="${s}">${canFine()&&m.date<=todayISO()?`<button type="button" class="btn btn-ghost btn-sm" data-act="meeting-fine" data-member="${p.id}" data-meeting="${m.id}" aria-label="Fine ${esc(p.name)}">${icon('flag')}Fine</button>`:''}<div class="row-fines" data-rowfines="${p.id}">${rowFinesHtml(m.id,p.id)}</div>
         <div class="reason fld"><label for="ar-${p.id}">Reason for absence <span class="opt">(optional)</span></label><input id="ar-${p.id}" name="ar-${p.id}" value="${s==='apology'?esc(a.reason||''):''}" placeholder="For example: sick, travelling, family matter" autocomplete="off"></div>
         <div class="auto-fine"><div class="inline-note warn">${fnote}</div><div class="fld" style="margin-top:6px"><label for="an-${p.id}">Note (optional)</label><input id="an-${p.id}" name="an-${p.id}" value="${s==='absent'?esc(a.reason||''):''}" placeholder="Any note for the fine record" autocomplete="off"></div></div></div>`;
     }).join('');
@@ -2350,7 +2388,7 @@ function fineCols(showMember=true){
 function finesTab(own){
   const F=(own?GF().filter(f=>f.memberId===me().id):GF()).map(fineInfo).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:a.id<b.id?1:-1);
   const ab=F.filter(f=>f.type==='Absenteeism'),t=fineTotals(ab);
-  return `${!own?`<div class="chips no-print" style="margin-bottom:12px">${can('recordFinance')?btn('add-fine','Record another fine',{ic:'plus',cls:'btn-secondary btn-sm'}):''}</div>`:''}
+  return `${!own?`<div class="chips no-print" style="margin-bottom:12px">${canFine()?btn('add-fine','Record another fine',{ic:'plus',cls:'btn-secondary btn-sm'}):''}</div>`:''}
   ${card({flush:true,title:own?'My fines':'Fines register',sub:`Absenteeism: ${ksh(t.generated)} generated · <b>${ksh(t.collected)} collected</b> · ${ksh(t.outstanding)} outstanding. Unpaid fines carry forward.`,body:F.length?table({caption:'Fines',cols:fineCols(!own),rows:F,rowClass:f=>['Waived','Cancelled'].includes(f.status)?'voided':'',foot:`<tfoot><tr><td>Total</td><td></td><td></td><td class="r num">${ksh(sum(F.filter(f=>f.status!=='Cancelled'),f=>f.amountVal||0))}</td><td class="r num">${ksh(sum(F,f=>f.paid))}</td><td class="r num">${ksh(sum(F,f=>f.outstanding))}</td><td></td><td></td></tr></tfoot>`}):emptyState({ic:'flag',title:'No fines recorded',text:'Absenteeism fines are created automatically when a member is marked X (absent without apology) in a held meeting.'})})}
   <p class="muted small" style="margin-top:10px">Fines are never deleted. Waivers need a reason and an authorized person; cancellations after an attendance correction are logged in the audit trail.</p>`;
 }
@@ -2653,6 +2691,7 @@ function loanAppsView(){
     {label:'Guarantors',render:a=>(a.guarantors||[]).map(g=>esc(g.name)).join(', ')||'-'},
     {label:'Qualification now',render:a=>['Disbursed','Rejected'].includes(a.status)?'<span class="muted small">Closed</span>':outcomePill(loanEligibility(a.memberId,a.amount,(a.guarantors||[]).length,a.months).outcome)},
     {label:'Status',render:a=>appPill(a.status)},
+    ...(can('approve')?[{label:'',nolabel:true,cls:'r',render:a=>['Submitted','Needs Review'].includes(a.status)?(a.submittedBy===me().id?'<span class="muted tiny">Another official decides</span>':btn('app-decision','Approve / reject',{ic:'check',cls:'btn-primary btn-sm',data:`data-id="${a.id}"`})):''}]:[]),
   ];
   const selfE=own?loanEligibility(me().id):null;
   return `${pageHeader({title:own?'Apply for a loan':'Loan applications',desc:'A member must qualify before receiving a loan. Every qualification result shows its reasons, and officials record the reason for every decision.',actions:(can('applyLoan')?btn('apply-loan',own?'Apply for a loan':'New application (assisted)',{ic:'clipboard'}):'')+(!own&&can('viewAll')?btn('check-elig','Check a member\'s qualification',{ic:'check',cls:'btn-secondary'}):'')})}
@@ -2712,16 +2751,18 @@ function openApp(id){
    <dl class="kv"><dt>Amount requested</dt><dd class="num">${ksh(a.amount)}</dd><dt>Repayment period</dt><dd>${a.months} months</dd><dt>Purpose</dt><dd>${esc(a.purpose)}</dd><dt>Enterprise</dt><dd>${esc(a.enterprise||'-')}</dd><dt>Guarantors</dt><dd>${(a.guarantors||[]).map(g=>esc(g.name)).join(', ')||'None'}</dd><dt>Guarantor confirmation</dt><dd>${esc((a.guarantors||[])[0]?.confirmation||'-')}</dd><dt>Submitted</dt><dd>${fmtDate(a.date)} · ${esc(a.channel||'')}</dd>${a.decision?`<dt>Decision</dt><dd>${esc(mName(a.decision.by))}, ${fmtDT(a.decision.at)}<div class="muted small">${esc(a.decision.reason)}</div></dd>`:''}${a.loanId?`<dt>Loan record</dt><dd><button type="button" class="link-btn" data-act="open-loan" data-id="${a.loanId}">${esc(a.loanId)}</button></dd>`:''}</dl></div>
    ${now?card({title:'Qualification today',body:eligibilityPanel(now)}):''}
    ${a.eligibility?`<div style="height:14px"></div>${card({title:'Qualification when submitted',sub:fmtDT(a.eligibility.at),body:`${outcomePill(a.eligibility.outcome)}<ul class="small" style="list-style:disc;padding-left:18px;margin-top:8px">${a.eligibility.checks.map(c=>`<li>${esc(c.label)}: ${c.res==='pass'?'met':c.res==='fail'?'not met':'needs review'} · ${esc(c.text)}</li>`).join('')}</ul>`})}`:''}
-   <div class="chips" style="margin-top:14px">${['Submitted','Needs Review'].includes(a.status)&&can('approve')?btn('app-decision','Approve or reject',{ic:'check',data:`data-id="${a.id}"`}):''}${a.status==='Approved'&&can('recordFinance')?btn('disburse','Record disbursement',{ic:'loan',cls:'btn-maroon',data:`data-id="${a.id}"`}):''}</div>`;
+   <div class="chips" style="margin-top:14px">${['Submitted','Needs Review'].includes(a.status)&&can('approve')&&a.submittedBy!==me().id?btn('app-decision','Approve or reject',{ic:'check',data:`data-id="${a.id}"`}):''}${a.status==='Approved'&&can('recordFinance')?btn('disburse','Record disbursement',{ic:'loan',cls:'btn-maroon',data:`data-id="${a.id}"`}):''}</div>`;
   openDrawer({title:`Loan application ${a.id}`,desc:esc(groupName(a.groupId)),body});
 }
 function openAppDecision(id){
   if(!needPerm('approve'))return;const a=S.loanApps.find(x=>x.id===id);if(!a)return;
+  if(a.submittedBy===me().id){toast('You submitted this application, so another official must decide on it.','error');return}
   const E=loanEligibility(a.memberId,a.amount,(a.guarantors||[]).length,a.months);
   openModal({title:`Decision on ${a.id}`,desc:`${esc(mName(a.memberId))} · ${ksh(a.amount)} · qualification: ${E.outcome}`,wide:true,body:`<div class="card" style="padding:14px;margin-bottom:12px">${eligibilityPanel(E)}</div><form id="frm-ad" data-form="app-decision" data-id="${a.id}" novalidate>${field({label:'Decision',name:'decision',opts:[['approve','Approve'],['reject','Reject']],value:E.outcome==='Not Eligible'?'reject':'approve'})}${field({label:'Reason (recorded with the decision)',name:'reason',type:'textarea',required:true,rows:2,err:'Give a reason of at least 8 characters.',hint:E.outcome!=='Eligible'?'The member does not fully qualify on current rules. Explain why the group decided this way.':'For example: "Qualified; agreed at the meeting of 12 October".'})}</form>`,footer:modalFooter('Save decision','frm-ad')});
 }
 FORMS['app-decision']=(form,d)=>{
   if(!needPerm('approve'))return;const a=S.loanApps.find(x=>x.id===form.dataset.id);if(!inAllowedGroup(a)||!['Submitted','Needs Review'].includes(a.status))return;
+  if(a.submittedBy===me().id){toast('You submitted this application, so another official must decide on it.','error');return}
   if(String(d.reason).trim().length<8){applyErrors(form,{reason:'x'});return}
   const prev=a.status;a.status=d.decision==='approve'?'Approved':'Rejected';a.decision={by:me().id,role:UI.role,at:nowStamp(),reason:String(d.reason).trim(),qualification:loanEligibility(a.memberId,a.amount,(a.guarantors||[]).length,a.months).outcome};a.updatedAt=nowStamp();
   logAudit({action:a.status==='Approved'?'Loan application approved':'Loan application rejected',target:a.id,detail:`${ksh(a.amount)} · ${mName(a.memberId)} · qualification at decision: ${a.decision.qualification}`,kind:'loan',memberId:a.memberId,prev,next:a.status,reason:a.decision.reason});
@@ -3006,7 +3047,7 @@ function settingsView(){
 }
 function rulesSettings(){
   const r=rules(),L=r.loans,Q=L.qualification||{},ed=can('editChama');
-  const src=r.source==='illustrative'?pill('info','Illustrative test values'):r.source==='confirmed'?pill('ok','Confirmed by the group','check'):pill('warn','Pending confirmation');
+  const src=r.source==='illustrative'?pill('info','Illustrative test values'):r.source==='confirmed'?pill('ok','Confirmed by the group','check'):r.source==='entered'?pill('teal','Partly set by officials'):pill('warn','Pending confirmation');
   const sec=(t,body)=>`<div class="rules-sec"><h3>${t}</h3>${body}</div>`;
   const kv=a=>`<dl class="kv">${a.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
   return `${notice(`Rules belong to each group. You are viewing <b>${esc(curGroup().groupName)}</b>. Switch group in the sidebar to see the others. Values marked "Pending confirmation" have not been supplied by the client and are never guessed.`,{ic:'sliders',tone:'teal'})}
@@ -3098,8 +3139,9 @@ function groupsSettings(){
   const ed=can('editChama');
   return `<div class="grid-eq">${card({title:'Organization',body:`<dl class="kv"><dt>Name</dt><dd>${esc(S.chama.name)}</dd>${S.chama.program?`<dt>Program</dt><dd>${esc(progFull())}</dd>`:''}<dt>Chama ID</dt><dd class="num">${esc(S.chama.chamaId)}</dd><dt>Location</dt><dd>${S.chama.location?esc(S.chama.location):PEND}</dd><dt>Community groups</dt><dd>${S.groups.map(g=>esc(g.groupName)).join(', ')}</dd><dt>VSLAs</dt><dd>${(S.vslas||[]).length}</dd><dt>Members (all groups)</dt><dd>${S.members.filter(m=>m.chamaId===S.chama.chamaId).length}</dd></dl>`})}
   ${card({title:'How records are kept apart',body:'<ul class="small stack" style="list-style:disc;padding-left:18px"><li>Every record carries a <b>chamaId</b> and a <b>groupId</b>; screens only show the selected group.</li><li>Officials can be limited to one group in Users & roles.</li><li>Members see only their own records plus what their group shares.</li><li>In production this must be enforced by the server (see Database).</li></ul>'})}</div>
-  ${card({flush:true,title:'Community groups',sub:'One community group per school',actions:`<div class="chips">${can('editChama')?btn('add-group','Add community group',{ic:'plus',cls:'btn-secondary btn-sm'}):''}${canImport()?btn('import-members','Import members from Excel',{ic:'download',cls:'btn-secondary btn-sm'}):''}</div>`,body:table({caption:'Community groups',cols:[{label:'Community group',render:g=>`<span class="who"><i class="gdot" style="background:${groupColor(g.groupId)}"></i><span><b>${esc(g.groupName)}</b> ${g.namePending?'<span class="pend">Name pending</span>':''}<span>${g.school?esc(g.school)+' school · ':''}${esc(g.groupId)} · member numbers ${esc(g.code)}-###</span></span></span>`},{label:'VSLAs',cls:'r',render:g=>vslasOf(g.groupId).length},{label:'Members',cls:'r',render:g=>S.members.filter(m=>m.groupId===g.groupId).length},{label:'Assisted / offline',cls:'r',render:g=>S.members.filter(m=>m.groupId===g.groupId&&m.accessMode==='Assisted / Offline').length},{label:'Rules',render:g=>{const n=pendingRuleCount(g.groupId);return rules(g.groupId).source==='illustrative'?pill('info','Test values'):n?pill('warn',`${n} pending`):pill('ok','Set','check')}},{label:'',nolabel:true,cls:'r',render:g=>ed?`<button type="button" class="btn btn-secondary btn-sm" data-act="edit-group" data-id="${g.groupId}">Rename</button>`:''}],rows:S.groups})})}
+  ${card({flush:true,title:'Community groups',sub:'One community group per school',actions:`<div class="chips">${can('editChama')?btn('add-group','Add community group',{ic:'plus',cls:'btn-secondary btn-sm'}):''}${canImport()?btn('import-members','Import members from Excel',{ic:'download',cls:'btn-secondary btn-sm'})+btn('ledger-import','Import VSLA ledger',{ic:'book',cls:'btn-secondary btn-sm'}):''}</div>`,body:table({caption:'Community groups',cols:[{label:'Community group',render:g=>`<span class="who"><i class="gdot" style="background:${groupColor(g.groupId)}"></i><span><b>${esc(g.groupName)}</b> ${g.namePending?'<span class="pend">Name pending</span>':''}<span>${g.school?esc(g.school)+' school · ':''}${esc(g.groupId)} · member numbers ${esc(g.code)}-###</span></span></span>`},{label:'VSLAs',cls:'r',render:g=>vslasOf(g.groupId).length},{label:'Members',cls:'r',render:g=>S.members.filter(m=>m.groupId===g.groupId).length},{label:'Assisted / offline',cls:'r',render:g=>S.members.filter(m=>m.groupId===g.groupId&&m.accessMode==='Assisted / Offline').length},{label:'Rules',render:g=>{const n=pendingRuleCount(g.groupId);return rules(g.groupId).source==='illustrative'?pill('info','Test values'):n?pill('warn',`${n} pending`):pill('ok','Set','check')}},{label:'',nolabel:true,cls:'r',render:g=>ed?`<button type="button" class="btn btn-secondary btn-sm" data-act="edit-group" data-id="${g.groupId}">Rename</button>`:''}],rows:S.groups})})}
   <div style="height:16px"></div>${vslaSettingsCard()}
+  ${(S.ledgerIssues||[]).length?`<div style="height:16px"></div>${ledgerIssuesCard()}`:''}
   ${isPlatformOwner()?`<div style="height:16px"></div>${card({flush:true,title:'Registered Chamas (platform view)',sub:'Other tenants are isolated placeholders. No records are loaded across Chamas',body:table({caption:'Tenants',cols:[{label:'Chama',render:t=>`<b>${esc(t.name)}</b><div class="muted tiny">${esc(t.chamaId)}</div>`},{label:'Status',render:t=>esc(t.status)},{label:'Records',render:t=>esc(t.recordMode)}],rows:S.tenants||[]})})}`:''}`;
 }
 function openEditGroup(id){
@@ -3139,6 +3181,7 @@ const SB_TABLES=[
   ['cashbook_entries',s=>s.cashbook],
   ['sfp_spending',s=>s.sfpSpend||[]],
   ['contribution_submissions',s=>s.submissions||[]],
+  ['ledger_issues',s=>s.ledgerIssues||[]],
   ['sms_outbox',s=>s.sms],
   ['audit_events',s=>s.audit],
 ];
@@ -3163,11 +3206,11 @@ async function sbLoad(){
       return true;
     }
     const get=async t=>(await sbSelectAll(t,cid)).map(r=>r.data);
-    const [groups,rulesRows,members,meetings,ledger,fines,welfare,loanApps,cashbook,sms,audit,sfpSpend,submissions,vslaRows]=await Promise.all(['groups','group_rules','members','meetings','financial_records','fines','welfare_payouts','loan_applications','cashbook_entries','sms_outbox','audit_events','sfp_spending','contribution_submissions','vslas'].map(get));
+    const [groups,rulesRows,members,meetings,ledger,fines,welfare,loanApps,cashbook,sms,audit,sfpSpend,submissions,vslaRows,ledgerIssues]=await Promise.all(['groups','group_rules','members','meetings','financial_records','fines','welfare_payouts','loan_applications','cashbook_entries','sms_outbox','audit_events','sfp_spending','contribution_submissions','vslas','ledger_issues'].map(get));
     const c=core[0].data,rulesObj={};rulesRows.forEach(r=>{const {id,...rest}=r;rulesObj[r.groupId]=rest});
     const byDate=(a,b)=>String(a.date||a.ts||'')<String(b.date||b.ts||'')?-1:1;
     S={chama:c.chama,actors:c.actors,demo:c.demo,schema:c.schema,tenants:c.tenants,notifications:c.notifications,generated:c.generated||[],
-      groups:groups.map(({id,...g})=>g).sort((a,b)=>a.groupId<b.groupId?-1:1),rules:rulesObj,members:members.sort((a,b)=>{const ga=String(a.groupId),gb=String(b.groupId);return ga<gb?-1:ga>gb?1:a.id<b.id?-1:1}),meetings:meetings.sort(byDate),ledger:ledger.sort(byDate),fines,welfare,loanApps,cashbook,sms,sfpSpend,submissions,vslas:vslaRows.map(({id,...v})=>v),audit:audit.sort((a,b)=>a.ts<b.ts?-1:1)};
+      groups:groups.map(({id,...g})=>g).sort((a,b)=>a.groupId<b.groupId?-1:1),rules:rulesObj,members:members.sort((a,b)=>{const ga=String(a.groupId),gb=String(b.groupId);return ga<gb?-1:ga>gb?1:a.id<b.id?-1:1}),meetings:meetings.sort(byDate),ledger:ledger.sort(byDate),fines,welfare,loanApps,cashbook,sms,sfpSpend,submissions,vslas:vslaRows.map(({id,...v})=>v),ledgerIssues,audit:audit.sort((a,b)=>a.ts<b.ts?-1:1)};
     SB.last={};SB_TABLES.forEach(([t,fn])=>fn(S).forEach(x=>{SB.last[t+'|'+x.id]=JSON.stringify(x)}));
     SB.lastSync=new Date();SB.error='';LIVE.lastAt=new Date();writeLocalCache();
     return true;
@@ -3290,6 +3333,8 @@ function actV7(name,el){
     case 'att-all':{const f=el.closest('form');$$('.att-row',f).filter(r=>!$('input[type=hidden]',r).value).forEach(r=>setAttendance($('button.present',r)));break}
     case 'fine-pay':openFinePay(id);break;
     case 'dash-range':UI.f.dashRange=+el.dataset.n;route();break;
+    case 'ledger-import':openLedgerImport();break;
+    case 'resolve-issue':openResolveIssue(el.dataset.id);break;
     case 'photo-pause':PHOTO.paused=!PHOTO.paused;document.querySelectorAll('[data-act="photo-pause"]').forEach(b=>{b.setAttribute('aria-pressed',String(PHOTO.paused));b.textContent=PHOTO.paused?'Play photos':'Pause photos'});break;
     case 'import-members':openImport({groupId:UI.group});break;
     case 'add-group':openImport({newGroup:true});break;
@@ -3305,6 +3350,8 @@ function actV7(name,el){
     case 'set-loan-rate':openSetLoanRate(id);break;
     case 'fine-waive':openFineWaive(id);break;
     case 'add-fine':openAddFine();break;
+    case 'meeting-fine':openAddFine({memberId:el.dataset.member,meetingId:el.dataset.meeting});break;
+    case 'set-rule':openSetRule(el.dataset.key);break;
     case 'rec-welfare':openWelfarePayout();break;
     case 'welfare-review':openWelfareReview(id);break;
     case 'apply-loan':openLoanApp();break;
@@ -3341,6 +3388,7 @@ function inputV7(t){
   return false;
 }
 function changeV7(t){
+  if(t.matches('[data-change="ledger-file"]')){previewLedger(t);return true}
   if(t.matches('[data-change="imp-file"]')){previewImport(t);return true}
   if(t.closest('#frm-imp')&&t.name==='groupId'){const f=$('#imp-file');if(f&&f.files&&f.files.length)previewImport(f);return true}
   if(t.matches('[data-change="reg-file"]')){const r=regState(),box=$('#reg-file-note');const file=t.files&&t.files[0];if(!file){r.importParsed=null;box.innerHTML='';return true}box.innerHTML='<div class="inline-note">Reading the file…</div>';readSheet(file).then(pz=>{if(!pz.rows.length)throw new Error('The sheet has a header row but no member rows.');r.importParsed=pz;const cg=[...new Set(pz.rows.map(x=>String(x.community||'').trim()).filter(Boolean))];box.innerHTML=`<div class="inline-note ok"><b>${esc(file.name)}</b>: ${plural(pz.rows.length,'member')}${cg.length?`, community groups: ${cg.map(esc).join(', ')}`:''}. They are checked and imported when you create the Chama.</div>`}).catch(e=>{r.importParsed=null;box.innerHTML=`<div class="inline-note bad">${esc(e.message||String(e))}</div>`});return true}
@@ -3474,7 +3522,7 @@ function dashAnalytics(){
   const sf=sfpSummary(),sfB=keys.map(k=>sum(sf.contribs.filter(e=>e.date<=lastDayISO(k)))-sum(sf.spend.filter(p=>p.date<=lastDayISO(k))));
   const savers=GM().map(m=>({label:m.name,value:memberStats(m.id).savingsTotal,series:'Total savings'})).sort((a,b)=>b.value-a.value).slice(0,6);
   const fk=keys.map(k=>{const F=GF().map(fineInfo);return{g:sum(F.filter(f=>monthKey(f.date)===k&&f.amountVal!=null&&f.status!=='Cancelled'),f=>f.amountVal),c:sum(F.flatMap(f=>(f.payments||[]).filter(p=>monthKey(p.date)===k)))}});
-  const heatKeys=keysBetween(keyAdd(curKey(),-5),curKey()),people=activeMembers();
+  const heatKeys=keysBetween(keyAdd(curKey(),-5),curKey()),allP=activeMembers(),score=m=>heatKeys.reduce((a,k)=>a+({overdue:3,partial:2,late:1}[periodStatus(m.id,k).state]||0),0),people=allP.length>30?allP.slice().sort((a,b)=>score(b)-score(a)).slice(0,30):allP;
   return `<div class="dash-sec"><h2 class="sec-h">Group analytics</h2>${dashFilterRow()}</div>
   <div class="grid-eq">
    ${chartCard({title:'Money in vs money out',sub:'From the cash book, by month',legend:vizLegend([{name:'Money in',color:VIZ.blue},{name:'Money out',color:VIZ.orange}]),chart:vizColumns({cats:labels,catTitle:(c)=>kt(labels.indexOf(c)),series:[{key:'i',name:'Money in',color:VIZ.blue},{key:'o',name:'Money out',color:VIZ.orange}],val:(i,k)=>io[i][k]}),table:vizTable('Money in and out',['Month','Money in','Money out'],keys.map((k,i)=>[keyLabelLong(k),ksh(io[i].i),ksh(io[i].o)]))})}
@@ -3488,7 +3536,7 @@ function dashAnalytics(){
    ${chartCard({title:'Attendance by meeting',sub:mts.length?`Average ${Math.round(sum(mts,m=>meetingStats(m).pct)/mts.length)}% present`:'No meetings in this period',legend:vizLegend([{name:'✓ Present',color:VIZ.good},{name:'Ⓔ With apology',color:VIZ.warn},{name:'X Without apology',color:VIZ.crit}]),chart:mts.length?vizColumns({cats:mts.map(m=>fmtDate(m.date).replace(/ \d{4}$/,'')),stacked:true,fmt:v=>plural(v,'member'),labelLast:false,series:[{key:'present',name:'✓ Present',color:VIZ.good},{key:'apology',name:'Ⓔ With apology',color:VIZ.warn},{key:'absent',name:'X Without apology',color:VIZ.crit}],val:(i,k)=>meetingStats(mts[i])[k]}):'<p class="muted small">No meetings held in this period.</p>',table:vizTable('Attendance',['Meeting','Present','With apology','Without apology'],mts.map(m=>{const s=meetingStats(m);return[fmtDate(m.date),s.present,s.apology,s.absent]}))})}
    ${chartCard({title:'Loan portfolio',sub:allInst.length?`${pct(onT,allInst.length)}% of paid instalments were on time`:'No instalments paid yet',chart:vizDonut({segments:port.map(([label,list,color])=>({label,value:list.length,color,fmt:`${plural(list.length,'loan')}`})),center:String(L.length),sub:'loans'}),table:vizTable('Loan portfolio',['Status','Loans','Outstanding'],port.map(([l,list])=>[l,list.length,ksh(sum(list,x=>x.outstanding))]))})}
   </div>
-  ${chartCard({title:'Contribution compliance',sub:'Each member\'s combined monthly contribution status, last 6 months',chart:people.length?vizHeat({rows:people.map(m=>m.name),cols:heatKeys.map(k=>MON[+k.slice(5)-1]),cell:(i,j)=>periodStatus(people[i].id,heatKeys[j]).state,legendKeys:['paid','late','partial','overdue','due']}):'<p class="muted small">No members yet.</p>'})}
+  ${chartCard({title:'Contribution compliance',sub:allP.length>30?`The 30 members who most need follow-up, of ${allP.length}. See Contributions → By member for everyone.`:'Each member\'s combined monthly contribution status, last 6 months',chart:people.length?vizHeat({rows:people.map(m=>m.name),cols:heatKeys.map(k=>MON[+k.slice(5)-1]),cell:(i,j)=>periodStatus(people[i].id,heatKeys[j]).state,legendKeys:['paid','late','partial','overdue','due']}):'<p class="muted small">No members yet.</p>'})}
   <div style="height:16px"></div>
   <div class="grid-eq">
    ${chartCard({title:'Fund balances',sub:'Social Fund / Welfare and School Feeding Programme',legend:vizLegend([{name:'Social Fund / Welfare',color:VIZ.blue},{name:'School Feeding Programme',color:VIZ.orange}],'line'),chart:vizLine({cats:labels,catTitle:(c)=>kt(labels.indexOf(c)),area:false,minZero:false,series:[{key:'w',name:'Social Fund / Welfare',color:VIZ.blue},{key:'f',name:'School Feeding Programme',color:VIZ.orange}],val:(i,k)=>k==='w'?wsB[i]:sfB[i]}),table:vizTable('Fund balances',['Month','Social Fund / Welfare','School Feeding Programme'],keys.map((k,i)=>[keyLabelLong(k),ksh(wsB[i]),ksh(sfB[i])]))})}
@@ -3650,7 +3698,7 @@ FORMS['reject-sub']=(form,d)=>{if(String(d.reason).trim().length<8){applyErrors(
 
 /* =====================================================================
    v0.8 · COMMUNITY GROUPS, VSLAs AND THE ALL-GROUPS PANE
-   Structure: Mara Enterprise Women Group → community group (one per school:
+   Structure: HPF Micro Enterprise Program → community group (one per school:
    Olemoncho, Mbitin, Nterere) → VSLAs (Village Savings and Loans Associations)
    → members. Each community group keeps one colour on every chart.
    ===================================================================== */
@@ -3688,10 +3736,10 @@ function orgDashboard(){
   const vRow=(s,val)=>({label:s.v.name,group:groupName(s.v.groupId),value:val,color:groupColor(s.v.groupId)});
   const legend=vizLegend(gs.map(x=>({name:x.name,color:x.color})));
   const unassigned=S.members.filter(m=>G.some(g=>g.groupId===m.groupId)&&m.status==='Active'&&!vslaById(m.vslaId)).length;
-  return `${pageHeader({title:S.chama.name,crumbs:progLabel()?esc(progFull()):'',desc:`All ${G.length} community groups and their ${V.length} VSLAs on one page, <span id="live-stamp">${liveLabel()}</span>. Each community group keeps the same colour on every chart.`})}
+  return `${pageHeader({title:S.chama.name,crumbs:esc(progLabel()?progFull():orgSub()),desc:`All ${G.length} community groups and their ${V.length} VSLAs on one page. <span id="live-stamp">${liveLabel()}</span>. Each community group keeps the same colour on every chart.`})}
   ${dashTabs('org')}
   ${photoBanner('Our community groups at work',`${G.map(g=>g.groupName).join(', ')} · ${progLabel()||'Micro Enterprise Program'}`)}
-  <div class="stats">${statCard({label:'Members',value:num(sum(per,p=>p.members)),sub:`${G.length} community groups · ${V.length} VSLAs${unassigned?` · ${unassigned} not in a VSLA yet`:''}`,ic:'users',cls:'span-2'})}${statCard({label:'Total savings',value:ksh(sum(per,p=>p.savings)),sub:'All groups',ic:'coins'})}${statCard({label:'Cash balance',value:ksh(sum(per,p=>p.cash)),sub:'Sum of the groups\' cash books',ic:'cash'})}${statCard({label:'Loans outstanding',value:ksh(sum(per,p=>p.loans)),sub:`${sum(per,p=>p.overdue)} overdue`,ic:'loan',tone:'maroon'})}${statCard({label:'Social Fund / Welfare',value:ksh(sum(per,p=>p.welfare)),sub:'All groups',ic:'heart'})}${statCard({label:'School Feeding Programme',value:ksh(sum(per,p=>p.sfp.balance)),sub:`${num(sum(per,p=>p.sfp.meals))} meals recorded`,ic:'building'})}</div>
+  <div class="stats">${statCard({label:'Members',value:num(sum(per,p=>p.members)),sub:`${G.length} community groups · ${V.length} VSLAs${unassigned?` · ${unassigned} not in a VSLA yet`:''}`,ic:'users',cls:'span-2'})}${statCard({label:'Total savings',value:ksh(sum(per,p=>p.savings)),sub:'All groups',ic:'coins'})}${statCard({label:'Cash balance',value:ksh(sum(per,p=>p.cash)),sub:'Sum of the groups\' cash books',ic:'cash'})}${statCard({label:'Loans outstanding',value:ksh(sum(per,p=>p.loans)),sub:`${sum(per,p=>p.overdue)} overdue${sum(G,g=>loanRoundsTotal(g.groupId))?` · ${ksh(sum(G,g=>loanRoundsTotal(g.groupId)))} issued in ledger loan rounds`:''}`,ic:'loan',tone:'maroon'})}${statCard({label:'Social Fund / Welfare',value:ksh(sum(per,p=>p.welfare)),sub:'All groups',ic:'heart'})}${statCard({label:'School Feeding Programme',value:ksh(sum(per,p=>p.sfp.balance)),sub:`${num(sum(per,p=>p.sfp.meals))} meals recorded`,ic:'building'})}</div>
   <div class="dash-sec"><h2 class="sec-h">Community groups compared</h2>${dashFilterRow()}</div>
   <div class="card" style="padding:12px 16px;margin-bottom:16px">${legend}<p class="muted small" style="margin:0">${gs.map(x=>`<b>${esc(x.name)}</b>${x.g.school?` (${esc(x.g.school)} school)`:''}`).join(' · ')}</p></div>
   <div class="grid-eq">
@@ -3731,6 +3779,7 @@ function groupVslaSection(){
 }
 
 /* ---------- VSLA management (Settings → Chama & groups) ---------- */
+const loanRoundsTotal=gid=>sum((S.cashbook||[]).filter(c=>c.groupId===gid&&c.category===LOAN_ROUND_CAT&&c.status==='Recorded'));
 function vslaSettingsCard(){
   const ed=can('editChama');
   return card({flush:true,title:'VSLAs (Village Savings and Loans Associations)',sub:'Each community group has its own VSLAs. Every member belongs to one.',actions:ed?btn('add-vsla','Add VSLA',{ic:'plus',cls:'btn-secondary btn-sm'}):'',body:table({caption:'VSLAs',cols:[
@@ -3818,9 +3867,9 @@ function planImport(parsed,{defaultGroupId,allowNewGroups=false}={}){
     const err=m=>plan.errors.push({line:r.line,name:String(r.name??'').trim(),msg:m});
     const name=String(r.name??'').trim().replace(/\s+/g,' ');
     if(name.length<3)return err('Full name is missing or too short.');
-    const forced=String(r.community??'').startsWith(' ');
+    const forced=String(r.community??'').startsWith('\u0000');
     let g=forced?null:r.community?findGroupByText(r.community):S.groups.find(x=>x.groupId===defaultGroupId);
-    if(!g&&r.community&&allowNewGroups){const nm=String(r.community).replace(' ','').trim();g=plan.newGroups.find(x=>x.groupName.toLowerCase()===nm.toLowerCase());if(!g){g={groupId:'NEW:'+nm,groupName:nm,school:nm,isNew:true};plan.newGroups.push(g)}}
+    if(!g&&r.community&&allowNewGroups){const nm=String(r.community).replace('\u0000','').trim();g=plan.newGroups.find(x=>x.groupName.toLowerCase()===nm.toLowerCase());if(!g){g={groupId:'NEW:'+nm,groupName:nm,school:nm,isNew:true};plan.newGroups.push(g)}}
     if(!g)return err(r.community?`Community group "${String(r.community).trim()}" is not registered. Add it first, or fix the spelling.`:'No community group given, and none was chosen for this import.');
     if(!g.isNew&&!inAllowedGroup(g))return err(`You are not allowed to change ${g.groupName}.`);
     const phone=importPhone(r.phone);if(phone==='invalid')return err(`Phone "${r.phone}" is not a Kenyan mobile number (e.g. 0712 345 678).`);
@@ -3864,13 +3913,13 @@ function applyImport(plan){
   logAudit({action:'Member list imported from Excel',target:plan.fileName,detail:`${plan.adds.length} added, ${plan.updates.length} updated, ${plan.newVslas.length} VSLAs and ${plan.newGroups.length} community groups created, ${plan.errors.length} rows skipped`,kind:'member',groupId:''});
   return{added:plan.adds.length,updated:plan.updates.length,vslas:plan.newVslas.length,groups:plan.newGroups.length};
 }
-function createGroup({name,school,code}){
+function createGroup({name,school,code,userId}){
   const used=new Set(S.groups.map(g=>g.code));let c=(code||String(name).replace(/[^A-Za-z]/g,'').slice(0,3)||'GRP').toUpperCase();let k=2;while(used.has(c)){c=c.slice(0,2)+k;k++}
   const n=S.groups.reduce((m,g)=>Math.max(m,+String(g.groupId).split('-')[1]||0),0)+1;
   const g={groupId:'GRP-'+String(n).padStart(2,'0'),code:c,chamaId:S.chama.chamaId,programId:S.chama.program?S.chama.program.programId:undefined,groupName:String(name).trim(),namePending:false,school:school?String(school).trim():null,status:'Active',createdAt:nowStamp()};
   S.groups.push(g);S.rules[g.groupId]=defaultRules(g.groupId);if(g.school)S.rules[g.groupId].schoolFeeding.schools=[g.school];
-  if(!isPlatformOwner()){const u=me();if(Array.isArray(u.groupAccess)&&!u.groupAccess.includes(g.groupId))u.groupAccess.push(g.groupId)}
-  logAudit({action:'Community group registered',target:g.groupId,detail:`${g.groupName}${g.school?' ('+g.school+' school)':''} · member numbers ${g.code}-###`,kind:'settings',groupId:g.groupId,next:g.groupName});
+  if(!isPlatformOwner()){const u=me();if(u&&Array.isArray(u.groupAccess)&&!u.groupAccess.includes(g.groupId))u.groupAccess.push(g.groupId)}
+  logAudit({userId,action:'Community group registered',target:g.groupId,detail:`${g.groupName}${g.school?' ('+g.school+' school)':''} · member numbers ${g.code}-###`,kind:'settings',groupId:g.groupId,next:g.groupName});
   return g;
 }
 function importPreviewHtml(plan){
@@ -3901,7 +3950,7 @@ async function previewImport(input){
     const newGroup=!!form.dataset.newgroup;
     const gidSel=newGroup?'__new__':(formData(form).groupId||UI.group);
     let plan;
-    if(newGroup){const nm=String(formData(form).gname||'').trim()||'New community group';if(S.groups.some(g=>g.groupName.toLowerCase()===nm.toLowerCase()))throw new Error(`A community group called ${nm} already exists. Use "Import members" to update it.`);parsed.rows.forEach(r=>{r.community=' '+nm});plan=planImport(parsed,{allowNewGroups:true})}
+    if(newGroup){const nm=String(formData(form).gname||'').trim()||'New community group';if(S.groups.some(g=>g.groupName.toLowerCase()===nm.toLowerCase()))throw new Error(`A community group called ${nm} already exists. Use "Import members" to update it.`);parsed.rows.forEach(r=>{r.community='\u0000'+nm});plan=planImport(parsed,{allowNewGroups:true})}
     else plan=planImport(parsed,{defaultGroupId:gidSel});
     UI.importPlan=plan;box.innerHTML=`<div class="inline-note ok">Read <b>${esc(file.name)}</b>: ${plural(parsed.rows.length,'row')}, columns found: ${parsed.columns.map(esc).join(', ')}.</div>`+importPreviewHtml(plan);
   }catch(e){box.innerHTML=`<div class="inline-note bad">${esc(e.message||String(e))}</div>`}
@@ -3939,7 +3988,7 @@ async function downloadTemplate(){
 const LIVE={timer:null,lastAt:null,pulling:false,every:15000};
 function liveStamp(){const t=LIVE.lastAt||new Date();return `${pad(t.getHours())}:${pad(t.getMinutes())}:${pad(t.getSeconds())}`}
 function liveLabel(){return sbConfigured()&&PERSIST.mode==='supabase'?`Live · updated ${liveStamp()} · refreshes every ${LIVE.every/1000} seconds`:`Updated ${liveStamp()} · connect Supabase (Settings → Database) for live data across devices`}
-const SB_MERGE={chamas:null,groups:['groups','groupId'],vslas:['vslas','vslaId'],group_rules:null,members:['members','id'],meetings:['meetings','id'],financial_records:['ledger','id'],fines:['fines','id'],welfare_payouts:['welfare','id'],loan_applications:['loanApps','id'],cashbook_entries:['cashbook','id'],sfp_spending:['sfpSpend','id'],contribution_submissions:['submissions','id'],sms_outbox:['sms','id'],audit_events:['audit','id']};
+const SB_MERGE={chamas:null,groups:['groups','groupId'],vslas:['vslas','vslaId'],group_rules:null,members:['members','id'],meetings:['meetings','id'],financial_records:['ledger','id'],fines:['fines','id'],welfare_payouts:['welfare','id'],loan_applications:['loanApps','id'],cashbook_entries:['cashbook','id'],sfp_spending:['sfpSpend','id'],contribution_submissions:['submissions','id'],ledger_issues:['ledgerIssues','id'],sms_outbox:['sms','id'],audit_events:['audit','id']};
 async function livePull(force){
   if(LIVE.pulling||!S||!sbConfigured()||PERSIST.mode!=='supabase'||SB.busy||SB.timer&&SB.pending)return;
   if(document.visibilityState==='hidden'&&!force)return;
@@ -3954,7 +4003,7 @@ async function livePull(force){
         const [coll,key]=SB_MERGE[t];const val=(t==='groups'||t==='vslas')?(({id,...x})=>x)(r.data):r.data;S[coll]=S[coll]||[];const i=S[coll].findIndex(x=>x[key]===val[key]);if(i>=0)S[coll][i]=val;else S[coll].push(val)});
     }
     SB.pulledAt=maxAt;LIVE.lastAt=new Date();
-    if(changed){ensureV07Data();writeLocalCache();liveRerender()}
+    if(changed){bumpData();ensureV07Data();writeLocalCache();liveRerender()}
     else{const el=$('#live-stamp');if(el)el.textContent=liveLabel()}
   }catch(e){SB.error=String(e.message||e)}
   LIVE.pulling=false;
@@ -3971,6 +4020,316 @@ function startLive(){
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&sbConfigured()&&PERSIST.mode==='supabase')livePull()});
 /* same-browser live updates across tabs when Supabase is not connected */
 window.addEventListener('storage',e=>{if(e.key!==LOCAL_KEY||!e.newValue||sbConfigured())return;if(readLocalCache()){ensureV07Data();LIVE.lastAt=new Date();liveRerender()}});
+
+
+/* =====================================================================
+   v0.9.1 · VSLA LEDGER IMPORT (Savings_Groups_Ledger workbook)
+   Reads the transcribed ledger workbook in the browser (All Records, Issues Log,
+   Summary). Records are kept exactly as written; flags and the Issues Log travel
+   with them. The data stays in this browser or the Chama's own Supabase project:
+   it is never part of the public page.
+   ===================================================================== */
+const LEDGER_BY='ledger-import';
+const LOAN_ROUND_CAT='Loan disbursement (group round)';
+const MON3={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+const clean=v=>String(v??'').trim();
+function aoaOf(X,wb,name){const ws=wb.Sheets[name];return ws?X.utils.sheet_to_json(ws,{header:1,raw:true,defval:''}):null}
+function ledgerRaw(v){ /* date cell → {iso|null, month|null, star, undated, text} */
+  if(v instanceof Date&&!isNaN(v))return{iso:toISO(v),text:toISO(v)};
+  if(typeof v==='number'&&v>20000&&v<80000){const d=new Date(Date.UTC(1899,11,30)+v*864e5);const iso=`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`;return{iso,text:iso}}
+  const s=clean(v);let m;
+  if((m=s.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})(\*)?$/))&&MON3[m[2].toLowerCase()]!=null)return{iso:`${m[3]}-${pad(MON3[m[2].toLowerCase()]+1)}-${pad(m[1])}`,star:!!m[4],text:s};
+  if((m=s.match(/^_+-([A-Za-z]{3})-(\d{4})$/))&&MON3[m[1].toLowerCase()]!=null)return{iso:null,month:`${m[2]}-${pad(MON3[m[1].toLowerCase()]+1)}`,text:s};
+  if(/^undated/i.test(s))return{iso:null,undated:true,text:s};
+  return{iso:null,bad:true,text:s};
+}
+async function readLedgerWorkbook(file){
+  if(!file)throw new Error('Choose the ledger workbook first.');
+  if(!/\.(xlsx|xlsm|xls)$/i.test(file.name))throw new Error('Upload the ledger workbook (.xlsx).');
+  const X=await loadXLSX();const wb=X.read(await file.arrayBuffer(),{type:'array',cellDates:true});
+  const all=aoaOf(X,wb,'All Records');
+  if(!all)throw new Error('This workbook has no "All Records" sheet, so it is not the VSLA ledger format. Use "Import from Excel" for member lists.');
+  const head=all[0].map(h=>clean(h).toLowerCase());
+  const col=n=>head.indexOf(n);
+  const need=['group','record type','date','member no','member','amount (kes)','recorded balance (kes)','flag'];
+  const missing=need.filter(n=>col(n)<0);if(missing.length)throw new Error('The "All Records" sheet is missing columns: '+missing.join(', '));
+  const rows=all.slice(1).map((r,i)=>({line:i+2,group:clean(r[col('group')]),type:clean(r[col('record type')]),dateRaw:r[col('date')],no:r[col('member no')]===''?null:Number(r[col('member no')]),member:clean(r[col('member')]),amount:r[col('amount (kes)')]===''?null:Number(r[col('amount (kes)')]),balance:r[col('recorded balance (kes)')]===''?null:Number(r[col('recorded balance (kes)')]),flag:clean(r[col('flag')])})).filter(r=>r.group);
+  const bad=rows.filter(r=>!['Savings','Social fund','Loan issued'].includes(r.type));if(bad.length)throw new Error(`Unknown record type "${bad[0].type}" on row ${bad[0].line}.`);
+  const nums=rows.filter(r=>r.amount!=null&&!(r.amount>=0&&Number.isFinite(r.amount)));if(nums.length)throw new Error(`Amount on row ${nums[0].line} is not a number.`);
+  /* Issues Log */
+  const il=aoaOf(X,wb,'Issues Log')||[];const ih=(il[0]||[]).map(h=>clean(h).toLowerCase());const ic=n=>ih.indexOf(n);
+  const issues=il.slice(1).filter(r=>clean(r[ic('group')])).map(r=>({no:clean(r[ic('#')]),group:clean(r[ic('group')]),area:clean(r[ic('area')]),date:clean(r[ic('date')]),member:clean(r[ic('member')]),shows:clean(r[ic('what the ledger shows')]),requires:clean(r[ic('what the numbers require')]),impact:r[ic('impact on total (kes)')]===''?null:Number(r[ic('impact on total (kes)')]),confidence:clean(r[ic('confidence')]),note:clean(r[ic('note')])}));
+  /* Summary sheet: the workbook's own totals, used to verify the import */
+  const su=aoaOf(X,wb,'Summary')||[];const hi=su.findIndex(r=>clean(r[0]).toLowerCase()==='group');const summary={};
+  if(hi>=0){const sh=su[hi].map(h=>clean(h).toLowerCase());const sc=n=>sh.findIndex(h=>h.startsWith(n));
+    su.slice(hi+1).forEach(r=>{const g=clean(r[0]);if(!g||/^total$/i.test(g))return;summary[g]={members:Number(r[sc('members')])||0,savings:Number(r[sc('savings contributed')])||0,balances:Number(r[sc('member balances')])||0,social:Number(r[sc('social fund collected')])||0,loans:Number(r[sc('all loan rounds total')])||0,ledgerTotal:Number(r[sc('ledger final total')])||0}})}
+  return{fileName:file.name,rows,issues,summary};
+}
+function planLedger(src){
+  const groups=[];const byName=new Map();
+  src.rows.forEach(r=>{if(!byName.has(r.group)){const g={name:r.group,rows:[]};byName.set(r.group,g);groups.push(g)}byName.get(r.group).rows.push(r)});
+  const problems=[];
+  groups.forEach(g=>{
+    const savDates=[...new Set(g.rows.filter(r=>r.type==='Savings').map(r=>ledgerRaw(r.dateRaw).iso).filter(Boolean))].sort();
+    const dateOf=(r)=>{const d=ledgerRaw(r.dateRaw);
+      if(d.iso)return{iso:d.iso,note:d.star?`Date "${d.text}" is marked uncertain (*) in the transcription.`:''};
+      if(d.month){const same=savDates.find(x=>x.slice(0,7)===d.month);return same?{iso:same,note:`Day not legible in the ledger ("${d.text}"); dated to this group's savings meeting on ${fmtDate(same)}.`}:{iso:d.month+'-01',note:`Day not legible in the ledger ("${d.text}"); recorded on the 1st of the month.`}}
+      if(d.undated){const all=[...new Set(g.rows.map(x=>ledgerRaw(x.dateRaw).iso).filter(Boolean))].sort();
+        const idx=g.rows.filter(x=>x.type===r.type).map(x=>clean(x.dateRaw));const order=[...new Set(idx)];const pos=order.indexOf(clean(r.dateRaw));
+        const prev=order.slice(0,pos).map(x=>ledgerRaw(x).iso).filter(Boolean).pop(),next=order.slice(pos+1).map(x=>ledgerRaw(x).iso).find(Boolean);
+        if(prev&&next){const mid=toISO(new Date((parseISO(prev).getTime()+parseISO(next).getTime())/2));return{iso:mid,note:`Undated column in the ledger (between ${fmtDate(prev)} and ${fmtDate(next)}); placed on ${fmtDate(mid)} for ordering only. Confirm the real date.`}}
+        problems.push(`${g.name}: an undated column could not be placed between two known dates.`);return{iso:null}}
+      problems.push(`${g.name}: date "${d.text}" on row ${r.line} is not recognised.`);return{iso:null}};
+    /* members, matched by name inside the group (the ledger's numbers differ between pages) */
+    const mem=new Map();
+    g.rows.filter(r=>r.type!=='Loan issued').forEach(r=>{const struck=/\(struck out\)/i.test(r.member);const name=r.member.replace(/\s*\(struck out\)\s*/i,'').trim();if(!name)return;
+      const k=name.toLowerCase();if(!mem.has(k))mem.set(k,{name,firstNo:r.type==='Savings'?r.no:null,struck,records:0});const m=mem.get(k);if(r.type==='Savings'&&m.firstNo==null)m.firstNo=r.no;if(struck)m.struck=true;if(r.amount)m.records++});
+    g.members=[...mem.values()].sort((a,b)=>(a.firstNo??999)-(b.firstNo??999));
+    g.savings=[];g.social=[];g.loans=[];
+    g.rows.forEach(r=>{
+      if(r.type==='Loan issued'){if(!r.amount)return;const d=dateOf(r);g.loans.push({iso:d.iso,amount:r.amount,flag:r.flag,dateNote:d.note});return}
+      if(!r.amount){return}
+      const d=dateOf(r);const name=r.member.replace(/\s*\(struck out\)\s*/i,'').trim();
+      const rec={iso:d.iso,amount:r.amount,member:name,balance:r.balance,flag:r.flag,dateNote:d.note,raw:clean(r.dateRaw),line:r.line};
+      (r.type==='Savings'?g.savings:g.social).push(rec);
+    });
+    /* loan rounds: identical lines on the same date are grouped (e.g. 9 members × 11,000) */
+    const lr=new Map();g.loans.forEach(l=>{const k=l.iso+'|'+l.amount+'|'+l.flag;if(!lr.has(k))lr.set(k,{iso:l.iso,amount:l.amount,count:0,flag:l.flag});lr.get(k).count++});
+    g.loanLines=[...lr.values()].sort((a,b)=>a.iso<b.iso?-1:a.iso>b.iso?1:b.amount-a.amount);
+    g.totals={savings:sum(g.savings),social:sum(g.social),loans:sum(g.loans),balances:g.members.reduce((a,m)=>{const last=g.savings.filter(s=>s.member.toLowerCase()===m.name.toLowerCase()&&s.balance!=null).sort((x,y)=>x.iso<y.iso?-1:1).pop();return a+(last?last.balance:0)},0)};
+    g.expected=src.summary[g.name]||null;
+    g.flagged=g.savings.filter(s=>s.flag).length+g.social.filter(s=>s.flag).length+g.loanLines.filter(l=>l.flag).length;
+    g.dateNotes=g.savings.filter(s=>s.dateNote).length+g.social.filter(s=>s.dateNote).length;
+    g.issues=src.issues.filter(i=>i.group===g.name);
+    if(g.expected){[['savings','Savings entries'],['social','Social Fund'],['loans','Loans']].forEach(([k,l])=>{if(g.totals[k]!==g.expected[k])problems.push(`${g.name}: ${l} add up to ${num(g.totals[k])}, but the Summary sheet says ${num(g.expected[k])}.`)})}
+    else problems.push(`${g.name} is not listed on the Summary sheet, so its totals cannot be cross-checked.`);
+  });
+  return{fileName:src.fileName,groups,problems,issuesAll:src.issues.filter(i=>!groups.some(g=>g.name===i.group)),src};
+}
+function applyLedger(plan,{targets,replace}){
+  const snapshot=JSON.stringify(S),result={groups:[]};
+  try{
+    if(replace){
+      const keep=S.groups.map(g=>({...g}));
+      S={...S,demo:false,groups:keep,vslas:[],members:[],ledger:[],meetings:[],fines:[],welfare:[],loanApps:[],cashbook:[],sfpSpend:[],submissions:[],sms:[],audit:[],ledgerIssues:[],actors:{},generated:[]};
+      keep.forEach(g=>{if(S.rules[g.groupId]&&S.rules[g.groupId].source==='illustrative'){const sf=S.rules[g.groupId].schoolFeeding;S.rules[g.groupId]=defaultRules(g.groupId);if(sf&&sf.schools)S.rules[g.groupId].schoolFeeding.schools=sf.schools}});
+    }
+    S.ledgerIssues=S.ledgerIssues||[];S.vslas=S.vslas||[];
+    const A=(o)=>logAudit({...o,userId:LEDGER_BY});
+    if(replace)A({action:'Sample data removed',target:S.chama.name,detail:`Fictional sample members and records removed before importing ${plan.fileName}`,kind:'settings',groupId:''});
+    plan.groups.forEach(g=>{
+      const t=targets[g.name]||'new';
+      const cg=t==='new'?createGroup({name:g.name,school:null,userId:LEDGER_BY}):S.groups.find(x=>x.groupId===t);
+      if(!cg)throw new Error(`Community group for ${g.name} not found.`);
+      if(!catsOf(cg.groupId).some(c=>c.fund===WELFARE_FUND))rules(cg.groupId).contributionCategories.unshift({id:'CAT-SOCIAL',name:'Social Fund',fund:WELFARE_FUND,frequency:'Monthly',basis:'savings',tiers:[]});
+      const socialCat=catsOf(cg.groupId).find(c=>c.fund===WELFARE_FUND).id;
+      const v={vslaId:nextSeq(S.vslas.map(x=>({id:x.vslaId})),'VSLA',3),chamaId:S.chama.chamaId,groupId:cg.groupId,name:g.name,namePending:false,status:'Active',source:'ledger-import',createdAt:nowStamp(),updatedAt:nowStamp()};
+      S.vslas.push(v);
+      A({action:'VSLA registered (ledger import)',target:v.vslaId,detail:`${v.name} in ${cg.groupName} from ${plan.fileName}`,kind:'settings',groupId:cg.groupId,next:v.name});
+      const code=cg.code||'G',idOf={};
+      const first=(name)=>{const ds=[...g.savings,...g.social].filter(r=>r.member.toLowerCase()===name.toLowerCase()&&r.iso).map(r=>r.iso).sort();return ds[0]||[...g.savings,...g.social].map(r=>r.iso).filter(Boolean).sort()[0]||todayISO()};
+      g.members.forEach(m=>{
+        const id=code+'-'+String(S.members.filter(x=>x.id.startsWith(code+'-')).reduce((a,y)=>Math.max(a,+y.id.split('-')[1]||0),0)+1).padStart(3,'0');
+        const mm={id,memberId:id,memberNumber:id,chamaId:S.chama.chamaId,groupId:cg.groupId,vslaId:v.vslaId,name:m.name,phone:'Not added',joined:first(m.name),role:'Member',status:m.struck?'Inactive':'Active',accessMode:'Not recorded',kycStatus:'Not Started',groupAccess:[cg.groupId],placeholder:false,ledgerNo:m.firstNo,source:'ledger-import',note:m.struck?`Struck out in the ${g.name} Social Fund list; appears to have left the group.`:'',createdAt:nowStamp(),updatedAt:nowStamp()};
+        S.members.push(mm);idOf[m.name.toLowerCase()]=id;
+        A({action:'Member registered (ledger import)',target:id,detail:`${mm.name} · ${v.name}${m.struck?' · inactive (struck out in ledger)':''}`,kind:'member',memberId:id});
+      });
+      const base={chamaId:S.chama.chamaId,groupId:cg.groupId,status:'Recorded',by:LEDGER_BY,method:'Cash',source:'ledger-import'};
+      g.savings.forEach(r=>{const e={...base,id:nextId('saving'),type:'saving',memberId:idOf[r.member.toLowerCase()],date:r.iso,amount:r.amount,ref:`Ledger · ${r.raw}`,ledgerBalance:r.balance,flag:[r.flag,r.dateNote].filter(Boolean).join(' '),note:[r.flag,r.dateNote].filter(Boolean).join(' '),at:r.iso+'T12:00'};if(!e.flag)delete e.flag;S.ledger.push(e);
+        A({ts:r.iso+'T12:00',action:'Saving recorded in the ledger',target:e.id,detail:`${ksh(e.amount)} · ${mName(e.memberId)} · ${v.name} · balance written ${r.balance!=null?ksh(r.balance):'(not written)'}`,kind:'record',memberId:e.memberId,groupId:cg.groupId,status:e.flag?'Flagged':'Completed',reason:e.flag||'',next:ksh(e.amount)})});
+      g.social.forEach(r=>{const e={...base,id:nextId('contribution'),type:'contribution',category:socialCat,period:monthKey(r.iso),expected:null,memberId:idOf[r.member.toLowerCase()],date:r.iso,amount:r.amount,ref:`Ledger · ${r.raw}`,flag:[r.flag,r.dateNote].filter(Boolean).join(' '),note:[r.flag,r.dateNote].filter(Boolean).join(' '),at:r.iso+'T12:00'};if(!e.flag)delete e.flag;S.ledger.push(e);
+        A({ts:r.iso+'T12:00',action:'Social Fund payment recorded in the ledger',target:e.id,detail:`${ksh(e.amount)} · ${mName(e.memberId)} · ${v.name}`,kind:'record',memberId:e.memberId,groupId:cg.groupId,status:e.flag?'Flagged':'Completed',reason:e.flag||'',next:ksh(e.amount)})});
+      g.loanLines.forEach(l=>{const c={id:nextSeq(S.cashbook,'CB'),chamaId:S.chama.chamaId,groupId:cg.groupId,vslaId:v.vslaId,direction:'out',date:l.iso,ref:`Ledger loan round ${fmtDate(l.iso)}`,description:`${v.name} loan round: ${plural(l.count,'member')} × ${ksh(l.amount)} (borrowers not named in the ledger)`,category:LOAN_ROUND_CAT,amount:l.count*l.amount,members:l.count,amountEach:l.amount,approvedBy:'',reason:'Recorded from the ledger photo. Assign borrowers when known.',flag:l.flag||'',status:'Recorded',by:LEDGER_BY,source:'ledger-import',at:l.iso+'T12:00'};S.cashbook.push(c);
+        A({ts:l.iso+'T12:00',action:'Loan round recorded in the ledger',target:c.id,detail:`${v.name}: ${plural(l.count,'member')} × ${ksh(l.amount)} = ${ksh(c.amount)} (borrowers not named)`,kind:'cashbook',groupId:cg.groupId,status:l.flag?'Flagged':'Completed',reason:l.flag||'',next:ksh(c.amount)})});
+      g.issues.forEach(i=>{const m=S.members.find(x=>x.vslaId===v.vslaId&&x.name.toLowerCase()===i.member.toLowerCase());const li={id:nextSeq(S.ledgerIssues,'LI',3),chamaId:S.chama.chamaId,groupId:cg.groupId,vslaId:v.vslaId,memberId:m?m.id:'',...i,status:'Open',createdAt:nowStamp()};S.ledgerIssues.push(li);
+        const d=ledgerRaw(i.date);A({ts:(d.iso||nowStamp().slice(0,10))+'T12:00',action:'Ledger issue noted',target:li.id,detail:`${v.name} · ${i.area}${i.member?' · '+i.member:''}: ${i.shows}`,kind:'record',memberId:li.memberId,groupId:cg.groupId,status:'Open',reason:[i.requires,i.note].filter(Boolean).join(' · '),prev:i.shows,next:i.requires||''})});
+      A({action:'Ledger imported',target:v.vslaId,detail:`${v.name}: ${plural(g.members.length,'member')}, ${g.savings.length} savings, ${g.social.length} Social Fund payments, ${plural(g.loanLines.length,'loan line')}, ${plural(g.issues.length,'ledger issue')}`,kind:'record',groupId:cg.groupId});
+      result.groups.push({name:g.name,groupId:cg.groupId,vslaId:v.vslaId});
+    });
+    plan.issuesAll.forEach(i=>{const li={id:nextSeq(S.ledgerIssues,'LI',3),chamaId:S.chama.chamaId,groupId:'',vslaId:'',memberId:'',...i,status:'Open',createdAt:nowStamp()};S.ledgerIssues.push(li);logAudit({userId:LEDGER_BY,action:'Ledger issue noted',target:li.id,detail:`${i.group} · ${i.area}: ${i.shows}`,kind:'record',groupId:'',status:'Open',reason:[i.requires,i.note].filter(Boolean).join(' · '),prev:i.shows,next:i.requires||''})});
+    ensureV07Data();recomputeActors();
+    /* verify against the workbook's own Summary sheet; undo everything on any difference */
+    const diffs=[];
+    plan.groups.forEach(g=>{const r=result.groups.find(x=>x.name===g.name);const ms=S.members.filter(m=>m.vslaId===r.vslaId).map(m=>m.id);
+      const sav=sum(S.ledger.filter(e=>e.type==='saving'&&ms.includes(e.memberId))),soc=sum(S.ledger.filter(e=>e.type==='contribution'&&ms.includes(e.memberId))),loans=sum(S.cashbook.filter(c=>c.vslaId===r.vslaId&&c.category===LOAN_ROUND_CAT));
+      const act=S.members.filter(m=>m.vslaId===r.vslaId&&m.status==='Active').length;
+      r.check={savings:sav,social:soc,loans,members:act,expected:g.expected};
+      if(g.expected){if(sav!==g.expected.savings)diffs.push(`${g.name} savings ${sav} ≠ ${g.expected.savings}`);if(soc!==g.expected.social)diffs.push(`${g.name} Social Fund ${soc} ≠ ${g.expected.social}`);if(loans!==g.expected.loans)diffs.push(`${g.name} loans ${loans} ≠ ${g.expected.loans}`);if(g.expected.members&&act!==g.expected.members)diffs.push(`${g.name} members ${act} ≠ ${g.expected.members}`)}});
+    if(diffs.length)throw new Error('Import undone: totals did not match the workbook Summary. '+diffs.join('; '));
+    result.ok=true;return result;
+  }catch(e){S=JSON.parse(snapshot);throw e}
+}
+function openLedgerImport(){
+  if(!canImport()){toast('Your role can\'t import records.','error');return}
+  UI.ledgerPlan=null;
+  const hasSample=S.members.some(m=>m.placeholder)||S.demo;
+  openModal({title:'Import VSLA ledger',desc:'Loads savings, Social Fund payments, loan rounds and the Issues Log from the transcribed ledger workbook. Nothing is saved until you confirm.',wide:true,body:`<form id="frm-ledger" data-form="ledger-import" novalidate>
+    <div class="fld"><label for="ledger-file">Ledger workbook (.xlsx)</label><input id="ledger-file" type="file" accept=".xlsx,.xlsm,.xls" data-change="ledger-file"><span class="hint">The workbook with the "All Records", "Issues Log" and "Summary" sheets. It is read in this browser only and is not uploaded to the website.</span></div>
+    ${hasSample?`<label class="checkrow" style="margin-top:12px"><input type="checkbox" name="replace" checked><span><b>Remove the sample (fictional) members and records first</b>, so the app shows only the real ledger data. Community groups and their confirmed rules are kept.</span></label>`:''}
+    <div id="ledger-preview" aria-live="polite" style="margin-top:12px"></div></form>`,footer:modalFooter('Import ledger','frm-ledger')});
+}
+async function previewLedger(input){
+  const box=$('#ledger-preview');const file=input.files&&input.files[0];UI.ledgerPlan=null;if(!file){box.innerHTML='';return}
+  box.innerHTML='<div class="inline-note">Reading the workbook…</div>';
+  try{
+    const plan=planLedger(await readLedgerWorkbook(file));UI.ledgerPlan=plan;
+    const opts=g=>`<select name="target-${esc(g.name)}" aria-label="Community group for ${esc(g.name)}"><option value="new">New community group "${esc(g.name)}"</option>${S.groups.map(x=>`<option value="${x.groupId}">${esc(x.groupName)}</option>`).join('')}</select>`;
+    const ok=(a,b)=>b==null?'<span class="muted">-</span>':a===b?`<span class="perm-yes">${icon('check')}matches</span>`:`<b class="minus">differs (${num(b)})</b>`;
+    box.innerHTML=`${plan.problems.length?`<div class="inline-note bad"><b>This workbook can't be imported as it is:</b><ul style="margin:6px 0 0 18px;list-style:disc">${plan.problems.map(p=>`<li>${esc(p)}</li>`).join('')}</ul></div>`:`<div class="inline-note ok">Read <b>${esc(plan.fileName)}</b>: ${plural(plan.groups.length,'VSLA')}, ${num(plan.src.rows.length)} records, ${plural(plan.src.issues.length,'ledger issue')}. All totals match the workbook's Summary sheet.</div>`}
+    <div class="tbl-wrap" style="margin-top:10px"><table class="rt"><caption class="sr-only">Ledger import preview</caption><thead><tr><th scope="col">VSLA</th><th scope="col">Put in community group</th><th scope="col" class="r">Members</th><th scope="col" class="r">Savings entries</th><th scope="col" class="r">Social Fund</th><th scope="col" class="r">Loan rounds</th><th scope="col" class="r">Flagged / date notes</th></tr></thead><tbody>
+    ${plan.groups.map(g=>`<tr><td class="cell-main" data-label="VSLA"><b>${esc(g.name)}</b><div class="muted tiny">Balances as written: ${ksh(g.totals.balances)}</div></td><td data-label="Community group">${opts(g)}</td><td class="r" data-label="Members">${g.members.filter(m=>!m.struck).length}${g.members.some(m=>m.struck)?` <span class="muted tiny">+${g.members.filter(m=>m.struck).length} inactive</span>`:''}</td><td class="r num" data-label="Savings entries">${ksh(g.totals.savings)}<div class="tiny">${ok(g.totals.savings,g.expected&&g.expected.savings)}</div></td><td class="r num" data-label="Social Fund">${ksh(g.totals.social)}<div class="tiny">${ok(g.totals.social,g.expected&&g.expected.social)}</div></td><td class="r num" data-label="Loan rounds">${ksh(g.totals.loans)}<div class="tiny">${ok(g.totals.loans,g.expected&&g.expected.loans)}</div></td><td class="r" data-label="Flagged / date notes">${g.flagged} / ${g.dateNotes}</td></tr>`).join('')}
+    </tbody></table></div>
+    <p class="muted small" style="margin-top:10px">Figures are recorded exactly as written in the ledger. Flagged records keep the transcription note, and the Issues Log becomes a checklist under Settings → Chama & groups. Loan rounds go into each cash book as money out, because the ledger does not name the borrowers. After importing, the totals are checked again and the import is undone if anything differs.</p>`;
+  }catch(e){box.innerHTML=`<div class="inline-note bad">${esc(e.message||String(e))}</div>`}
+}
+FORMS['ledger-import']=(form,d)=>{
+  if(!canImport())return;const plan=UI.ledgerPlan;
+  if(!plan){toast('Choose the ledger workbook first.','error');return}
+  if(plan.problems.length){toast('This workbook has problems listed in the preview. Nothing was imported.','error');return}
+  const targets={};plan.groups.forEach(g=>{targets[g.name]=d['target-'+g.name]||'new'});
+  try{
+    const res=applyLedger(plan,{targets,replace:!!d.replace});UI.ledgerPlan=null;
+    UI.group=res.groups[0].groupId;UI.f={};UI.tab={};saveGroupPref();
+    commit(`Ledger imported: ${plural(res.groups.length,'VSLA')} with totals matching the workbook. Check the ledger issues under Settings → Chama & groups.`);
+  }catch(e){toast(e.message||String(e),'error')}
+};
+/* ledger issues checklist */
+function ledgerIssuesCard(){
+  const L=(S.ledgerIssues||[]).filter(i=>!i.groupId||allowedGroups().some(g=>g.groupId===i.groupId));if(!L.length)return '';
+  const open=L.filter(i=>i.status==='Open');
+  return card({flush:true,title:'Ledger issues to confirm',sub:`${open.length} open of ${L.length} · from the ledger transcription's Issues Log`,body:table({caption:'Ledger issues',cols:[
+    {label:'VSLA',render:i=>`<b>${esc(i.group)}</b><div class="muted tiny">${esc(i.id)} · ${esc(i.area)}</div>`},
+    {label:'Date / member',render:i=>`${esc(i.date||'-')}<div class="muted tiny">${esc(i.member||'-')}</div>`},
+    {label:'The ledger shows',render:i=>`<span style="white-space:normal;display:block;max-width:220px">${esc(i.shows)}</span>`},
+    {label:'The numbers require',render:i=>`<span style="white-space:normal;display:block;max-width:220px">${esc(i.requires||'-')}</span>`},
+    {label:'Impact',cls:'r',render:i=>i.impact?`<span class="num">${ksh(i.impact)}</span>`:'-'},
+    {label:'Confidence',render:i=>pill(i.confidence==='Certain'?'bad':i.confidence==='Likely'?'warn':'neutral',i.confidence||'-')},
+    {label:'Status',render:i=>i.status==='Open'?`${pill('warn','Open','clock')}${can('editChama')||can('recordFinance')?` <button type="button" class="btn btn-ghost btn-sm" data-act="resolve-issue" data-id="${i.id}">Resolve</button>`:''}`:`${pill('ok','Resolved','check')}<div class="muted tiny" style="white-space:normal;max-width:200px">${esc(i.resolution||'')}</div>`},
+  ],rows:L})});
+}
+function openResolveIssue(id){
+  const i=(S.ledgerIssues||[]).find(x=>x.id===id);if(!i)return;
+  openModal({title:`Resolve ${i.id}`,desc:`${esc(i.group)} · ${esc(i.area)} · ${esc(i.member||'')}`,body:`${notice(`<b>Ledger shows:</b> ${esc(i.shows)}<br><b>Numbers require:</b> ${esc(i.requires||'-')}<br>${esc(i.note||'')}`,{ic:'info',tone:'teal'})}<form id="frm-ri" data-form="resolve-issue" data-id="${i.id}" novalidate>${field({label:'What was confirmed with the treasurer',name:'resolution',type:'textarea',required:true,rows:3,err:'Describe what was confirmed (at least 8 characters).',hint:'If a record must change, correct it from the record itself (Records → open the record → Correct). This keeps the original in the audit trail.'})}</form>`,footer:modalFooter('Mark resolved','frm-ri')});
+}
+FORMS['resolve-issue']=(form,d)=>{
+  if(!(can('editChama')||can('recordFinance')))return;const i=(S.ledgerIssues||[]).find(x=>x.id===form.dataset.id);if(!i)return;
+  if(String(d.resolution).trim().length<8){applyErrors(form,{resolution:'x'});return}
+  i.status='Resolved';i.resolution=String(d.resolution).trim();i.resolvedBy=me().id;i.resolvedAt=nowStamp();
+  logAudit({action:'Ledger issue resolved',target:i.id,detail:`${i.group} · ${i.area}${i.member?' · '+i.member:''}`,kind:'record',memberId:i.memberId||'',groupId:i.groupId,prev:'Open',next:'Resolved',reason:i.resolution});
+  commit(`${i.id} marked resolved.`);
+};
+function loanRoundsCard(){
+  const R=S.cashbook.filter(c=>c.groupId===UI.group&&c.category===LOAN_ROUND_CAT&&c.status==='Recorded').sort((a,b)=>a.date<b.date?-1:1);if(!R.length)return '';
+  return card({flush:true,title:'Loan rounds from the ledger',sub:`${ksh(sum(R))} issued in ${plural(new Set(R.map(r=>r.date+r.vslaId)).size,'round')} · borrowers are not named in the ledger, so repayments cannot be tracked per member yet`,body:table({caption:'Ledger loan rounds',cols:[{label:'Date',render:r=>fmtDate(r.date)},{label:'VSLA',render:r=>esc(vslaName(r.vslaId))},{label:'Members',cls:'r',render:r=>r.members},{label:'Each',cls:'r',render:r=>`<span class="num">${ksh(r.amountEach)}</span>`},{label:'Total',cls:'r',render:r=>`<span class="num"><b>${ksh(r.amount)}</b></span>`},{label:'Note',render:r=>r.flag?pill('warn',r.flag):''}],rows:R})})+'<div style="height:16px"></div>';
+}
+
+
+/* =====================================================================
+   v0.9.1 · Treasurer approvals, setting pending loan rules in place,
+   and fines recorded directly from the meeting register
+   ===================================================================== */
+const canSetLoanRule=()=>can('editChama')||UI.role==='Treasurer';
+const canFine=()=>can('recordFinance')||can('manageMeetings');
+const LOAN_RULE_FIELDS={
+  'loans.interestRate':['Interest rate','% flat','min="0" max="100" step="0.5"',v=>v+'% flat'],
+  'loans.maxMonths':['Longest repayment period','months','min="1" max="36" step="1"',v=>v+' months'],
+  'loans.guarantorsRequired':['Guarantors required','guarantors','min="0" max="5" step="1"',v=>String(v)],
+  'loans.limitMultiple':['Loan limit','× savings','min="0" step="0.5"',v=>v+'× savings'],
+  'loans.onTimeBonusPct':['On-time bonus','% added per loan repaid on time','min="0" max="100" step="1"',v=>'+'+v+'% per loan repaid on time'],
+  'loans.maxLimitMultiple':['Maximum limit','× savings','min="0" step="0.5"',v=>v+'× savings'],
+  'loans.qualification.minMembershipMonths':['Minimum membership','months','min="0" step="1"',v=>v+' months'],
+  'loans.qualification.minSavings':['Minimum savings','KSh','min="0" step="1"',v=>ksh(v)],
+  'loans.qualification.minContributionPct':['Contribution record','% of periods paid','min="0" max="100" step="1"',v=>v+'% of periods paid'],
+  'loans.qualification.maxActiveLoans':['Open loans allowed','loans at a time','min="0" step="1"',v=>String(v)],
+};
+const getPath=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+function setPath(o,p,v){const ks=p.split('.');let a=o;ks.slice(0,-1).forEach(k=>{if(a[k]==null)a[k]={};a=a[k]});a[ks[ks.length-1]]=v}
+function ruleCell(path){
+  const f=LOAN_RULE_FIELDS[path],v=getPath(rules(),path);
+  if(isNum(v))return `${esc(f[3](+v))}${testTag()}${canSetLoanRule()?` <button type="button" class="link-btn tiny" data-act="set-rule" data-key="${path}" aria-label="Change ${esc(f[0])}">Change</button>`:''}`;
+  return canSetLoanRule()?`<button type="button" class="pend pend-btn" data-act="set-rule" data-key="${path}" aria-label="Set ${esc(f[0])}">Pending confirmation · Set</button>`:PEND;
+}
+function loanRulesCard(){
+  const Q=rules().loans.qualification||{};
+  return card({title:'This group\'s loan rules',sub:canSetLoanRule()?'Click "Set" on a pending rule to record the value the group agreed. Every change is logged in the audit trail.':'Configured per group. Pending rules make an application "Needs Review" rather than guessing.',body:`<dl class="kv">
+    ${Object.keys(LOAN_RULE_FIELDS).map(k=>`<dt>${esc(LOAN_RULE_FIELDS[k][0])}</dt><dd>${ruleCell(k)}</dd>`).join('')}
+    <dt>No overdue loans</dt><dd>${Q.noOverdue!==false?'Required':'Not required'}</dd><dt>Fines cleared first</dt><dd>${Q.noOutstandingFines?'Required':'Not required'}</dd></dl>`});
+}
+function limitExplainer(){
+  const L=rules().loans;
+  if(!isNum(L.limitMultiple))return `<p>${ruleCell('loans.limitMultiple')}</p><p class="muted small" style="margin-top:8px">Once the limit rule is set, each member's limit is worked out from their savings, and grows when loans are repaid on time.</p>`;
+  return `<ol class="small stack" style="padding-left:18px"><li>Starting limit: savings × <b>${L.limitMultiple}</b>${testTag()}.</li><li>Every loan repaid with <b>all instalments on or before the deadline</b> adds ${isNum(L.onTimeBonusPct)?`<b>${L.onTimeBonusPct}%</b>`:ruleCell('loans.onTimeBonusPct')} to the limit.</li><li>The limit never goes above ${isNum(L.maxLimitMultiple)?`savings × <b>${L.maxLimitMultiple}</b>`:ruleCell('loans.maxLimitMultiple')}.</li></ol>`;
+}
+function openSetRule(path){
+  if(!canSetLoanRule()){toast('Only the Treasurer or Chairperson can set loan rules.','error');return}
+  const f=LOAN_RULE_FIELDS[path];if(!f)return;const v=getPath(rules(),path);
+  openModal({title:`${f[0]} · ${curGroup().groupName}`,desc:isNum(v)?`Currently ${f[3](+v)}`:'Currently pending confirmation',body:`<form id="frm-sr" data-form="set-rule" data-key="${path}" novalidate>
+    ${field({label:`${f[0]} (${f[1]})`,name:'value',type:'number',value:isNum(v)?v:'',required:true,attrs:f[2],err:'Enter a number in the allowed range.'})}
+    ${field({label:'Where this was agreed',name:'reason',type:'textarea',required:true,rows:2,err:'Give a short reason (at least 4 characters).',hint:'For example: "Agreed at the group meeting of 12 October".'})}
+    <p class="muted small" style="margin-top:8px">This applies to new loan applications and loans from now on. Loans already recorded keep the terms they were given.</p></form>`,footer:modalFooter('Save rule','frm-sr')});
+}
+FORMS['set-rule']=(form,d)=>{
+  if(!canSetLoanRule())return;const path=form.dataset.key,f=LOAN_RULE_FIELDS[path];if(!f)return;
+  const val=numOrNull(d.value),err={};const inp=form.querySelector('[name=value]');
+  if(val==null||(inp.min!==''&&val<+inp.min)||(inp.max!==''&&val>+inp.max))err.value='x';
+  if(String(d.reason).trim().length<4)err.reason='x';
+  if(!applyErrors(form,err))return;
+  const r=S.rules[UI.group]||(S.rules[UI.group]=defaultRules(UI.group));const prev=getPath(r,path);
+  setPath(r,path,val);r.updatedAt=nowStamp();r.updatedBy=me().id;if(r.source==='pending')r.source='entered';
+  logAudit({action:'Group rule changed',target:curGroup().groupName,detail:`${f[0]} set by the ${UI.role}`,kind:'settings',groupId:UI.group,prev:isNum(prev)?f[3](+prev):'Pending confirmation',next:f[3](val),reason:String(d.reason).trim()});
+  commit(`${f[0]} set to ${f[3](val)} for ${curGroup().groupName}.`);
+};
+
+/* fines recorded directly (from the meeting register or the fines tab) */
+function openAddFine(opts={}){
+  if(!canFine()){toast('Only the Secretary or Treasurer can record fines.','error');return}
+  const r=rules(),mt=opts.meetingId?S.meetings.find(x=>x.id===opts.meetingId):null;
+  if(mt&&mt.date>todayISO()){toast('This meeting has not taken place yet, so no fine can be recorded for it.','error');return}
+  const m=opts.memberId?byId(opts.memberId):null;
+  const other=r.fines.other||[];
+  openModal({title:m?`Fine ${m.name}`:'Record a fine',desc:mt?`${esc(mt.type)} · ${fmtDate(mt.date)} · ${esc(groupName(mt.groupId))}`:'For fines other than the automatic absenteeism fine.',body:`<form id="frm-af" data-form="add-fine" ${mt?`data-meeting="${mt.id}"`:''} novalidate><div class="fgrid">
+    ${m?`<input type="hidden" name="memberId" value="${m.id}"><div class="fld full"><span class="lbl">Member</span>${who(m.id,esc(m.id))}</div>`:field({label:'Member',name:'memberId',opts:memberOpts(),value:memberOpts()[0]?.[0],required:true,cls:'full'})}
+    ${field({label:'What the fine is for',name:'type',value:other[0]?other[0].name:'',required:true,attrs:'list="fine-types" autocomplete="off" data-change="fine-type"',err:'Say what the fine is for.',hint:other.length?'Pick one of the group\'s fines or type another.':'For example: late arrival, phone ringing in the meeting.'})}
+    <datalist id="fine-types">${other.map(o=>`<option value="${esc(o.name)}">`).join('')}</datalist>
+    ${field({label:'Amount',name:'amount',type:'number',value:other[0]&&isNum(other[0].amount)?other[0].amount:'',required:true,prefix:'KSh',attrs:'min="1" step="1" inputmode="numeric"',err:'Enter an amount above zero.',hint:'Filled in from the group\'s rule when there is one.'})}
+    ${field({label:'Date',name:'date',type:'date',value:mt?mt.date:todayISO(),required:true,attrs:`max="${todayISO()}"`,err:'Enter a date that is not in the future.'})}
+    ${field({label:'Reason',name:'reason',type:'textarea',required:true,rows:2,cls:'full',err:'Give a reason of at least 4 characters.'})}</div>
+    <p class="muted small" style="margin-top:8px">The member is sent a (simulated) SMS, and the fine appears in the fines register until it is paid or waived.</p></form>`,footer:modalFooter('Record fine','frm-af')});
+}
+FORMS['add-fine']=(form,d)=>{
+  if(!canFine())return;const err={},amt=Number(d.amount),fm=byId(d.memberId);
+  if(!fm||!inAllowedGroup(fm))err.memberId='Choose a member of this group.';
+  if(!String(d.type||'').trim())err.type='x';
+  if(!(amt>0))err.amount='Enter an amount above zero.';
+  if(String(d.reason).trim().length<4)err.reason='Give a reason of at least 4 characters.';
+  if(!d.date||d.date>todayISO())err.date='Enter a date that is not in the future.';
+  if(!applyErrors(form,err))return;
+  const mt=form.dataset.meeting?S.meetings.find(x=>x.id===form.dataset.meeting):null;
+  const f={id:nextSeq(S.fines,'FN'),chamaId:S.chama.chamaId,groupId:fm.groupId,memberId:fm.id,meetingId:mt?mt.id:'',date:d.date,type:String(d.type).trim(),reason:String(d.reason).trim()+(mt?` (${mt.type}, ${fmtDate(mt.date)})`:''),amount:Math.round(amt),amountPending:false,payments:[],status:'Outstanding',recordedBy:me().id,createdAt:nowStamp(),updatedAt:nowStamp()};
+  S.fines.push(f);
+  logAudit({action:mt?'Fine recorded at meeting':'Fine created',target:f.id,detail:`${f.type} fine ${ksh(f.amount)} · ${fm.name}${mt?' · meeting '+fmtDate(mt.date):''}`,kind:'fine',memberId:fm.id,next:ksh(f.amount),reason:f.reason});
+  queueSMS(fm.id,'Fine notification',`Chama Digital: A fine of KSh ${num(f.amount)} (${f.type}) was recorded on ${fmtDate(f.date)}. Reason: ${String(d.reason).trim()}.`);
+  if(mt){ /* stay in the open register: keep the attendance marks already made */
+    saveState();closeOverlay();
+    const box=document.querySelector(`[data-rowfines="${fm.id}"]`);if(box)box.innerHTML=rowFinesHtml(mt.id,fm.id);
+    toast(`Fine of ${ksh(f.amount)} recorded for ${fm.name}. Remember to save the register.`);return;
+  }
+  commit(`Fine recorded for ${fm.name}.`);
+};
+function rowFinesHtml(meetingId,memberId){
+  const F=S.fines.filter(f=>f.meetingId===meetingId&&f.memberId===memberId&&f.type!=='Absenteeism'&&f.status!=='Cancelled');
+  return F.length?F.map(f=>`<span class="pill pill-warn">${icon('flag')}${esc(f.type)} ${ksh(f.amount)}</span>`).join(' '):'';
+}
+
+/* ---------- memoised calculations (see memo() above) ---------- */
+{const f=periodStatus;periodStatus=function(m,k,c){return memo('ps|'+m+'|'+k+'|'+(c||''),()=>f(m,k,c))}}
+{const f=memberStats;memberStats=function(id){if(!byId(id))return{periods:0,paid:0,onTime:0,missed:0,contribTotal:0,savingsTotal:0,loans:[],loanOutstanding:0,lastContrib:null,recs:[]};return memo('mst|'+id,()=>f(id))}}
+{const f=loanInfo;loanInfo=function(l){return memo('li|'+l.id+'|'+l.interestPct+'|'+l.status,()=>f(l))}}
+{const f=monthSummary;monthSummary=function(k){return memo('msum|'+UI.group+'|'+k,()=>f(k))}}
+{const f=cashEntries;cashEntries=function(g=UI.group){return memo('cash|'+g,()=>f(g))}}
+{const f=welfareSummary;welfareSummary=function(g=UI.group){return memo('ws|'+g,()=>f(g))}}
+{const f=sfpSummary;sfpSummary=function(g=UI.group){return memo('sfp|'+g,()=>f(g))}}
+{const f=expectedTotal;expectedTotal=function(m,k){return memo('et|'+m+'|'+k,()=>f(m,k))}}
 
 /* ---------- 22. Router ---------- */
 const ROUTES={dashboard:dashboardView,members:membersViewObj,contributions:contributionsViewObj,savings:savingsViewObj,welfare:{render:()=>welfareView()},'loan-apps':{render:()=>loanAppsView()},loans:loansViewObj,cashbook:{render:()=>cashbookView()},meetings:{render:()=>meetingsView()},communications:{render:()=>communicationsView()},reports:reportsViewObj,kyc:{render:kycView},audit:auditViewObj,settings:settingsViewObj,records:recordsViewObj};
@@ -4250,7 +4609,8 @@ const canManage=()=>!CAP.user||!CAP.me?true:!!CAP.me.canEdit; // local-only mode
 function splitForSave(){const {ledger,audit,...core}=S;return{core,ledgerDoc:{items:ledger},auditDoc:{items:audit}}}
 function composeState(core,ledgerDoc,auditDoc){return{...core,ledger:(ledgerDoc&&ledgerDoc.items)||[],audit:(auditDoc&&auditDoc.items)||[]}}
 function writeLocalCache(){
-  try{const {core,ledgerDoc,auditDoc}=splitForSave();localStorage.setItem(LOCAL_KEY,JSON.stringify({core,ledgerDoc,auditDoc}))}catch(e){}
+  try{const {core,ledgerDoc,auditDoc}=splitForSave();localStorage.setItem(LOCAL_KEY,JSON.stringify({core,ledgerDoc,auditDoc}));writeLocalCache.full=false}
+  catch(e){if(!writeLocalCache.full){writeLocalCache.full=true;setTimeout(()=>toast(sbConfigured()?'This browser\'s storage is full. Your records are still saved to Supabase.':'This browser\'s storage is full, so the latest changes may not be kept after closing the page. Connect Supabase in Settings → Database to keep everything safely.','error'),0)}}
 }
 function readLocalCache(){
   try{const raw=localStorage.getItem(LOCAL_KEY);if(!raw)return false;const o=JSON.parse(raw);if(!o||!o.core)return false;S=composeState(o.core,o.ledgerDoc,o.auditDoc);return true}catch(e){return false}
@@ -4259,6 +4619,7 @@ function saveRolePref(){try{localStorage.setItem(ROLE_KEY,UI.role)}catch(e){}}
 function readRolePref(){try{return localStorage.getItem(ROLE_KEY)}catch(e){return null}}
 
 function saveState(){
+  bumpData();
   if(!S)return;
   writeLocalCache();
   if(sbConfigured())sbSchedule();

@@ -374,5 +374,27 @@ create policy "prototype anon read" on public.audit_events for select to anon us
 create policy "prototype anon insert" on public.audit_events for insert to anon with check (true);
 create policy "prototype anon update" on public.audit_events for update to anon using (true) with check (true);
 
+create table if not exists public.ledger_issues (
+  chama_id text not null,
+  id text not null,
+  group_id text,
+  member_id text,
+  record_date date,
+  amount numeric,
+  status text,
+  data jsonb not null,
+  updated_at timestamptz not null default now(),
+  primary key (chama_id, id)
+);
+create index if not exists ledger_issues_group_idx on public.ledger_issues (chama_id, group_id);
+create index if not exists ledger_issues_member_idx on public.ledger_issues (chama_id, member_id);
+alter table public.ledger_issues enable row level security;
+drop policy if exists "prototype anon read" on public.ledger_issues;
+drop policy if exists "prototype anon insert" on public.ledger_issues;
+drop policy if exists "prototype anon update" on public.ledger_issues;
+create policy "prototype anon read" on public.ledger_issues for select to anon using (true);
+create policy "prototype anon insert" on public.ledger_issues for insert to anon with check (true);
+create policy "prototype anon update" on public.ledger_issues for update to anon using (true) with check (true);
+
 -- Production: replace these policies with ones based on auth.uid(), e.g. a user_roles(user_id, chama_id, group_id, role, member_id)
 -- table, so officials see only their groups and members see only rows where member_id = their own member id.

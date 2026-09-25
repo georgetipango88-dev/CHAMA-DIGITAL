@@ -1,7 +1,7 @@
 # CHAMA DIGITAL
 
 Front-end HTML prototype of Chama Digital: digital record-keeping for Kenyan Chamas.
-Built for **Mara Enterprise Women Group**, part of the **Human Practice Foundation (HPF) Micro Enterprise Program**: three community groups at three schools
+Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): three community groups at three schools
 (**Olemoncho, Mbitin and Nterere**), each made up of several VSLAs (Village Savings and Loans Associations).
 
 **Live prototype:** https://georgetipango88-dev.github.io/CHAMA-DIGITAL/
@@ -15,6 +15,20 @@ Built for **Mara Enterprise Women Group**, part of the **Human Practice Foundati
 | `chama-digital-v0.6-fixed.html` | Original prototype (v0.6) |
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
+
+## New in v0.9.1
+- Renamed to **HPF Micro Enterprise Program**.
+- **Import VSLA ledger** (Members or Settings → Chama & groups): reads the transcribed ledger workbook
+  (All Records, Issues Log, Summary sheets) in the browser. Savings, Social Fund payments and loan rounds are recorded
+  exactly as written, flagged records keep their notes, and every ledger record gets its own audit entry dated as in
+  the ledger. Totals are checked against the workbook's Summary sheet and the import is undone if anything differs.
+  The workbook is never uploaded to the public site.
+- The Issues Log becomes a **Ledger issues** checklist the treasurer can resolve.
+- The **Treasurer can approve** pending loan applications (never one they submitted), and pending **loan rules can be
+  set in place** by clicking "Pending confirmation · Set".
+- **Fine a member from the meeting register**: a Fine button on each member's row (Secretary or Treasurer).
+- The **Chama Digital logo** returns to the landing page.
+- Sample data: **210 members** in 15 VSLAs; pages draw in well under a second.
 
 ## New in v0.9
 - **Excel upload** when registering a Chama (setup wizard), adding a community group, or updating an existing group

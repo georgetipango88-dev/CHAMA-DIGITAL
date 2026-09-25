@@ -365,6 +365,21 @@ table.rt{width:100%;border-collapse:collapse;font-size:.875rem}
 }
 /* ===== v0.7 Mara Enterprise additions ===== */
 [hidden]{display:none!important}
+.tracker{display:flex;list-style:none;margin:6px 0 0;padding:0;overflow-x:auto}
+.tracker li{flex:1 1 0;min-width:84px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;padding:0 4px}
+.tracker li:not(:first-child)::before{content:"";position:absolute;top:13px;right:50%;width:100%;height:3px;background:#e2ddd3;z-index:0}
+.tracker li.t-done:not(:first-child)::before,.tracker li.t-now:not(:first-child)::before,.tracker li.t-bad:not(:first-child)::before{background:#1baf7a}
+.tracker .t-dot{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:#fff;border:2px solid #cfc8bb;color:#6b6356}
+.tracker .t-done .t-dot{background:#1baf7a;border-color:#1baf7a;color:#fff}
+.tracker .t-now .t-dot{border-color:#2a78d6;color:#2a78d6;box-shadow:0 0 0 4px rgba(42,120,214,.15)}
+.tracker .t-bad .t-dot{background:#c4453a;border-color:#c4453a;color:#fff}
+.tracker .t-skip{opacity:.45}
+.tracker .t-l{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:12.5px;line-height:1.25}
+.elig-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:8px}
+.elig-ok{background:#e6f6ef}.elig-warn{background:#fdf3dc}.elig-bad{background:#fbe7e4}
+.elig-count{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:6px}
+.rem-prev{margin-top:6px;font-size:13px;line-height:1.4}
+.rem-ev{align-items:flex-start}
 .pend-btn{border:1px solid #EFD48A;cursor:pointer;font-family:inherit;min-height:28px}.pend-btn:hover{background:#FCE3A4}
 .row-fines{flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap}.row-fines:empty{display:none}
 /* ===== photo slideshow (landing background, banners) ===== */
@@ -481,7 +496,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.2 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -946,7 +961,7 @@ const FORMS={}; /* form handlers, keyed by data-form */
 const UI={role:'Treasurer',group:null,tab:{},f:{},report:null,reg:null,focus:null};
 function resetDemo(opts={}){S=seedDemo(opts);ensureV07Data();saveState()}
 const byId=id=>S.members.find(m=>m.id===id);
-const mName=id=>id==='ledger-import'?'Ledger import':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
+const mName=id=>id==='ledger-import'?'Ledger import':id==='system'?'System (automatic)':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
 function me(){
   const a=byId(S.actors[UI.role]);
   if(a&&(a.role===UI.role||UI.role==='Member'||UI.role==='Platform Owner/Admin'&&a.role!=='Member'))return a;
@@ -969,7 +984,7 @@ function logAudit({action,target,detail,kind,memberId='',status='Completed',reas
   const mx=S.audit.reduce((m,x)=>Math.max(m,+x.id.split('-')[1]),0);
   const gid=groupId!==undefined?groupId:(memberId&&byId(memberId)?byId(memberId).groupId:(UI.group||''));
   const u=me();
-  S.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:ts||nowStamp(),userId:userId||(u?u.id:'system'),role:userId==='ledger-import'?'Import':UI.role,chamaId:S.chama.chamaId,groupId:gid,action,target,detail,kind,memberId,status,reason,prev:String(prev||''),next:String(next||'')});
+  S.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:ts||nowStamp(),userId:userId||(u?u.id:'system'),role:userId==='ledger-import'?'Import':userId==='system'?'System':UI.role,chamaId:S.chama.chamaId,groupId:gid,action,target,detail,kind,memberId,status,reason,prev:String(prev||''),next:String(next||'')});
 }
 
 /* ---------- v0.7 data normalisation, groups & access scope ---------- */
@@ -1728,6 +1743,7 @@ function openRecord(id){
 /* ---------- 17. Statements & reports ---------- */
 const REPORT_TYPES=[
   {id:'member',label:'Member statement',d:'One member\'s contributions, savings and internal loan repayments',perm:false},
+  {id:'savst',label:'Savings statement (up to 10 years)',d:'Every saving with a running balance and yearly totals',perm:false},
   {id:'contrib',label:'Contribution report',d:'What each member paid compared with what was due',perm:true},
   {id:'savings',label:'Savings report',d:'Savings recorded per member',perm:true},
   {id:'loans',label:'Internal loan report',d:'Loans the Chama has made and what is outstanding',perm:true},
@@ -1739,7 +1755,7 @@ const REPORT_TYPES=[
   {id:'cashbook',label:'Cash book report',d:'Money in, money out and running balance',perm:true},
   {id:'groups',label:'Group comparison',d:'Key figures side by side for the groups you are authorized to see',perm:true},
 ];
-const RANGES=[['this-month','This month'],['last-month','Last month'],['quarter','This quarter'],['year','This year'],['custom','Custom range']];
+const RANGES=[['this-month','This month'],['last-month','Last month'],['quarter','This quarter'],['year','This year'],['12m','Last 12 months'],['5y','Last 5 years'],['10y','Last 10 years'],['custom','Custom range']];
 function rangeFor(r){
   const t=todayISO(),k=monthKey(t);let from,to=t,label;
   if(r.range==='this-month'){from=k+'-01';label='This month'}
@@ -1806,14 +1822,14 @@ function reportPaper(R,r){
 function reportsView(){
   const all=can('reports');
   if(!UI.report)UI.report={type:'member',range:'this-month',memberId:me().id,from:'',to:'',result:null,loading:false};
-  const r=UI.report;if(!all){r.type='member';r.memberId=me().id}
+  const r=UI.report;if(!all){if(r.type!=='savst')r.type='member';r.memberId=me().id}
   const recent=visibleAudit().filter(a=>a.kind==='statement'&&(all||a.userId===me().id)).sort((a,b)=>a.ts<b.ts?1:-1).slice(0,4);
   return `${pageHeader({title:all?'Statements & reports':'My statements',desc:all?'Clear, printable records for the Chama and for each member. Every report you generate is logged in the activity trail.':'A statement of your own contributions, savings and internal loan repayments.'})}
   ${notice('<b>Prototype:</b> reports are built in your browser from the demonstration records. There is no server creating PDF files. Use <b>Print</b> and choose "Save as PDF", or download the data as CSV.',{ic:'info'})}
   <div class="report-grid" style="display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:16px;align-items:start">
    <div class="stack no-print">
     ${card({title:'Choose a report',body:`<div role="radiogroup" aria-label="Report type">${REPORT_TYPES.filter(t=>all||!t.perm).map(t=>`<button type="button" role="radio" class="opt-card" aria-checked="${r.type===t.id}" data-act="report-type" data-type="${t.id}"><span><b>${t.label}</b><span class="d">${t.d}</span></span></button>`).join('')}</div>
-     ${r.type==='member'&&all?`<div style="margin-top:8px">${field({label:'Member',name:'rmember',opts:GM().map(m=>[m.id,m.name]),value:r.memberId,attrs:'data-change="report-field" data-key="memberId"'})}</div>`:''}
+     ${(r.type==='member'||r.type==='savst')&&all?`<div style="margin-top:8px">${field({label:'Member',name:'rmember',opts:GM().map(m=>[m.id,m.name]),value:r.memberId,attrs:'data-change="report-field" data-key="memberId"'})}</div>`:''}
      <div class="fld" style="margin-top:14px"><span class="lbl" id="rl">Date range</span><div class="chips" role="group" aria-labelledby="rl">${RANGES.map(([id,l])=>`<button type="button" class="chip" aria-pressed="${r.range===id}" data-act="report-range" data-range="${id}">${l}</button>`).join('')}</div></div>
      ${r.range==='custom'?`<div class="fgrid" style="margin-top:12px">${field({label:'From',name:'rfrom2',type:'date',value:r.from,attrs:'data-change="report-field" data-key="from"'})}${field({label:'To',name:'rto2',type:'date',value:r.to,attrs:'data-change="report-field" data-key="to"'})}</div>`:''}
      <div style="margin-top:16px">${btn('generate-report','Generate report',{ic:'file'})}</div>`})}
@@ -2144,8 +2160,11 @@ function loanEligibility(memberId,amount,guarantorCount,months){
   if(Q.noOutstandingFines)add('Outstanding fines',fo>0?'fail':'pass',fo>0?`${ksh(fo)} in unpaid fines; the group requires fines to be cleared first.`:'No unpaid fines.');
   else if(fo>0)add('Outstanding fines','review',`${ksh(fo)} in unpaid fines.`);
   if(guarantorCount!==undefined){
-    if(isNum(L.guarantorsRequired))add('Guarantors',guarantorCount>=L.guarantorsRequired?'pass':'fail',`${plural(guarantorCount,'guarantor')} named; the group requires ${L.guarantorsRequired}.`);
-    else add('Guarantors','review',`${plural(guarantorCount,'guarantor')} named. Guarantor requirement is pending confirmation.`);
+    const G=typeof guarantorCount==='object'?guarantorCount:{named:guarantorCount,confirmed:guarantorCount,pending:0,declined:0};
+    const gt=`${plural(G.named,'guarantor')} named: ${G.confirmed} confirmed (Yes)${G.pending?`, ${G.pending} not yet answered`:''}${G.declined?`, ${G.declined} declined (No)`:''}`;
+    if(isNum(L.guarantorsRequired)){const need=+L.guarantorsRequired;
+      add('Guarantors',G.confirmed>=need?'pass':G.confirmed+G.pending>=need?'review':'fail',`${gt}. The group requires ${need} confirmed${G.confirmed<need?(G.confirmed+G.pending>=need?'; waiting for answers.':'; name another guarantor.'):'.'}`)}
+    else add('Guarantors','review',`${gt}. Guarantor requirement is pending confirmation.`);
   }
   const lim=loanLimit(memberId);
   if(amount!==undefined&&amount>0){
@@ -2271,7 +2290,7 @@ function meetingsView(){
     body=card({title:'Meetings held',sub:'Tap a meeting to see or edit its attendance register',flush:true,body:past.length?table({caption:'Attendance register by meeting',cols,rows:past}):emptyState({ic:'calendar',title:'No meetings held yet',text:'Meetings that have been held will be listed here with their attendance.'})})
       +(own?'':`<div style="height:16px"></div>${registerGrid(past.slice(0,6).reverse())}`);
   }
-  return `${pageHeader({title:own?'Meetings & my attendance':'Meetings & attendance register',desc:'Who attended each meeting of this group. Absence without apology creates an absenteeism fine automatically, using the group\'s own fine rule.',actions:can('manageMeetings')?btn('sched-meeting','Schedule meeting',{ic:'plus'}):''})}
+  return `${pageHeader({title:own?'Meetings & my attendance':'Meetings & attendance register',desc:'Who attended each meeting of this group. Absence without apology creates an absenteeism fine automatically, using the group\'s own fine rule.',actions:can('manageMeetings')?btn('sched-meeting','Schedule meeting',{ic:'plus'})+btn('record-past','Record a past meeting',{ic:'clock',cls:'btn-secondary'}):''})}
   ${!can('manageMeetings')&&!own?notice('Taking attendance is done by the Secretary. Fine payments are recorded by the Treasurer.',{ic:'lock'}):''}
   ${photoBanner('Where the records begin','Attendance, contributions and fines are recorded at every meeting.',[PHOTOS[0],PHOTOS[1]],'small')}
   <div class="card" style="padding:12px 16px;margin-bottom:16px">${attLegend()}</div>
@@ -2307,7 +2326,7 @@ function openMeeting(id){
       <section class="card"><div class="card-h"><div><h2 tabindex="-1" data-autofocus>Attendance register</h2><p id="att-summary" aria-live="polite"></p></div><button type="button" class="btn btn-ghost btn-sm" data-act="att-all">Mark the rest present</button></div><div class="card-b flush">${rows||'<p class="muted" style="padding:0 18px 16px">No members in this group yet.</p>'}</div></section>
       <div style="height:14px"></div>${field({label:'Minutes',name:'minutes',type:'textarea',value:m.minutes,rows:5,opt:true,hint:'What was discussed and agreed. Visible to all members of this group.'})}
       <label class="checkrow" style="margin:14px 0"><input type="checkbox" name="held" ${m.status==='Held'||m.date<=todayISO()?'checked':''}><span>This meeting has been held (fines are only created for held meetings)</span></label>
-      <button type="submit" class="btn btn-primary">${icon('check')}Save register</button></form>`;
+      <button type="submit" class="btn btn-primary">${icon('check')}Save register</button></form><div style="height:14px"></div>${meetingDocsCard(m)}`;
     openDrawer({title:`${m.type} · ${fmtDate(m.date)}`,desc:esc(groupName(m.groupId)),body});
     updateAttSummary($('#frm-mtg'));return;
   }
@@ -2315,7 +2334,7 @@ function openMeeting(id){
   const body=`<div class="card" style="padding:16px;margin-bottom:14px"><b>${esc(m.type)}</b><div class="muted small">${fmtDay(m.date)}, ${m.time} · ${esc(m.location)}</div><div style="margin-top:8px">${m.status==='Held'?pill('ok','Held','check'):pill('teal','Scheduled','clock')}</div></div>
     ${card({title:'Agenda',body:`<ol class="small" style="padding-left:18px">${m.agenda.map(a=>`<li style="margin-top:4px">${esc(a)}</li>`).join('')}</ol>`})}<div style="height:14px"></div>
     ${m.status==='Held'&&Object.keys(att).length?card({title:own?'Attendance':'Attendance register',sub:`✓ ${st.present} present · Ⓔ ${st.apology} with apology · X ${st.absent} without apology · ${st.pct}%`,flush:true,body:`<ul class="rows">${visible.map(p=>{const a=att[p.id]||{},s=attStatus(a);return `<li>${attSym(s)}${who(p.id)}<div class="grow"></div><span class="muted small">${ATT[s]?ATT[s].label:'Not marked'}${a.reason&&(!own||p.id===me().id)?' · '+esc(a.reason):''}</span></li>`}).join('')}</ul>${own?'<p class="muted small" style="padding:0 18px 14px">Other members\' attendance details are visible to officials only; the totals above are shared with the group.</p>':''}`}):''}<div style="height:14px"></div>
-    ${card({title:'Minutes',body:m.minutes?`<p style="white-space:pre-wrap">${esc(m.minutes)}</p>`:'<p class="muted">No minutes recorded.</p>'})}`;
+    ${card({title:'Minutes',body:m.minutes?`<p style="white-space:pre-wrap">${esc(m.minutes)}</p>`:'<p class="muted">No minutes recorded.</p>'})}<div style="height:14px"></div>${meetingDocsCard(m)}`;
   openDrawer({title:`${m.type} · ${fmtDate(m.date)}`,desc:esc(groupName(m.groupId)),body});
 }
 function updateAttSummary(form){
@@ -2689,7 +2708,7 @@ function loanAppsView(){
     {label:'Amount',cls:'r',render:a=>`<span class="num"><b>${ksh(a.amount)}</b></span><div class="muted tiny">${a.months} months</div>`},
     {label:'Purpose / enterprise',render:a=>`${esc(a.purpose)}<div class="muted tiny">${esc(a.enterprise||'')}</div>`},
     {label:'Guarantors',render:a=>(a.guarantors||[]).map(g=>esc(g.name)).join(', ')||'-'},
-    {label:'Qualification now',render:a=>['Disbursed','Rejected'].includes(a.status)?'<span class="muted small">Closed</span>':outcomePill(loanEligibility(a.memberId,a.amount,(a.guarantors||[]).length,a.months).outcome)},
+    {label:'Qualification now',render:a=>['Disbursed','Rejected'].includes(a.status)?'<span class="muted small">Closed</span>':outcomePill(loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months).outcome)},
     {label:'Status',render:a=>appPill(a.status)},
     ...(can('approve')?[{label:'',nolabel:true,cls:'r',render:a=>['Submitted','Needs Review'].includes(a.status)?(a.submittedBy===me().id?'<span class="muted tiny">Another official decides</span>':btn('app-decision','Approve / reject',{ic:'check',cls:'btn-primary btn-sm',data:`data-id="${a.id}"`})):''}]:[]),
   ];
@@ -2746,7 +2765,7 @@ FORMS['loan-app']=(form,d)=>{
 function openApp(id){
   const a=S.loanApps.find(x=>x.id===id);if(!a)return;
   if(!(can('viewAll')&&allowedGroups().some(g=>g.groupId===a.groupId))&&!(UI.role==='Member'&&a.memberId===me().id)&&!isPlatformOwner())return;
-  const now=['Disbursed','Rejected'].includes(a.status)?null:loanEligibility(a.memberId,a.amount,(a.guarantors||[]).length,a.months);
+  const now=['Disbursed','Rejected'].includes(a.status)?null:loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months);
   const body=`<div class="card" style="padding:18px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px">${who(a.memberId,esc(a.id))}${appPill(a.status)}</div>
    <dl class="kv"><dt>Amount requested</dt><dd class="num">${ksh(a.amount)}</dd><dt>Repayment period</dt><dd>${a.months} months</dd><dt>Purpose</dt><dd>${esc(a.purpose)}</dd><dt>Enterprise</dt><dd>${esc(a.enterprise||'-')}</dd><dt>Guarantors</dt><dd>${(a.guarantors||[]).map(g=>esc(g.name)).join(', ')||'None'}</dd><dt>Guarantor confirmation</dt><dd>${esc((a.guarantors||[])[0]?.confirmation||'-')}</dd><dt>Submitted</dt><dd>${fmtDate(a.date)} · ${esc(a.channel||'')}</dd>${a.decision?`<dt>Decision</dt><dd>${esc(mName(a.decision.by))}, ${fmtDT(a.decision.at)}<div class="muted small">${esc(a.decision.reason)}</div></dd>`:''}${a.loanId?`<dt>Loan record</dt><dd><button type="button" class="link-btn" data-act="open-loan" data-id="${a.loanId}">${esc(a.loanId)}</button></dd>`:''}</dl></div>
    ${now?card({title:'Qualification today',body:eligibilityPanel(now)}):''}
@@ -2757,16 +2776,17 @@ function openApp(id){
 function openAppDecision(id){
   if(!needPerm('approve'))return;const a=S.loanApps.find(x=>x.id===id);if(!a)return;
   if(a.submittedBy===me().id){toast('You submitted this application, so another official must decide on it.','error');return}
-  const E=loanEligibility(a.memberId,a.amount,(a.guarantors||[]).length,a.months);
+  const E=loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months);
   openModal({title:`Decision on ${a.id}`,desc:`${esc(mName(a.memberId))} · ${ksh(a.amount)} · qualification: ${E.outcome}`,wide:true,body:`<div class="card" style="padding:14px;margin-bottom:12px">${eligibilityPanel(E)}</div><form id="frm-ad" data-form="app-decision" data-id="${a.id}" novalidate>${field({label:'Decision',name:'decision',opts:[['approve','Approve'],['reject','Reject']],value:E.outcome==='Not Eligible'?'reject':'approve'})}${field({label:'Reason (recorded with the decision)',name:'reason',type:'textarea',required:true,rows:2,err:'Give a reason of at least 8 characters.',hint:E.outcome!=='Eligible'?'The member does not fully qualify on current rules. Explain why the group decided this way.':'For example: "Qualified; agreed at the meeting of 12 October".'})}</form>`,footer:modalFooter('Save decision','frm-ad')});
 }
 FORMS['app-decision']=(form,d)=>{
   if(!needPerm('approve'))return;const a=S.loanApps.find(x=>x.id===form.dataset.id);if(!inAllowedGroup(a)||!['Submitted','Needs Review'].includes(a.status))return;
   if(a.submittedBy===me().id){toast('You submitted this application, so another official must decide on it.','error');return}
   if(String(d.reason).trim().length<8){applyErrors(form,{reason:'x'});return}
-  const prev=a.status;a.status=d.decision==='approve'?'Approved':'Rejected';a.decision={by:me().id,role:UI.role,at:nowStamp(),reason:String(d.reason).trim(),qualification:loanEligibility(a.memberId,a.amount,(a.guarantors||[]).length,a.months).outcome};a.updatedAt=nowStamp();
+  const prev=a.status;a.status=d.decision==='approve'?'Approved':'Rejected';a.decision={by:me().id,role:UI.role,at:nowStamp(),reason:String(d.reason).trim(),qualification:loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months).outcome};a.updatedAt=nowStamp();
   logAudit({action:a.status==='Approved'?'Loan application approved':'Loan application rejected',target:a.id,detail:`${ksh(a.amount)} · ${mName(a.memberId)} · qualification at decision: ${a.decision.qualification}`,kind:'loan',memberId:a.memberId,prev,next:a.status,reason:a.decision.reason});
-  queueSMS(a.memberId,'Loan application decision',`Chama Digital: Your loan application ${a.id} for KSh ${num(a.amount)} was ${a.status.toLowerCase()}.`);
+  if(a.status==='Approved')sendReminder(a.memberId,'loan-approved',{app:a.id,amount:num(a.amount)},{mode:'Automatic',key:'loan-approved|'+a.id});
+  else queueSMS(a.memberId,'Loan application decision',`Chama Digital: Your loan application ${a.id} for KSh ${num(a.amount)} was ${a.status.toLowerCase()}.`);
   commit(`Application ${a.id} ${a.status.toLowerCase()}.`);
 };
 function openRecLoan(appId){
@@ -2938,7 +2958,7 @@ const SMS_TEMPLATES={
 };
 function communicationsView(){
   const own=UI.role==='Member',fin=can('viewAll'),tab0=UI.tab.comms||(own?'ussd':'sms'),tab=own&&tab0==='compose'?'sms':tab0;
-  const items=[{id:'sms',label:own?'My SMS messages':'SMS outbox'},{id:'ussd',label:'USSD simulator'},...(own?[]:[{id:'compose',label:'Send SMS (simulated)'}]),{id:'notices',label:'In-app notices'}];
+  const items=[{id:'sms',label:own?'My SMS messages':'SMS outbox'},{id:'ussd',label:'USSD simulator'},...(own?[]:[{id:'compose',label:'Send SMS (simulated)'}]),{id:'notices',label:'In-app notices'},{id:'reminders',label:own||!canRemind()?'My reminder language':'Reminders'}];
   let body='';
   if(tab==='sms'){
     const list=(S.sms||[]).filter(x=>x.chamaId===S.chama.chamaId&&(own?x.memberId===me().id:x.groupId===UI.group&&(fin||['Meeting reminder','Meeting change','Chama announcement'].includes(x.event)))).sort((a,b)=>a.at<b.at?1:-1);
@@ -2953,6 +2973,8 @@ function communicationsView(){
       ${c.tpl==='Chama announcement'?`<div class="fld full"><label for="smsc-x">Announcement text</label><textarea id="smsc-x" data-input="smsc" maxlength="140">${esc(c.text)}</textarea></div>`:''}</div>
       <div class="inline-note" style="margin-top:12px"><b>${plural(rec.length,'recipient')}.</b> ${preview.length?'Preview: '+preview.map(p=>`<div style="margin-top:6px"><b>${esc(p.m.name)}:</b> ${esc(p.t)}</div>`).join(''):'No message would be generated for these recipients.'}</div>
       <div style="margin-top:14px">${btn('sms-queue','Add to outbox (not sent)',{ic:'msg'})}</div>`});
+  }else if(tab==='reminders'){
+    body=remindersPanel();
   }else if(tab==='ussd'){
     body=ussdPanel();
   }else{
@@ -3058,7 +3080,7 @@ function rulesSettings(){
     sec('Loans',kv([['Internal loans',L.enabled?'Enabled':'Not enabled'],['Interest rate',valP(L.interestRate,v=>v+'% '+(L.interestMethod||'Flat').toLowerCase())],['Longest repayment period',valP(L.maxMonths,v=>v+' months')],['Repayment schedule',esc(L.repaymentFrequency||'Monthly')],['Guarantors required',valP(L.guarantorsRequired)],['Loan limit',valP(L.limitMultiple,v=>v+'× savings')],['On-time repayment bonus',valP(L.onTimeBonusPct,v=>'+'+v+'% per loan repaid on time')],['Maximum limit',valP(L.maxLimitMultiple,v=>v+'× savings')],['Qualification: membership',valP(Q.minMembershipMonths,v=>v+' months')],['Qualification: savings',kshP(Q.minSavings)],['Qualification: contribution record',valP(Q.minContributionPct,v=>v+'%')],['Qualification: open loans allowed',valP(Q.maxActiveLoans)],['Qualification: no overdue loans',Q.noOverdue!==false?'Yes':'No'],['Qualification: fines cleared',Q.noOutstandingFines?'Yes':'No'],['Late repayment rule',L.late&&L.late.enabled?`${esc(L.late.type)} · ${valP(L.late.amount)} · grace ${valP(L.late.graceDays,v=>v+' days')}<div class="muted tiny">${esc(L.late.description||'')}</div>`:'None confirmed']]))+
     sec('Social Fund / Welfare',kv([['Opening balance',kshP(r.welfare.openingBalance)],['Permitted reasons',r.welfare.categories.length?r.welfare.categories.map(esc).join(', '):PEND],['Maximum per payout',kshP(r.welfare.maxPayout)]]))+
     sec('School Feeding Programme',kv([['Target',r.schoolFeeding&&isNum(r.schoolFeeding.target)?kshP(r.schoolFeeding.target)+' per '+String(r.schoolFeeding.targetPeriod||'Month').toLowerCase():PEND],['Schools supported',r.schoolFeeding&&r.schoolFeeding.schools.length?r.schoolFeeding.schools.map(esc).join(', '):PEND]]))+
-    sec('Cash book & enterprise',kv([['Cash book opening balance',kshP(r.cashbook.openingBalance)],['Enterprise arrangement',valP(r.enterprise.schedule)],['Enterprise notes',esc(r.enterprise.description||'-')]]))
+    sec('Cash book & enterprise',kv([['Cash book opening balance',kshP(r.cashbook.openingBalance)],['Enterprise frequency',valP(r.enterprise.schedule)],['Main enterprise type',valP(r.enterprise.type)],['Enterprise notes',esc(r.enterprise.description||'-')]]))
   })}`;
 }
 function openEditGroupRules(){
@@ -3081,7 +3103,7 @@ function openEditGroupRules(){
   <p class="muted small" style="margin:12px 0 6px"><b>Late repayment</b></p><div class="fgrid">${field({label:'Late repayment rule',name:'late-type',opts:[['none','No rule'],['fixed','Fixed charge per late instalment'],['percent','Percentage of the late instalment']],value:L.late&&L.late.enabled?L.late.type:'none'})}${n('Charge (KSh or %)','late-amt',L.late?.amount)}${n('Grace days','late-grace',L.late?.graceDays,'min="0" step="1"')}${field({label:'Description',name:'late-desc',value:L.late?.description||'',opt:true})}</div></div>
   <div class="rules-sec"><h3>Social Fund / Welfare</h3><div class="fgrid">${n('Opening balance (KSh)','wel-open',r.welfare.openingBalance)}${n('Maximum per payout (KSh)','wel-max',r.welfare.maxPayout)}${field({label:'Permitted payout reasons (one per line)',name:'wel-cats',type:'textarea',rows:3,cls:'full',value:r.welfare.categories.join('\n'),opt:true})}</div></div>
   <div class="rules-sec"><h3>School Feeding Programme</h3><div class="fgrid">${n('Target (KSh)','sfp-target',r.schoolFeeding?.target)}${field({label:'Target period',name:'sfp-period',opts:['Month','Quarter','Year'],value:r.schoolFeeding?.targetPeriod||'Month'})}${field({label:'Schools supported (one per line)',name:'sfp-schools',type:'textarea',rows:2,cls:'full',value:(r.schoolFeeding?.schools||[]).join('\n'),opt:true})}</div></div>
-  <div class="rules-sec"><h3>Cash book & enterprise</h3><div class="fgrid">${n('Cash book opening balance (KSh)','cash-open',r.cashbook.openingBalance,'min="0" step="any"','Total cash held at the start, including the welfare fund\'s opening balance.')}${field({label:'Enterprise arrangement',name:'ent-schedule',opts:[['','Pending confirmation'],'Weekly','Monthly','Quarterly (about every three months)','Other (see notes)'],value:r.enterprise.schedule||''})}${field({label:'Enterprise notes',name:'ent-desc',type:'textarea',rows:2,cls:'full',value:r.enterprise.description||'',opt:true})}</div></div>
+  <div class="rules-sec"><h3>Cash book & enterprise</h3><div class="fgrid">${n('Cash book opening balance (KSh)','cash-open',r.cashbook.openingBalance,'min="0" step="any"','Total cash held at the start, including the welfare fund\'s opening balance.')}${field({label:'Enterprise frequency',name:'ent-schedule',opts:[['','Pending confirmation'],...ENT_FREQ],value:r.enterprise.schedule||''})}${field({label:'Main enterprise type',name:'ent-type',opts:[['','Pending confirmation'],...ENTERPRISE_TYPES],value:r.enterprise.type||''})}${field({label:'Enterprise notes',name:'ent-desc',type:'textarea',rows:2,cls:'full',value:r.enterprise.description||'',opt:true})}</div></div>
   <div class="rules-sec">${field({label:'Reason for the change',name:'reason',type:'textarea',required:true,rows:2,err:'Give a short reason, for example "Agreed at the general meeting".'})}
   <label class="checkrow" style="margin-top:10px"><input type="checkbox" name="confirmed" ${r.source==='confirmed'?'checked':''}><span>These values have been confirmed by the group (removes the "Test value" label).</span></label></div></form>`;
   openModal({title:`Edit rules · ${curGroup().groupName}`,wide:true,body,footer:modalFooter('Save rules','frm-rules')});
@@ -3111,7 +3133,7 @@ FORMS['save-rules']=(form,d)=>{
   r.welfare={openingBalance:N('wel-open'),maxPayout:N('wel-max'),categories:String(d['wel-cats']||'').split('\n').map(s=>s.trim()).filter(Boolean)};
   r.schoolFeeding={target:N('sfp-target'),targetPeriod:d['sfp-period']||'Month',schools:String(d['sfp-schools']||'').split('\n').map(x=>x.trim()).filter(Boolean)};
   r.cashbook={openingBalance:N('cash-open')};
-  r.enterprise={schedule:d['ent-schedule']||null,description:String(d['ent-desc']||'').trim()};
+  r.enterprise={schedule:d['ent-schedule']||null,type:d['ent-type']||null,description:String(d['ent-desc']||'').trim()};
   r.source=d.confirmed?'confirmed':(old.source==='confirmed'?'entered':old.source==='illustrative'?'illustrative':'entered');
   r.updatedAt=nowStamp();r.updatedBy=me().id;
   S.rules[UI.group]=r;
@@ -4321,6 +4343,464 @@ function rowFinesHtml(meetingId,memberId){
   return F.length?F.map(f=>`<span class="pill pill-warn">${icon('flag')}${esc(f.type)} ${ksh(f.amount)}</span>`).join(' '):'';
 }
 
+
+/* =====================================================================
+   v0.9.2 · field-note changes: enterprise type and frequency, guarantor
+   confirmation (Yes / No / Pending), clear qualification results, a loan
+   application tracker, savings statements up to 10 years, reminders in
+   English, Kiswahili and Maa, and past meetings with their documents
+   ===================================================================== */
+const ENTERPRISE_TYPES=['Livestock trading (goats, sheep, cattle)','Beadwork and crafts','Small shop or kiosk','Vegetable or fruit farming','Poultry','Milk selling','Tailoring','Food kiosk or hotel','Second-hand clothes','Other (describe in the details)'];
+const ENT_FREQ=['Daily','Weekly','Monthly','Quarterly (about every three months)','Other (see notes)'];
+const G_STATUS=['Pending','Yes','No'];
+
+/* ---------- guarantors ---------- */
+const gStatus=g=>g.status||(g.confirmation?'Yes':'Pending'); /* records from before v0.9.2: confirmed at the meeting */
+function guarantorCounts(a){
+  const G=(a&&a.guarantors)||[];
+  return{named:G.length,confirmed:G.filter(g=>gStatus(g)==='Yes').length,pending:G.filter(g=>gStatus(g)==='Pending').length,declined:G.filter(g=>gStatus(g)==='No').length};
+}
+const gPill=s=>s==='Yes'?pill('ok','Yes, confirmed','check'):s==='No'?pill('bad','No, declined','x'):pill('warn','Pending','clock');
+const canRecordGuarantor=()=>can('approve')||can('recordFinance')||can('manageMeetings');
+const appOpen=a=>['Submitted','Needs Review'].includes(a.status);
+
+/* ---------- qualification shown clearly ---------- */
+function eligibilityPanel(E){
+  const n=r=>E.checks.filter(c=>c.res===r).length,g=E.checks.find(c=>c.label==='Guarantors');
+  const head=E.outcome==='Eligible'?'Qualifies: every check is met.':E.outcome==='Needs Review'?'Needs review: nothing fails, but some checks cannot be confirmed yet.':'Does not qualify yet: at least one check is not met.';
+  const order={fail:0,review:1,pass:2},list=E.checks.slice().sort((a,b)=>order[a.res]-order[b.res]);
+  return `<div class="elig-head elig-${E.outcome==='Eligible'?'ok':E.outcome==='Needs Review'?'warn':'bad'}"><div><b>Qualification result</b><div class="small">${head}</div></div>${outcomePill(E.outcome)}</div>
+  <div class="elig-count small"><span><b>${n('pass')}</b> met</span><span><b>${n('review')}</b> need review</span><span><b>${n('fail')}</b> not met</span>${g?`<span>Guarantors: <b>${g.res==='pass'?'confirmed':g.res==='fail'?'not enough':'waiting'}</b></span>`:''}</div>
+  <ul class="check-list">${list.map(c=>`<li><span class="ck ${c.res}" aria-hidden="true">${c.res==='pass'?'✓':c.res==='fail'?'✗':'?'}</span><div><b><span class="sr-only">${c.res==='pass'?'Met':c.res==='fail'?'Not met':'Needs review'}: </span>${esc(c.label)}</b> <span class="muted tiny">${c.res==='pass'?'Met':c.res==='fail'?'Not met':'Needs review'}</span><div class="muted small">${esc(c.text)}</div></div></li>`).join('')}</ul>
+  <p class="muted small" style="margin-top:8px">${E.limit.pending?'Loan limit: pending confirmation of the group\'s limit rule.':`Loan limit: <b>${ksh(E.limit.limit)}</b>${E.limit.borrowed?`, <b>${ksh(E.limit.available)}</b> available after ${ksh(E.limit.borrowed)} already borrowed`:''}.`}</p>`;
+}
+
+/* ---------- application tracker ---------- */
+function appSteps(a){
+  const L=rules(a.groupId).loans,G=guarantorCounts(a),need=isNum(L.guarantorsRequired)?+L.guarantorsRequired:null;
+  const closed=['Disbursed','Rejected'].includes(a.status);
+  const E=closed?null:loanEligibility(a.memberId,a.amount,G,a.months);
+  const loan=a.loanId?S.ledger.find(e=>e.id===a.loanId):null,li=loan?loanInfo(loan):null;
+  const st=[];
+  st.push({label:'Submitted',state:'done',note:fmtDate(a.date)});
+  let gs,gn;
+  if(need===0){gs='done';gn='None required'}
+  else if(need!=null&&G.confirmed>=need){gs='done';gn=`${G.confirmed} of ${need} confirmed`}
+  else if(closed){gs=G.confirmed?'done':'skip';gn=`${G.confirmed} confirmed`}
+  else if(need!=null&&G.confirmed+G.pending<need){gs='bad';gn=G.declined?`${G.declined} declined, name another`:`${G.named} of ${need} named`}
+  else{gs='now';gn=G.pending?`${G.pending} waiting to reply`:'Requirement pending'}
+  st.push({label:'Guarantors',state:gs,note:gn});
+  if(closed)st.push({label:'Qualification',state:'done',note:a.decision?a.decision.qualification:(a.eligibility||{}).outcome||''});
+  else st.push({label:'Qualification',state:E.outcome==='Eligible'?'done':E.outcome==='Needs Review'?'now':'bad',note:E.outcome});
+  st.push({label:'Decision',state:a.status==='Rejected'?'bad':['Approved','Disbursed'].includes(a.status)?'done':'wait',note:a.status==='Rejected'?'Rejected':['Approved','Disbursed'].includes(a.status)?'Approved':'Officials decide'});
+  st.push({label:'Disbursed',state:a.status==='Disbursed'?'done':a.status==='Approved'?'now':'wait',note:a.status==='Disbursed'&&loan?fmtDate(loan.date):a.status==='Approved'?'Treasurer to record':''});
+  st.push({label:'Repaying',state:li?(li.status==='Repaid'?'done':li.status==='Overdue'?'bad':'now'):'wait',note:li?(li.status==='Repaid'?'Fully repaid':li.status==='Overdue'?`${ksh(li.overdueAmt)} overdue`:`${ksh(li.outstanding)} to go`):''});
+  if(a.status==='Rejected')st.slice(4).forEach(s=>{s.state='skip';s.note=''});
+  return{steps:st,E};
+}
+function appTracker(a,compact){
+  const {steps}=appSteps(a),cur=steps.findIndex(s=>s.state!=='done');
+  const icon2={done:'✓',now:'●',bad:'!',wait:'',skip:'-'};
+  if(compact){const s=cur<0?steps[steps.length-1]:steps[cur];return `<span class="small">Step ${cur<0?steps.length:cur+1} of ${steps.length}: <b>${esc(s.label)}</b></span>${s.note?`<div class="muted tiny">${esc(s.note)}</div>`:''}`}
+  return `<ol class="tracker" aria-label="Application progress">${steps.map((s,i)=>`<li class="t-${s.state}" ${i===cur?'aria-current="step"':''}><span class="t-dot" aria-hidden="true">${icon2[s.state]||i+1}</span><span class="t-l"><b>${esc(s.label)}</b><span class="sr-only"> (${s.state==='done'?'done':s.state==='bad'?'needs attention':s.state==='now'?'in progress':'not yet'})</span>${s.note?`<span class="muted tiny">${esc(s.note)}</span>`:''}</span></li>`).join('')}</ol>`;
+}
+
+/* ---------- loan applications page ---------- */
+function loanAppsView(){
+  const own=UI.role==='Member';
+  const list=(own?GLA().filter(a=>a.memberId===me().id):can('viewAll')?GLA():[]).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:a.id<b.id?1:-1);
+  const cnt=s=>list.filter(a=>a.status===s).length;
+  const cols=[
+    {label:'Application',render:a=>`<button type="button" class="link-btn" data-act="open-app" data-id="${a.id}">${esc(a.id)}</button><div class="muted tiny">${fmtDate(a.date)} · ${esc(a.channel||'')}</div>`},
+    ...(own?[]:[{label:'Member',render:a=>who(a.memberId,esc(a.memberId))}]),
+    {label:'Amount',cls:'r',render:a=>`<span class="num"><b>${ksh(a.amount)}</b></span><div class="muted tiny">${a.months} months</div>`},
+    {label:'Enterprise',render:a=>`${esc(a.enterpriseType||a.purpose)}<div class="muted tiny">${esc([a.enterprise,a.entFreq].filter(Boolean).join(' · ')||a.purpose)}</div>`},
+    {label:'Guarantors',render:a=>(a.guarantors||[]).length?(a.guarantors||[]).map(g=>`<div class="small">${esc(g.name)} ${gPill(gStatus(g))}</div>`).join(''):'-'},
+    {label:'Qualification now',render:a=>['Disbursed','Rejected'].includes(a.status)?'<span class="muted small">Closed</span>':outcomePill(loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months).outcome)},
+    {label:'Progress',render:a=>appTracker(a,true)},
+    {label:'Status',render:a=>appPill(a.status)},
+    ...(can('approve')?[{label:'',nolabel:true,cls:'r',render:a=>appOpen(a)?(a.submittedBy===me().id?'<span class="muted tiny">Another official decides</span>':btn('app-decision','Approve / reject',{ic:'check',cls:'btn-primary btn-sm',data:`data-id="${a.id}"`})):''}]:[]),
+  ];
+  const selfE=own?loanEligibility(me().id):null;
+  const asks=own?guarantorAsks(me().id):[];
+  return `${pageHeader({title:own?'Apply for a loan':'Loan applications',desc:'A member must qualify before receiving a loan. Every qualification result shows its reasons, and officials record the reason for every decision.',actions:(can('applyLoan')?btn('apply-loan',own?'Apply for a loan':'New application (assisted)',{ic:'clipboard'}):'')+(!own&&can('viewAll')?btn('check-elig','Check a member\'s qualification',{ic:'check',cls:'btn-secondary'}):'')})}
+  ${notice('Applications are records for the group\'s own decision. Chama Digital does not lend or move money. Only guarantors who answered <b>Yes</b> count toward the group\'s requirement. This prototype has no legally verified electronic signature.',{ic:'info',tone:'maroon'})}
+  ${asks.length?card({title:`Guarantor requests for you (${asks.length})`,sub:'A member named you as a guarantor. Reply Yes if you agree to guarantee the loan, or No if you do not.',flush:true,body:`<ul class="rows">${asks.map(({a,g})=>`<li>${who(a.memberId,`${esc(a.id)} · ${ksh(a.amount)} over ${a.months} months · ${esc(a.enterpriseType||a.purpose)}`)}<div class="grow"></div>${gStatus(g)==='Pending'&&appOpen(a)?`${btn('guar-respond','Yes, I guarantee',{ic:'check',cls:'btn-primary btn-sm',data:`data-id="${a.id}" data-g="${g.memberId}" data-v="Yes"`})} ${btn('guar-respond','No',{ic:'x',cls:'btn-secondary btn-sm',data:`data-id="${a.id}" data-g="${g.memberId}" data-v="No"`})}`:gPill(gStatus(g))}</li>`).join('')}</ul>`})+'<div style="height:14px"></div>':''}
+  <div class="stats">${statCard({label:'Awaiting decision',value:cnt('Submitted')+cnt('Needs Review'),sub:`${cnt('Needs Review')} need review`,ic:'clock',tone:'amber'})}${statCard({label:'Waiting for guarantors',value:list.filter(a=>appOpen(a)&&guarantorCounts(a).pending).length,sub:'At least one guarantor has not replied',ic:'users'})}${statCard({label:'Approved, not yet disbursed',value:cnt('Approved'),sub:'Treasurer records the disbursement',ic:'check'})}${statCard({label:'Disbursed',value:cnt('Disbursed'),sub:'Now tracked in Loan Repayments',ic:'loan'})}</div>
+  <div class="grid-eq">${own?card({title:'My qualification today',body:eligibilityPanel(selfE)}):loanRulesCard()}${own?loanRulesCard():card({title:'How the loan limit grows',body:limitExplainer()})}</div>
+  ${own&&list.filter(a=>a.status!=='Rejected'&&!(a.status==='Disbursed'&&appSteps(a).steps[5].state==='done')).slice(0,2).map(a=>card({title:`Tracking ${a.id}: ${ksh(a.amount)}`,sub:`Submitted ${fmtDate(a.date)}`,actions:btn('open-app','Details',{cls:'btn-ghost btn-sm',data:`data-id="${a.id}"`}),body:appTracker(a)})).join('<div style="height:14px"></div>')||''}
+  ${card({flush:true,title:own?'My applications':'Applications',body:list.length?table({caption:'Loan applications',cols,rows:list,rowClass:a=>a.status==='Rejected'?'voided':''}):emptyState({ic:'clipboard',title:'No applications yet',text:own?'When you apply for a loan, your application and its progress appear here.':'Applications submitted by members, or entered for assisted members, appear here.'})})}`;
+}
+function guarantorAsks(mid){
+  return S.loanApps.filter(a=>a.chamaId===S.chama.chamaId).flatMap(a=>(a.guarantors||[]).filter(g=>g.memberId===mid).map(g=>({a,g}))).filter(({a,g})=>appOpen(a)||gStatus(g)!=='Pending').sort((x,y)=>x.a.date<y.a.date?1:-1).slice(0,8);
+}
+
+function openLoanApp(){
+  if(!needPerm('applyLoan'))return;
+  const own=UI.role==='Member',mid=own?me().id:(memberOpts()[0]||[])[0];if(!mid){toast('Add a member first.','error');return}
+  const L=rules().loans,ent=rules().enterprise||{},gopts=[['','None'],...GM().filter(m=>m.status==='Active').map(m=>[m.id,`${m.name} (${m.id})`])];
+  const gRow=i=>field({label:`Guarantor ${i}`,name:'g'+i,opts:gopts,value:''})+(own?`<input type="hidden" name="g${i}s" value="Pending">`:field({label:`Guarantor ${i} confirmed?`,name:`g${i}s`,opts:G_STATUS.map(x=>[x,x==='Yes'?'Yes (confirmed)':x==='No'?'No (declined)':'Pending (not yet asked or no reply)']),value:'Pending'}));
+  openModal({title:own?'Apply for a loan':'New loan application (assisted member)',desc:esc(curGroup().groupName),wide:true,body:`<form id="frm-la" data-form="loan-app" novalidate><div class="fgrid">
+    ${own?`<input type="hidden" name="memberId" value="${mid}"><div class="fld full"><span class="lbl">Applicant</span>${who(mid,esc(mid))}</div>`:field({label:'Applicant',name:'memberId',opts:memberOpts(),value:mid,required:true,cls:'full'})}
+    ${field({label:'Amount requested',name:'amount',type:'number',required:true,prefix:'KSh',attrs:'min="1" step="1" inputmode="numeric"',err:'Enter an amount above zero.'})}
+    ${field({label:'Repayment period (months)',name:'months',type:'number',value:isNum(L.maxMonths)?Math.min(6,L.maxMonths):6,required:true,attrs:'min="1" max="36" step="1"',err:'Enter a whole number from 1 to 36.'})}
+    ${field({label:'Loan purpose',name:'purpose',required:true,err:'Enter the purpose.'})}
+    ${field({label:'Enterprise type',name:'enterpriseType',opts:[['','Choose the enterprise type'],...ENTERPRISE_TYPES],value:ent.type&&ENTERPRISE_TYPES.includes(ent.type)?ent.type:'',required:true,err:'Choose the enterprise type.'})}
+    ${field({label:'Enterprise details',name:'enterprise',opt:true,hint:'For example: buys goats at Kilgoris market and sells in Lolgorian.'})}
+    ${field({label:'How often the enterprise earns',name:'entFreq',opts:[['','Not stated'],...ENT_FREQ],value:''})}
+    ${gRow(1)}${gRow(2)}${gRow(3)}
+    ${own?`<p class="full muted small">Each guarantor gets a request (simulated SMS, plus a notice in their own account) and answers <b>Yes</b> or <b>No</b>. Only a Yes counts toward the group's requirement.</p>`:field({label:'How the guarantors confirmed',name:'gnote',value:'Confirmed in person at the group meeting',cls:'full',hint:'Only needed for guarantors marked Yes or No. This is not an electronic signature.'})}
+    <div class="full card" style="padding:14px" id="la-elig" aria-live="polite"></div></div></form>`,footer:modalFooter('Submit application','frm-la')});
+  laLive($('#frm-la'));
+}
+function laGuarantors(d){
+  const seen=new Set(),out=[];
+  [1,2,3].forEach(i=>{const id=d['g'+i];if(id&&id!==d.memberId&&!seen.has(id)){seen.add(id);out.push({memberId:id,status:G_STATUS.includes(d[`g${i}s`])?d[`g${i}s`]:'Pending'})}});
+  return out;
+}
+function laLive(form){
+  const box=$('#la-elig',form);if(!box)return;const d=formData(form);
+  box.innerHTML=eligibilityPanel(loanEligibility(d.memberId,Number(d.amount)||undefined,guarantorCounts({guarantors:laGuarantors(d)}),Number(d.months)||undefined));
+}
+FORMS['loan-app']=(form,d)=>{
+  if(!needPerm('applyLoan'))return;
+  const own=UI.role==='Member';if(own&&d.memberId!==me().id)return;
+  const err={},amt=Number(d.amount),mo=Number(d.months),m=byId(d.memberId);
+  if(!m||m.groupId!==UI.group)err.memberId='Choose a member of this group.';
+  if(!(amt>0))err.amount='x';if(!(Number.isInteger(mo)&&mo>=1&&mo<=36))err.months='x';if(!String(d.purpose).trim())err.purpose='x';
+  if(!d.enterpriseType)err.enterpriseType='x';
+  if([1,2,3].some(i=>d['g'+i]&&d['g'+i]===d.memberId))err.g1='The applicant cannot guarantee their own loan.';
+  const picked=[1,2,3].map(i=>d['g'+i]).filter(Boolean);if(new Set(picked).size<picked.length)err.g2='Each guarantor can only be named once.';
+  if(!applyErrors(form,err))return;
+  const gs=laGuarantors(d),note=String(d.gnote||'').trim();
+  const guarantors=gs.map(g=>({memberId:g.memberId,name:mName(g.memberId),status:own?'Pending':g.status,confirmation:!own&&g.status!=='Pending'?note:'',respondedAt:!own&&g.status!=='Pending'?nowStamp():'',respondedBy:!own&&g.status!=='Pending'?me().id:'',channel:!own&&g.status!=='Pending'?'Recorded by '+UI.role:''}));
+  const G=guarantorCounts({guarantors}),E=loanEligibility(m.id,amt,G,mo);
+  const a={id:nextSeq(S.loanApps,'LA'),chamaId:S.chama.chamaId,groupId:m.groupId,memberId:m.id,date:todayISO(),amount:Math.round(amt),months:mo,purpose:String(d.purpose).trim(),enterpriseType:d.enterpriseType,enterprise:String(d.enterprise||'').trim(),entFreq:d.entFreq||'',
+    guarantors,status:E.outcome==='Eligible'?'Submitted':'Needs Review',
+    eligibility:{outcome:E.outcome,checks:E.checks,limit:E.limit.limit,at:E.at},submittedBy:me().id,channel:own?'Member self-service':'Assisted by '+UI.role,decision:null,createdAt:nowStamp(),updatedAt:nowStamp()};
+  S.loanApps.push(a);
+  logAudit({action:'Loan application submitted',target:a.id,detail:`${ksh(a.amount)} over ${mo} months · ${m.name} · ${a.enterpriseType} · guarantors ${G.confirmed} Yes, ${G.pending} pending, ${G.declined} No · qualification: ${E.outcome}`,kind:'loan',memberId:m.id,next:a.status});
+  queueSMS(m.id,'Loan application received',`Chama Digital: Your loan application ${a.id} for KSh ${num(a.amount)} was received. Qualification check: ${E.outcome}. You can follow each step under Loan Applications.`);
+  guarantors.filter(g=>g.status==='Pending').forEach(g=>sendReminder(g.memberId,'guarantor',{applicant:m.name,amount:num(a.amount),app:a.id},{mode:'Automatic',key:`guarantor|${a.id}|${g.memberId}`}));
+  commit(`Application ${a.id} submitted. Qualification check: ${E.outcome}.`);
+};
+function respondGuarantor(appId,gid,val){
+  const a=S.loanApps.find(x=>x.id===appId);if(!a||!G_STATUS.includes(val))return;
+  const g=(a.guarantors||[]).find(x=>x.memberId===gid);if(!g)return;
+  const self=me().id===gid;
+  if(!self&&!(canRecordGuarantor()&&inAllowedGroup(a))){toast('Only the guarantor, or an official recording their answer, can do this.','error');return}
+  if(!appOpen(a)){toast('A decision has already been made on this application.','error');return}
+  const prev=gStatus(g);if(prev===val)return;
+  g.status=val;g.respondedAt=nowStamp();g.respondedBy=me().id;g.channel=self?'Guarantor\'s own account':'Recorded by '+UI.role;if(val!=='Pending')g.confirmation=self?'Answered in their own account':'Answer recorded by the '+UI.role;
+  a.updatedAt=nowStamp();
+  const E=loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months);
+  logAudit({action:'Guarantor answered',target:a.id,detail:`${g.name} answered ${val} for ${mName(a.memberId)}'s application (${ksh(a.amount)}) · ${g.channel} · qualification now: ${E.outcome}`,kind:'loan',memberId:a.memberId,prev,next:val});
+  queueSMS(a.memberId,'Guarantor answer',`Chama Digital: ${g.name} answered ${val==='Yes'?'YES (agrees to guarantee)':val==='No'?'NO (will not guarantee)':'PENDING'} on your loan application ${a.id}. Qualification now: ${E.outcome}.`);
+  commit(val==='Yes'?`Thank you. ${g.name} is recorded as a guarantor (Yes).`:`${g.name}'s answer is recorded as ${val}.`);
+}
+
+function openApp(id){
+  const a=S.loanApps.find(x=>x.id===id);if(!a)return;
+  const isG=(a.guarantors||[]).some(g=>g.memberId===me().id);
+  if(!(can('viewAll')&&allowedGroups().some(g=>g.groupId===a.groupId))&&!(UI.role==='Member'&&(a.memberId===me().id||isG))&&!isPlatformOwner()&&!(canRecordGuarantor()&&inAllowedGroup(a)))return;
+  const {E:now}=appSteps(a),G=guarantorCounts(a),need=rules(a.groupId).loans.guarantorsRequired,own=UI.role==='Member'&&a.memberId===me().id;
+  const gRows=(a.guarantors||[]).map(g=>{const s=gStatus(g),mine=g.memberId===me().id,off=canRecordGuarantor()&&!mine&&UI.role!=='Member';
+    const acts=appOpen(a)&&(mine||off)?`<div class="chips" style="margin-top:6px">${['Yes','No','Pending'].filter(v=>v!==s&&(mine?v!=='Pending':true)).map(v=>btn('guar-respond',mine?(v==='Yes'?'Yes, I guarantee':'No'):`Record ${v}`,{ic:v==='Yes'?'check':v==='No'?'x':'clock',cls:(v==='Yes'?'btn-primary':'btn-secondary')+' btn-sm',data:`data-id="${a.id}" data-g="${g.memberId}" data-v="${v}"`})).join('')}</div>`:'';
+    return `<li>${who(g.memberId,esc(g.memberId))}<div class="grow"></div><div style="text-align:right">${gPill(s)}<div class="muted tiny">${g.respondedAt?`${esc(g.channel||'')} · ${fmtDT(g.respondedAt)}`:'No answer yet'}</div>${acts}</div></li>`}).join('');
+  const body=`<div class="card" style="padding:18px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px">${who(a.memberId,esc(a.id))}${appPill(a.status)}</div>${appTracker(a)}</div>
+   <div class="card" style="padding:18px;margin-bottom:14px"><dl class="kv"><dt>Amount requested</dt><dd class="num">${ksh(a.amount)}</dd><dt>Repayment period</dt><dd>${a.months} months</dd><dt>Purpose</dt><dd>${esc(a.purpose)}</dd><dt>Enterprise type</dt><dd>${esc(a.enterpriseType||'Not stated')}</dd><dt>Enterprise details</dt><dd>${esc(a.enterprise||'-')}</dd><dt>How often it earns</dt><dd>${esc(a.entFreq||'Not stated')}</dd><dt>Submitted</dt><dd>${fmtDate(a.date)} · ${esc(a.channel||'')}</dd>${a.decision?`<dt>Decision</dt><dd>${esc(mName(a.decision.by))}, ${fmtDT(a.decision.at)}<div class="muted small">${esc(a.decision.reason)}</div></dd>`:''}${a.loanId?`<dt>Loan record</dt><dd><button type="button" class="link-btn" data-act="open-loan" data-id="${a.loanId}">${esc(a.loanId)}</button></dd>`:''}</dl></div>
+   ${card({title:'Guarantors',sub:`${G.confirmed} Yes · ${G.pending} pending · ${G.declined} No · the group requires ${isNum(need)?need+' confirmed':'(pending confirmation)'}`,flush:true,body:gRows?`<ul class="rows">${gRows}</ul>`:'<p class="muted" style="padding:0 18px 16px">No guarantors named.</p>'})}<div style="height:14px"></div>
+   ${now?card({title:own?'Your qualification today':'Qualification today',body:eligibilityPanel(now)}):''}
+   ${a.eligibility?`<div style="height:14px"></div>${card({title:'Qualification when submitted',sub:fmtDT(a.eligibility.at),body:`${outcomePill(a.eligibility.outcome)}<ul class="small" style="list-style:disc;padding-left:18px;margin-top:8px">${a.eligibility.checks.map(c=>`<li>${esc(c.label)}: ${c.res==='pass'?'met':c.res==='fail'?'not met':'needs review'} · ${esc(c.text)}</li>`).join('')}</ul>`})}`:''}
+   <div class="chips" style="margin-top:14px">${appOpen(a)&&can('approve')&&a.submittedBy!==me().id?btn('app-decision','Approve or reject',{ic:'check',data:`data-id="${a.id}"`}):''}${a.status==='Approved'&&can('recordFinance')?btn('disburse','Record disbursement',{ic:'loan',cls:'btn-maroon',data:`data-id="${a.id}"`}):''}</div>`;
+  openDrawer({title:`Loan application ${a.id}`,desc:esc(groupName(a.groupId)),body});
+}
+
+/* ---------- reminders: English, Kiswahili and Maa ---------- */
+const REM_LANGS=[['en','English'],['sw','Kiswahili'],['mas','Maa (Maasai)']];
+const langName=l=>(REM_LANGS.find(x=>x[0]===l)||REM_LANGS[0])[1];
+const REM_EVENTS={
+  'late-loan':{label:'Late loan repayment',sms:'Late loan reminder',vars:['name','amount','loan','date']},
+  'unpaid-fine':{label:'Unpaid fine',sms:'Unpaid fine reminder',vars:['name','amount','reason','date']},
+  'meeting':{label:'Upcoming meeting (agenda and venue)',sms:'Meeting reminder',vars:['name','group','date','time','venue','agenda']},
+  'loan-approved':{label:'Loan approved',sms:'Loan approved',vars:['name','app','amount']},
+  'guarantor':{label:'Guarantor request',sms:'Guarantor request',vars:['name','applicant','amount','app']},
+};
+/* Maa wording is a draft for review by a Maa-speaking official; every template can be edited in Communications → Reminders. */
+const REM_TPL={
+  'late-loan':{
+    en:'Chama Digital: Hello {name}, your loan repayment of KSh {amount} on loan {loan} was due on {date} and is late. Please pay as soon as you can. Paying on time increases your loan limit.',
+    sw:'Chama Digital: Habari {name}, malipo yako ya mkopo {loan} ya KSh {amount} yalipaswa kulipwa tarehe {date} na yamechelewa. Tafadhali lipa haraka iwezekanavyo. Kulipa kwa wakati huongeza kikomo chako cha mkopo.',
+    mas:'Chama Digital: Takwenya {name}. Enkopo {loan}: KSh {amount}, tarehe {date} (late). Taisere, ilipa. Ashe oleng.'},
+  'unpaid-fine':{
+    en:'Chama Digital: Hello {name}, you have an unpaid fine of KSh {amount} ({reason}) from {date}. Please clear it at the next meeting.',
+    sw:'Chama Digital: Habari {name}, una faini ya KSh {amount} ({reason}) tangu tarehe {date} ambayo haijalipwa. Tafadhali ilipe katika mkutano ujao.',
+    mas:'Chama Digital: Takwenya {name}. Faini KSh {amount} ({reason}), tarehe {date}. Taisere, ilipa te enkiguena. Ashe oleng.'},
+  'meeting':{
+    en:'Chama Digital: Hello {name}, {group} meeting on {date} at {time}. Venue: {venue}. Agenda: {agenda}.',
+    sw:'Chama Digital: Habari {name}, mkutano wa {group} tarehe {date} saa {time}. Mahali: {venue}. Ajenda: {agenda}.',
+    mas:'Chama Digital: Takwenya {name}. Enkiguena {group}: tarehe {date}, saa {time}, {venue}. Ajenda: {agenda}. Ashe oleng.'},
+  'loan-approved':{
+    en:'Chama Digital: Hello {name}, your loan application {app} for KSh {amount} has been approved. The Treasurer will record the disbursement.',
+    sw:'Chama Digital: Habari {name}, ombi lako la mkopo {app} la KSh {amount} limeidhinishwa. Mweka Hazina atarekodi utoaji wa fedha.',
+    mas:'Chama Digital: Takwenya {name}. Enkopo {app}, KSh {amount}: approved. Ashe oleng.'},
+  'guarantor':{
+    en:'Chama Digital: Hello {name}, {applicant} named you as a guarantor for loan application {app} (KSh {amount}). Please answer YES or NO in Chama Digital, or tell the Secretary.',
+    sw:'Chama Digital: Habari {name}, {applicant} amekutaja kama mdhamini wa ombi la mkopo {app} (KSh {amount}). Tafadhali jibu NDIYO au HAPANA kwenye Chama Digital, au mwambie Katibu.',
+    mas:'Chama Digital: Takwenya {name}. {applicant}: enkopo {app} (KSh {amount}), guarantor? Taisere: EE (Yes) anaa A-A (No), te Chama Digital anaa Katibu. Ashe oleng.'},
+};
+function remStore(){S.chama.reminders=S.chama.reminders||{cfg:{},tpl:{},log:{}};const r=S.chama.reminders;r.cfg=r.cfg||{};r.tpl=r.tpl||{};r.log=r.log||{};return r}
+function remCfg(gid=UI.group){const r=remStore();return r.cfg[gid]=Object.assign({auto:true,lang:'en',meetingDays:3,repeatDays:7,lastRun:''},r.cfg[gid]||{})}
+const remTpl=(ev,lang)=>((remStore().tpl[ev]||{})[lang])||REM_TPL[ev][lang]||REM_TPL[ev].en;
+const tplEdited=(ev,lang)=>!!((remStore().tpl[ev]||{})[lang]);
+const fillTpl=(t,v)=>String(t).replace(/\{(\w+)\}/g,(x,k)=>v[k]!=null?String(v[k]):x);
+const memberLang=m=>m&&m.smsLang&&REM_LANGS.some(x=>x[0]===m.smsLang)?m.smsLang:remCfg(m?m.groupId:UI.group).lang;
+function sendReminder(memberId,ev,vars,{lang,mode='Manual',key}={}){
+  const m=byId(memberId);if(!m)return null;
+  const L=lang&&lang!=='member'?lang:memberLang(m),v={name:firstName(m.name),...vars};
+  const msg=fillTpl(remTpl(ev,L),v);
+  queueSMS(m.id,REM_EVENTS[ev].sms,msg);
+  const x=S.sms[S.sms.length-1];if(x&&x.memberId===m.id){x.lang=L;x.reminder=ev;x.mode=mode}
+  S.notifications=S.notifications||[];
+  S.notifications.push({id:nextSeq(S.notifications,'NT',5),chamaId:S.chama.chamaId,groupId:m.groupId,type:'Reminder',title:REM_EVENTS[ev].label,message:msg,audience:'Member',memberId:m.id,channel:'In-app',status:'Shown in app',date:todayISO(),lang:L});
+  const ours=S.notifications.filter(n=>n.type==='Reminder');if(ours.length>600){const drop=new Set(ours.slice(0,ours.length-600).map(n=>n.id));S.notifications=S.notifications.filter(n=>!drop.has(n.id))}
+  if(key)remStore().log[key]=todayISO();
+  return{m,L,msg};
+}
+/* who is due a reminder today, for one event in one group */
+function remDue(ev,gid=UI.group){
+  const t=todayISO(),cfg=remCfg(gid),out=[],act=S.members.filter(m=>m.groupId===gid&&m.status==='Active');
+  if(ev==='late-loan'){
+    act.forEach(m=>memberStats(m.id).loans.filter(l=>l.status==='Overdue').forEach(l=>{const s=l.sched.find(x=>!x.paid&&x.due<t);if(s)out.push({m,key:`late-loan|${l.id}|${s.n}`,vars:{amount:num(l.overdueAmt),loan:l.id,date:fmtDate(s.due)},repeat:true})}));
+  }else if(ev==='unpaid-fine'){
+    act.forEach(m=>{const F=S.fines.filter(f=>f.memberId===m.id).map(fineInfo).filter(f=>f.outstanding>0).sort((a,b)=>a.date<b.date?-1:1);if(F.length)out.push({m,key:`unpaid-fine|${m.id}|${F.map(f=>f.id).join('+')}`,vars:{amount:num(sum(F,f=>f.outstanding)),reason:F.length>1?`${F.length} fines, first: ${F[0].type}`:F[0].type,date:fmtDate(F[0].date)},repeat:true})});
+  }else if(ev==='meeting'){
+    const mt=S.meetings.filter(x=>x.groupId===gid&&x.status==='Scheduled'&&x.date>=t&&x.date<=addDays(t,+cfg.meetingDays||3)).sort((a,b)=>a.date<b.date?-1:1)[0];
+    if(mt)act.filter(m=>m.joined<=mt.date).forEach(m=>out.push({m,key:`meeting|${mt.id}|${m.id}`,vars:{group:groupName(gid),date:fmtDate(mt.date),time:mt.time,venue:mt.location,agenda:(mt.agenda||[]).slice(0,3).join('; ')+((mt.agenda||[]).length>3?'; ...':'')},meeting:mt}));
+  }else if(ev==='loan-approved'){
+    S.loanApps.filter(a=>a.groupId===gid&&a.status==='Approved').forEach(a=>{const m=byId(a.memberId);if(m)out.push({m,key:`loan-approved|${a.id}`,vars:{app:a.id,amount:num(a.amount)}})});
+  }else if(ev==='guarantor'){
+    S.loanApps.filter(a=>a.groupId===gid&&appOpen(a)).forEach(a=>(a.guarantors||[]).filter(g=>gStatus(g)==='Pending').forEach(g=>{const m=byId(g.memberId);if(m)out.push({m,key:`guarantor|${a.id}|${g.memberId}`,vars:{applicant:mName(a.memberId),amount:num(a.amount),app:a.id},repeat:true})}));
+  }
+  const log=remStore().log,rep=+cfg.repeatDays||7;
+  out.forEach(x=>{const last=log[x.key];x.last=last||'';x.fresh=!last||(x.repeat&&last<=addDays(t,-rep))});
+  return out;
+}
+function sendReminderBatch(ev,gid,{lang='member',mode='Manual',onlyFresh=true}={}){
+  const due=remDue(ev,gid).filter(x=>!onlyFresh||x.fresh);if(!due.length)return 0;
+  const langs={};due.forEach(x=>{const r=sendReminder(x.m.id,ev,x.vars,{lang,mode,key:x.key});if(r)langs[r.L]=(langs[r.L]||0)+1});
+  logAudit({action:mode==='Automatic'?'Automatic reminders sent':'Reminders sent',target:REM_EVENTS[ev].label,detail:`${plural(due.length,'message')} to ${groupName(gid)} members · ${Object.entries(langs).map(([l,n])=>`${langName(l)} ${n}`).join(', ')} · simulated SMS and in-app notice`,kind:'settings',groupId:gid,...(mode==='Automatic'?{userId:'system'}:{})});
+  return due.length;
+}
+/* once a day per group, for groups with automatic reminders on */
+function runAutoReminders(){
+  if(!S||!S.groups)return 0;const t=todayISO();let n=0,ran=false;
+  S.groups.forEach(g=>{const c=remCfg(g.groupId);if(!c.auto||c.lastRun===t)return;c.lastRun=t;ran=true;Object.keys(REM_EVENTS).forEach(ev=>{n+=sendReminderBatch(ev,g.groupId,{mode:'Automatic'})})});
+  if(ran)saveState();
+  return n;
+}
+const canRemind=()=>can('manageMeetings')||can('recordFinance')||can('editChama');
+const canEditTpl=()=>can('manageMeetings')||can('editChama');
+function remindersPanel(){
+  const own=UI.role==='Member';
+  if(own||!canRemind()){
+    const m=me();
+    return card({title:'My reminder language',sub:'Reminders about loans, fines, meetings and guarantor requests are sent in the language you choose.',body:`<div class="fgrid">${field({label:'Send my reminders in',name:'mylang',opts:REM_LANGS,value:memberLang(m),attrs:'data-change="my-lang"'})}<div></div></div>
+      <div class="inline-note" style="margin-top:12px"><b>Example (meeting reminder):</b> ${esc(fillTpl(remTpl('meeting',memberLang(m)),{name:firstName(m.name),group:groupName(m.groupId),date:fmtDate(addDays(todayISO(),3)),time:'14:00',venue:S.chama.meetingPlace||'the usual place',agenda:'Savings; loans; any other business'}))}</div>`});
+  }
+  const gid=UI.group,cfg=remCfg(gid);UI.rem=UI.rem||{lang:'member',onlyFresh:true};
+  const evs=Object.keys(REM_EVENTS).map(ev=>{const due=remDue(ev,gid);return{ev,due,fresh:due.filter(x=>x.fresh)}});
+  const ex=d=>d.due[0]?d.due[0]:null;
+  const cards=evs.map(d=>{const e=ex(d),v=e?{name:firstName(e.m.name),...e.vars}:{name:'Naserian',amount:'1,000',loan:'LN-0001',date:fmtDate(todayISO()),reason:'Absenteeism',group:groupName(gid),time:'14:00',venue:'School hall',agenda:'Savings; loans',app:'LA-0001',applicant:'Nashipai Sankale'};
+    const sendN=UI.rem.onlyFresh?d.fresh.length:d.due.length;
+    return `<li class="rem-ev"><div class="grow"><b>${esc(REM_EVENTS[d.ev].label)}</b><div class="muted small">${plural(d.due.length,'member')} due${d.due.length!==d.fresh.length?`, ${d.due.length-d.fresh.length} already reminded recently`:''}${d.ev==='meeting'&&d.due[0]?` · meeting ${fmtDate(d.due[0].meeting.date)}`:''}</div>
+      <details style="margin-top:6px"><summary class="small">Preview in all three languages${e?` (for ${esc(e.m.name)})`:' (example)'}</summary>${REM_LANGS.map(([l,n])=>`<div class="rem-prev"><span class="pill pill-${l==='mas'?'warn':'info'}">${n}</span> ${esc(fillTpl(remTpl(d.ev,l),v))}</div>`).join('')}</details></div>
+      ${btn('rem-send',`Send now (${sendN})`,{ic:'msg',cls:'btn-secondary btn-sm',data:`data-ev="${d.ev}" ${sendN?'':'disabled'}`})}</li>`}).join('');
+  const langCounts=REM_LANGS.map(([l,n])=>`${n}: ${S.members.filter(m=>m.groupId===gid&&m.status==='Active'&&memberLang(m)===l).length}`).join(' · ');
+  return `${card({title:'Reminders',sub:`${groupName(gid)} · each message goes to the SMS outbox (simulated) and to the member's in-app notices. Members' languages: ${langCounts}.`,body:`<div class="fgrid">
+      <div class="fld"><label for="rem-lang">Language for "Send now"</label><select id="rem-lang" data-change="rem-opt" data-key="lang">${selectOpts([['member','Each member\'s own language'],...REM_LANGS],UI.rem.lang)}</select></div>
+      <label class="checkrow" style="align-self:end"><input type="checkbox" data-change="rem-opt" data-key="onlyFresh" ${UI.rem.onlyFresh?'checked':''}><span>Skip members already reminded in the last ${cfg.repeatDays} days</span></label></div>
+      <ul class="rows" style="margin-top:10px">${cards}</ul>`})}
+    <div style="height:14px"></div>
+    <div class="grid-eq">${card({title:'Automatic daily reminders',sub:cfg.lastRun?`Last automatic run: ${fmtDate(cfg.lastRun)}`:'Not run yet',body:`<form id="frm-remcfg" data-form="rem-cfg" novalidate><div class="fgrid">
+      <label class="checkrow full"><input type="checkbox" name="auto" ${cfg.auto?'checked':''}><span>Send reminders automatically once a day (late loans, unpaid fines, the next meeting, approved loans, guarantor requests)</span></label>
+      ${field({label:'Group default language',name:'lang',opts:REM_LANGS,value:cfg.lang,hint:'Used for members who have not chosen a language.'})}
+      ${field({label:'Meeting reminder, days before',name:'meetingDays',type:'number',value:cfg.meetingDays,attrs:'min="1" max="14" step="1"',err:'Enter 1 to 14.'})}
+      ${field({label:'Repeat loan, fine and guarantor reminders every',name:'repeatDays',type:'number',value:cfg.repeatDays,prefix:'days',attrs:'min="1" max="60" step="1"',err:'Enter 1 to 60.'})}</div>
+      <div style="margin-top:12px"><button type="submit" class="btn btn-primary">${icon('check')}Save</button></div></form>`})}
+      ${card({title:'A member\'s language',sub:'Members can also choose this themselves under Messages → My reminder language.',body:`<form id="frm-mlang" data-form="member-lang" novalidate><div class="fgrid">${field({label:'Member',name:'memberId',opts:memberOpts(),value:memberOpts()[0]?.[0],cls:'full'})}${field({label:'Language',name:'lang',opts:REM_LANGS,value:'en'})}<div style="align-self:end"><button type="submit" class="btn btn-secondary">${icon('check')}Save language</button></div></div></form>`})}</div>
+    <div style="height:14px"></div>
+    ${card({title:'Message wording',sub:'Placeholders in braces, such as {name} or {amount}, are filled in for each member.',flush:true,body:`${notice('<b>Maa (Maasai) wording is a draft.</b> Please have a Maa-speaking official check and correct it before the group relies on it. Changes are logged in the audit trail.',{ic:'alert',tone:'amber'})}
+      <ul class="rows">${Object.keys(REM_EVENTS).map(ev=>`<li style="align-items:flex-start"><div class="grow"><b>${esc(REM_EVENTS[ev].label)}</b>${REM_LANGS.map(([l,n])=>`<div class="rem-prev"><span class="pill pill-${l==='mas'?'warn':'info'}">${n}${tplEdited(ev,l)?' · edited':''}</span> ${esc(remTpl(ev,l))}</div>`).join('')}</div>${canEditTpl()?btn('rem-tpl','Edit',{ic:'edit',cls:'btn-ghost btn-sm',data:`data-ev="${ev}"`}):''}</li>`).join('')}</ul>`})}`;
+}
+FORMS['rem-cfg']=(form,d)=>{
+  if(!canRemind())return;const err={},md=Number(d.meetingDays),rd=Number(d.repeatDays);
+  if(!(Number.isInteger(md)&&md>=1&&md<=14))err.meetingDays='x';if(!(Number.isInteger(rd)&&rd>=1&&rd<=60))err.repeatDays='x';
+  if(!applyErrors(form,err))return;
+  const c=remCfg(),prev=`${c.auto?'on':'off'}, ${langName(c.lang)}, ${c.meetingDays} days, every ${c.repeatDays} days`;
+  Object.assign(c,{auto:!!d.auto,lang:REM_LANGS.some(x=>x[0]===d.lang)?d.lang:'en',meetingDays:md,repeatDays:rd});
+  logAudit({action:'Reminder settings changed',target:groupName(UI.group),detail:'Automatic reminders and default language',kind:'settings',groupId:UI.group,prev,next:`${c.auto?'on':'off'}, ${langName(c.lang)}, ${c.meetingDays} days, every ${c.repeatDays} days`});
+  commit('Reminder settings saved.');
+};
+FORMS['member-lang']=(form,d)=>{
+  if(!canRemind())return;const m=byId(d.memberId);if(!m||!inAllowedGroup(m)||!REM_LANGS.some(x=>x[0]===d.lang))return;
+  const prev=memberLang(m);m.smsLang=d.lang;m.updatedAt=nowStamp();
+  logAudit({action:'Reminder language set',target:m.id,detail:`${m.name}: ${langName(d.lang)}`,kind:'member',memberId:m.id,prev:langName(prev),next:langName(d.lang)});
+  commit(`${m.name} will get reminders in ${langName(d.lang)}.`);
+};
+function setMyLang(l){
+  const m=me();if(!m||!REM_LANGS.some(x=>x[0]===l)||String(m.id).startsWith('unassigned-'))return;
+  const prev=memberLang(m);m.smsLang=l;m.updatedAt=nowStamp();
+  logAudit({action:'Reminder language set',target:m.id,detail:`${m.name} chose ${langName(l)}`,kind:'member',memberId:m.id,prev:langName(prev),next:langName(l)});
+  commit(`Your reminders will be sent in ${langName(l)}.`);
+}
+function openRemTpl(ev){
+  if(!canEditTpl()){toast('Only the Secretary or Chairperson can change message wording.','error');return}
+  const E=REM_EVENTS[ev];if(!E)return;
+  openModal({title:`Wording: ${E.label}`,desc:`Placeholders: ${E.vars.map(v=>'{'+v+'}').join(' ')}`,wide:true,body:`<form id="frm-rt" data-form="rem-tpl" data-ev="${ev}" novalidate>
+    ${REM_LANGS.map(([l,n])=>field({label:n,name:'t-'+l,type:'textarea',rows:3,value:remTpl(ev,l),attrs:'maxlength="320"',hint:l==='mas'?'Draft wording: check with a Maa speaker.':'',err:'Enter the message (keep the placeholders you need).'})).join('')}
+    <label class="checkrow" style="margin-top:10px"><input type="checkbox" name="reset"><span>Reset all three to the original wording</span></label></form>`,footer:modalFooter('Save wording','frm-rt')});
+}
+FORMS['rem-tpl']=(form,d)=>{
+  if(!canEditTpl())return;const ev=form.dataset.ev,R=remStore();if(!REM_EVENTS[ev])return;
+  if(d.reset){delete R.tpl[ev];logAudit({action:'Reminder wording reset',target:REM_EVENTS[ev].label,detail:'Back to the original English, Kiswahili and Maa wording',kind:'settings'});commit('Wording reset.');return}
+  const err={};REM_LANGS.forEach(([l])=>{if(String(d['t-'+l]||'').trim().length<10)err['t-'+l]='x'});if(!applyErrors(form,err))return;
+  const changed=REM_LANGS.filter(([l])=>String(d['t-'+l]).trim()!==remTpl(ev,l));
+  R.tpl[ev]=R.tpl[ev]||{};REM_LANGS.forEach(([l])=>{const v=String(d['t-'+l]).trim();if(v===REM_TPL[ev][l])delete R.tpl[ev][l];else R.tpl[ev][l]=v});
+  if(changed.length)logAudit({action:'Reminder wording changed',target:REM_EVENTS[ev].label,detail:`Edited: ${changed.map(([,n])=>n).join(', ')}`,kind:'settings'});
+  commit(changed.length?'Wording saved.':'No changes.');
+};
+
+/* ---------- savings statement up to 10 years ---------- */
+function buildSavingsStatement(r,R,{from,to,sumGrid,tbl}){
+  const all=can('reports'),m=byId(all?r.memberId:me().id);if(!m)return true;
+  const ten=addDays(addMonths(to,-120),1);let note='';if(from<ten){from=ten;note='Statements cover at most 10 years, so this one starts on '+fmtDate(from)+'.'}
+  const S0=ledgerOf(m.id).filter(e=>valid(e)&&e.type==='saving').sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.at<b.at?-1:1);
+  const open=sum(S0.filter(e=>e.date<from)),recs=S0.filter(e=>e.date>=from&&e.date<=to);
+  let run=open;const rows=recs.map(e=>({...e,bal:(run+=e.amount)}));
+  const years=[...new Set(rows.map(e=>e.date.slice(0,4)))];
+  const Y=years.map(y=>{const yr=rows.filter(e=>e.date.startsWith(y));return{y,n:yr.length,amt:sum(yr),close:yr[yr.length-1].bal}});
+  R.title='Savings statement';R.subject=`${m.name} (${m.id})`;R.from=from;
+  R.sections=(note?`<p class="muted small">${esc(note)}</p>`:'')+sumGrid([['Opening balance',ksh(open)],['Saved in period',ksh(sum(rows))],['Deposits',rows.length],['Closing balance',ksh(run)],['Years covered',years.length||0],['Savings to date (all time)',ksh(sum(S0))]])
+    +(Y.length>1?tbl('Savings by year',[{label:'Year',render:x=>x.y},{label:'Deposits',cls:'r',render:x=>x.n},{label:'Saved',cls:'r',render:x=>`<span class="num">${ksh(x.amt)}</span>`},{label:'Balance at year end',cls:'r',render:x=>`<span class="num">${ksh(x.close)}</span>`}],Y):'')
+    +`<h3>Deposits with running balance</h3>`+(rows.length?tbl('Savings statement',[{label:'Date',render:e=>fmtDate(e.date)},{label:'Record',render:e=>esc(e.id)},{label:'Reference',render:e=>esc(e.ref||'-')},{label:'Amount',cls:'r',render:e=>`<span class="num">+${ksh(e.amount)}</span>`},{label:'Balance',cls:'r',render:e=>`<span class="num"><b>${ksh(e.bal)}</b></span>`}],rows):'<p class="muted">No savings recorded in this period.</p>');
+  R.csv=[['Date','Record','Reference','Amount (KSh)','Balance (KSh)'],['','Opening balance','','',open],...rows.map(e=>[e.date,e.id,e.ref||'',e.amount,e.bal])];
+  return true;
+}
+{const f=buildReportV7;buildReportV7=function(r,R,o){if(r.type==='savst')return buildSavingsStatement(r,R,o);return f(r,R,o)}}
+{const f=rangeFor;rangeFor=function(r){const t=todayISO();
+  if(r.range==='12m')return{from:addDays(addMonths(t,-12),1),to:t,label:'Last 12 months'};
+  if(r.range==='5y')return{from:addDays(addMonths(t,-60),1),to:t,label:'Last 5 years'};
+  if(r.range==='10y')return{from:addDays(addMonths(t,-120),1),to:t,label:'Last 10 years'};
+  return f(r)}}
+
+/* ---------- meetings: record a past meeting, upload its documents ---------- */
+function openSchedule(opts={}){
+  if(!needPerm('manageMeetings'))return;
+  const t=todayISO(),past=!!opts.past;
+  const body=`<form id="frm-mt" data-form="sched-meeting" novalidate><div class="fgrid">
+   <div class="fld full"><span class="lbl">This meeting</span><div class="chips" role="group"><button type="button" class="chip" aria-pressed="${!past}" data-act="sched-mode" data-past="0">Is coming up (schedule it)</button><button type="button" class="chip" aria-pressed="${past}" data-act="sched-mode" data-past="1">Already took place (record it)</button></div><input type="hidden" name="past" value="${past?1:''}"></div>
+   ${field({label:'Date',name:'date',type:'date',value:past?addDays(t,-7):addDays(t,7),required:true,attrs:past?`max="${t}"`:`min="${t}"`,err:past?'Choose today or an earlier date.':'Choose today or a future date.'})}${field({label:'Time',name:'time',type:'time',value:'14:00',required:true})}
+   ${field({label:'Meeting type',name:'type',opts:['Monthly meeting','Special meeting','Annual general meeting'],value:'Monthly meeting'})}${field({label:'Location',name:'location',value:S.chama.meetingPlace||'',required:true,err:past?'Enter where the meeting was held.':'Enter where the meeting will be.'})}
+   ${field({label:'Agenda (one item per line)',name:'agenda',type:'textarea',rows:5,cls:'full',value:'Opening and apologies\nMinutes of the last meeting\nTreasurer\'s report on contributions and internal loans\nAny other business'})}
+   ${past?field({label:'Minutes',name:'minutes',type:'textarea',rows:4,cls:'full',opt:true,hint:'You can also upload a photo or PDF of the written minutes after saving.'}):''}</div>
+   ${past?'<p class="muted small" style="margin-top:8px">After saving, the attendance register opens so you can mark ✓, Ⓔ and X from the paper register and upload the meeting documents. Members are not sent a meeting SMS for a past meeting.</p>':'<p class="muted small" style="margin-top:8px">Members get a meeting reminder with the agenda and venue, in their own language, before the meeting.</p>'}</form>`;
+  openModal({title:past?'Record a past meeting':'Schedule meeting',body,footer:modalFooter(past?'Record meeting':'Schedule meeting','frm-mt')});
+}
+FORMS['sched-meeting']=(form,d)=>{
+  if(!needPerm('manageMeetings'))return;
+  const past=!!d.past,t=todayISO(),err={};
+  if(!d.date||(past?d.date>t:d.date<t))err.date=past?'Choose today or an earlier date.':'Choose today or a future date.';
+  if(!String(d.location).trim())err.location='x';if(!/^\d{2}:\d{2}$/.test(String(d.time||'')))err.time='Enter a time such as 14:00.';
+  if(past&&S.meetings.some(m=>m.groupId===UI.group&&m.date===d.date&&m.status!=='Cancelled'))err.date='A meeting on this date is already recorded for this group.';
+  if(!applyErrors(form,err))return;
+  const id='MT-'+String(S.meetings.reduce((x,m)=>Math.max(x,+m.id.split('-')[1]||0),0)+1).padStart(3,'0');
+  const loc=String(d.location).trim(),agenda=String(d.agenda).split('\n').map(s=>s.trim()).filter(Boolean);
+  S.meetings.push({id,chamaId:S.chama.chamaId,groupId:UI.group,createdAt:nowStamp(),updatedAt:nowStamp(),date:d.date,time:d.time,type:d.type,location:loc,agenda,status:past?'Held':'Scheduled',attendance:{},minutes:past?String(d.minutes||'').trim():'',documents:[],...(past?{recordedAfter:true,recordedBy:me().id}:{})});
+  if(past){
+    logAudit({action:'Past meeting recorded',target:id,detail:`${d.type}, held ${fmtDate(d.date)} at ${loc} · recorded afterwards by the ${UI.role}`,kind:'meeting'});
+    saveState();closeAllOverlays();route();toast(`Meeting of ${fmtDate(d.date)} recorded. Mark the attendance register now.`);openMeeting(id);return;
+  }
+  logAudit({action:'Meeting scheduled',target:id,detail:`${d.type}, ${fmtDate(d.date)}`,kind:'meeting'});
+  const cfg=remCfg();
+  if(d.date<=addDays(t,+cfg.meetingDays||3))sendReminderBatch('meeting',UI.group,{mode:'Automatic'});
+  commit(`Meeting scheduled for ${fmtDate(d.date)}. Members are reminded ${cfg.meetingDays} days before, in their own language.`);
+};
+
+const DOC_MAX_PDF=1.5*1024*1024,DOC_MAX_IMG_IN=15*1024*1024,DOC_MAX_PER_MEETING=6;
+const fmtBytes=b=>b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
+const dataUrlBytes=u=>Math.round((String(u).length-String(u).indexOf(',')-1)*3/4);
+function meetingDocsCard(m){
+  const D=m.documents||[],edit=can('manageMeetings');
+  return `<div data-mtgdocs="${m.id}">${card({title:'Meeting documents',sub:edit?`Photos or PDFs of the minutes, the paper register or receipts. Photos are compressed; PDFs up to ${fmtBytes(DOC_MAX_PDF)}; at most ${DOC_MAX_PER_MEETING} per meeting.`:'Documents the Secretary uploaded for this meeting.',flush:true,body:`${D.length?`<ul class="rows">${D.map(x=>`<li><span class="act-ic">${icon(x.type==='application/pdf'?'file':'eye')}</span><div class="grow"><b>${esc(x.name)}</b><div class="muted small">${esc(x.kind||'Document')} · ${fmtBytes(x.size)}${x.originalSize&&x.originalSize>x.size?` (from ${fmtBytes(x.originalSize)})`:''} · ${esc(firstName(mName(x.uploadedBy)))}, ${fmtDT(x.at)}</div></div>${btn('mtg-doc-view','View',{ic:'eye',cls:'btn-ghost btn-sm',data:`data-id="${m.id}" data-doc="${x.id}"`})}${edit?btn('mtg-doc-del','Remove',{ic:'x',cls:'btn-ghost btn-sm',data:`data-id="${m.id}" data-doc="${x.id}"`}):''}</li>`).join('')}</ul>`:'<p class="muted" style="padding:0 18px 12px">No documents uploaded.</p>'}
+    ${edit&&D.length<DOC_MAX_PER_MEETING?`<div class="fgrid" style="padding:0 18px 16px"><div class="fld"><label for="md-kind-${m.id}">Document</label><select id="md-kind-${m.id}">${selectOpts(['Minutes','Attendance register','Receipts or cash records','Photo of the meeting','Other'],'Minutes')}</select></div><div class="fld"><label for="md-file-${m.id}">File (photo or PDF)</label><input type="file" id="md-file-${m.id}" accept="image/*,application/pdf" data-change="mtg-doc" data-id="${m.id}"></div><div class="full" id="md-note-${m.id}" aria-live="polite"></div></div>`:''}`})}</div>`;
+}
+function compressImage(file,maxSide,q){
+  return new Promise((res,rej)=>{const u=URL.createObjectURL(file),img=new Image();
+    img.onload=()=>{const k=Math.min(1,maxSide/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',q))};
+    img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('This image could not be read. Try a JPG or PNG photo.'))};img.src=u});
+}
+const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('The file could not be read.'));r.readAsDataURL(f)});
+async function uploadMeetingDoc(input){
+  const m=S.meetings.find(x=>x.id===input.dataset.id),file=input.files&&input.files[0],note=$('#md-note-'+input.dataset.id);
+  const say=(t,k='')=>{if(note)note.innerHTML=`<div class="inline-note ${k}">${esc(t)}</div>`};
+  if(!m||!file)return;if(!can('manageMeetings')){say('Only the Secretary can upload meeting documents.','bad');return}
+  if((m.documents||[]).length>=DOC_MAX_PER_MEETING){say(`This meeting already has ${DOC_MAX_PER_MEETING} documents. Remove one first.`,'bad');return}
+  const isPdf=file.type==='application/pdf'||/\.pdf$/i.test(file.name),isImg=/^image\//.test(file.type);
+  if(!isPdf&&!isImg){say('Only photos (JPG, PNG) and PDF files can be uploaded.','bad');input.value='';return}
+  if(isPdf&&file.size>DOC_MAX_PDF){say(`This PDF is ${fmtBytes(file.size)}. The limit is ${fmtBytes(DOC_MAX_PDF)}: scan at a lower resolution, or upload photos of the pages instead (photos are compressed).`,'bad');input.value='';return}
+  if(isImg&&file.size>DOC_MAX_IMG_IN){say(`This photo is ${fmtBytes(file.size)}, which is too large to process.`,'bad');input.value='';return}
+  say(isImg?'Compressing the photo…':'Reading the PDF…');
+  try{
+    let url;
+    if(isImg){url=await compressImage(file,1600,0.72);if(dataUrlBytes(url)>450*1024)url=await compressImage(file,1200,0.6)}
+    else url=await readAsDataURL(file);
+    const kindSel=$('#md-kind-'+m.id),kind=kindSel?kindSel.value:'Document';
+    m.documents=m.documents||[];
+    const doc={id:nextSeq(m.documents,'DOC',2),name:isImg?file.name.replace(/\.[^.]+$/,'')+'.jpg':file.name,kind,type:isImg?'image/jpeg':'application/pdf',size:dataUrlBytes(url),originalSize:file.size,dataUrl:url,uploadedBy:me().id,at:nowStamp()};
+    m.documents.push(doc);m.updatedAt=nowStamp();
+    logAudit({action:'Meeting document uploaded',target:m.id,detail:`${kind}: ${doc.name} (${fmtBytes(doc.size)}${isImg?`, compressed from ${fmtBytes(file.size)}`:''}) · meeting of ${fmtDate(m.date)}`,kind:'meeting',groupId:m.groupId});
+    saveState();
+    const box=document.querySelector(`[data-mtgdocs="${m.id}"]`);if(box)box.outerHTML=meetingDocsCard(m);
+    toast(`${kind} uploaded.`);
+  }catch(e){say(e.message||String(e),'bad')}
+}
+function dataUrlToBlobUrl(u){const [h,b]=String(u).split(',');const mime=(h.match(/data:([^;]+)/)||[])[1]||'application/octet-stream';const bin=atob(b),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return URL.createObjectURL(new Blob([arr],{type:mime}))}
+function viewMeetingDoc(mid,did){
+  const m=S.meetings.find(x=>x.id===mid);if(!m||(!isPlatformOwner()&&!allowedGroups().some(g=>g.groupId===m.groupId)))return;
+  const d=(m.documents||[]).find(x=>x.id===did);if(!d)return;
+  const url=dataUrlToBlobUrl(d.dataUrl);
+  openModal({title:d.name,desc:`${esc(d.kind||'')} · ${fmtDate(m.date)} meeting`,wide:true,body:d.type==='application/pdf'?`<iframe src="${url}" title="${esc(d.name)}" style="width:100%;height:70vh;border:1px solid var(--line,#ddd);border-radius:8px"></iframe>`:`<img src="${url}" alt="${esc(d.kind||'Meeting document')}: ${esc(d.name)}" style="max-width:100%;height:auto;border-radius:8px">`,footer:`<a class="btn btn-secondary" href="${url}" download="${esc(d.name)}">${icon('download')}Download</a><button type="button" class="btn btn-primary" data-act="close-overlay">Close</button>`});
+}
+function removeMeetingDoc(mid,did){
+  if(!needPerm('manageMeetings'))return;const m=S.meetings.find(x=>x.id===mid);if(!m)return;const d=(m.documents||[]).find(x=>x.id===did);if(!d)return;
+  confirmDialog({title:'Remove this document?',text:`${esc(d.name)} will be removed from the meeting of ${fmtDate(m.date)}. The audit trail keeps a record that it was uploaded and removed.`,confirmLabel:'Remove',tone:'btn-maroon',onConfirm:()=>{
+    m.documents=m.documents.filter(x=>x.id!==did);m.updatedAt=nowStamp();
+    logAudit({action:'Meeting document removed',target:m.id,detail:`${d.kind}: ${d.name} · meeting of ${fmtDate(m.date)}`,kind:'meeting',groupId:m.groupId,prev:d.name});
+    saveState();closeOverlay();const box=document.querySelector(`[data-mtgdocs="${m.id}"]`);if(box)box.outerHTML=meetingDocsCard(m);toast('Document removed.')}});
+}
+
+/* ---------- dispatch ---------- */
+{const f=actV7;actV7=function(name,el,ev){
+  switch(name){
+    case 'guar-respond':respondGuarantor(el.dataset.id,el.dataset.g,el.dataset.v);return;
+    case 'rem-send':{const n=sendReminderBatch(el.dataset.ev,UI.group,{lang:(UI.rem||{}).lang||'member',onlyFresh:(UI.rem||{}).onlyFresh!==false});commit(n?`${plural(n,'reminder')} added to the SMS outbox and members' notices.`:'No one is due this reminder.');return}
+    case 'rem-tpl':openRemTpl(el.dataset.ev);return;
+    case 'sched-mode':{closeOverlay();openSchedule({past:el.dataset.past==='1'});return}
+    case 'record-past':openSchedule({past:true});return;
+    case 'mtg-doc-view':viewMeetingDoc(el.dataset.id,el.dataset.doc);return;
+    case 'mtg-doc-del':removeMeetingDoc(el.dataset.id,el.dataset.doc);return;
+  }
+  return f(name,el,ev);
+}}
+{const f=changeV7;changeV7=function(t){
+  if(t.matches('[data-change="mtg-doc"]')){uploadMeetingDoc(t);return true}
+  if(t.matches('[data-change="rem-opt"]')){UI.rem=UI.rem||{lang:'member',onlyFresh:true};UI.rem[t.dataset.key]=t.type==='checkbox'?t.checked:t.value;renderView('x','x',()=>communicationsView());return true}
+  if(t.matches('[data-change="my-lang"]')){setMyLang(t.value);return true}
+  return f(t);
+}}
+setTimeout(function autoRem(){try{if(S&&document.body.dataset.mode==='app')runAutoReminders()}catch(e){console.warn('reminders',e)}setTimeout(autoRem,60000)},4000);
+
 /* ---------- memoised calculations (see memo() above) ---------- */
 {const f=periodStatus;periodStatus=function(m,k,c){return memo('ps|'+m+'|'+k+'|'+(c||''),()=>f(m,k,c))}}
 {const f=memberStats;memberStats=function(id){if(!byId(id))return{periods:0,paid:0,onTime:0,missed:0,contribTotal:0,savingsTotal:0,loans:[],loanOutstanding:0,lastContrib:null,recs:[]};return memo('mst|'+id,()=>f(id))}}
@@ -4512,7 +4992,7 @@ FORMS['edit-member']=(form,d)=>{
 };
 
 /* Meetings */
-function openSchedule(){
+function openScheduleV06(){
   if(!needPerm('manageMeetings'))return;
   const t=todayISO();
   const body=`<form id="frm-mt" data-form="sched-meeting" novalidate><div class="fgrid">
@@ -4521,7 +5001,7 @@ function openSchedule(){
    ${field({label:'Agenda (one item per line)',name:'agenda',type:'textarea',rows:5,cls:'full',value:'Opening and apologies\nMinutes of the last meeting\nTreasurer\'s report on contributions and internal loans\nAny other business'})}</div></form>`;
   openModal({title:'Schedule meeting',body,footer:modalFooter('Schedule meeting','frm-mt')});
 }
-FORMS['sched-meeting']=(form,d)=>{
+FORMS['sched-meeting-v06']=(form,d)=>{
   if(!needPerm('manageMeetings'))return;
   const err={};if(!d.date||d.date<todayISO())err.date='Choose today or a future date.';if(!String(d.location).trim())err.location='Enter where the meeting will be.';if(!/^\d{2}:\d{2}$/.test(String(d.time||'')))err.time='Enter a time such as 14:00.';
   if(!applyErrors(form,err))return;
@@ -4576,7 +5056,7 @@ function generateReport(){
   setTimeout(()=>{
     r.result=buildReport(r);r.result.csvName=`chama-digital-${r.type}-${todayISO()}.csv`;r.loading=false;
     const t=REPORT_TYPES.find(x=>x.id===r.type).label;
-    logAudit({action:'Statement generated',target:r.result.subject?`${t}: ${byId(r.memberId).name}`:t,detail:`${r.result.label}, ${fmtDate(r.result.from)} to ${fmtDate(r.result.to)}`,kind:'statement',memberId:r.type==='member'?r.memberId:''});
+    logAudit({action:'Statement generated',target:r.result.subject?`${t}: ${byId(r.memberId).name}`:t,detail:`${r.result.label}, ${fmtDate(r.result.from)} to ${fmtDate(r.result.to)}`,kind:'statement',memberId:['member','savst'].includes(r.type)?r.memberId:''});
     saveState();
     if(currentPage==='reports'){$('#report-out').innerHTML=reportOut();const p=$('.paper');p&&p.scrollIntoView({block:'start',behavior:'smooth'})}
     renderNav();toast('Report generated. Preview is ready below.');

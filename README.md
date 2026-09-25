@@ -8,13 +8,38 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 
 | File | What it is |
 |---|---|
-| `index.html` | Current live build (v0.9) |
-| `chama-digital-v0.9-mara.html` | The same v0.9 build under its version name |
+| `index.html` | Current live build (v0.9, updated through v0.9.2) |
+| `chama-digital-v0.9-mara.html` | The same build under its version name |
 | `chama-digital-v0.8-mara.html` | Previous build (v0.8) |
 | `chama-digital-v0.7-mara.html` | Previous build (v0.7) |
 | `chama-digital-v0.6-fixed.html` | Original prototype (v0.6) |
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
+
+## New in v0.9.2
+Changes requested from the client's field notes.
+- **Enterprise details**: the "how often it earns" list now runs Daily → Weekly → Monthly → Quarterly → Other, and
+  a **main enterprise type** (livestock, poultry, beadwork, shop, farming, dairy, tailoring, food kiosk, other) is
+  recorded in the group's rules and on every loan application.
+- **Guarantors answer Yes / No / Pending** themselves from their own account (or an official records their answer):
+  only a **Yes** counts toward the group's guarantor requirement, and a pending answer keeps the application at
+  "Needs Review" rather than guessing. Every answer is a simulated SMS, an in-app notice and an audit entry.
+- **Qualification results** are shown with a plain-language heading (Qualifies / Needs review / Does not qualify yet)
+  and a met / needs review / not met count, alongside the full reasons list.
+  A **loan application tracker** (Submitted → Guarantors → Qualification → Decision → Disbursed → Repaying) appears
+  on the application, on the member's own Loan Applications page and on the member dashboard.
+- **Savings statements** can now be run over the last 12 months, 5 years or 10 years (running balance plus a
+  year-by-year total), alongside the existing report ranges.
+- **Reminders** (Communications → Reminders): send-now buttons for late loan repayments, unpaid fines and the next
+  meeting (with its agenda and venue), plus an in-app notice and an improved SMS when a loan is approved. Each group
+  can turn on an automatic daily run (default off); repeat messages are skipped for members reminded recently.
+  **Every reminder can be sent in English, Kiswahili or Maa (Maasai)** — a member chooses their own language, an
+  official can set a group default, and the Maa wording is marked as a draft for a Maa-speaking official to check
+  and correct (edits are logged in the audit trail).
+- The **Secretary can record a meeting that has already taken place**: choose "Already took place", pick the past
+  date, and the register opens immediately (no meeting-reminder SMS is sent for a meeting that is already over).
+  **Meeting documents** (a photo of the paper register, minutes or a receipt, or a PDF) can be attached to any
+  meeting; images are compressed automatically, and every upload is in the audit trail.
 
 ## New in v0.9.1
 - Renamed to **HPF Micro Enterprise Program**.

@@ -8,11 +8,21 @@ Built for **Mara Enterprise Women Group**, part of the **Human Practice Foundati
 
 | File | What it is |
 |---|---|
-| `index.html` | Current live build (v0.8) |
-| `chama-digital-v0.8-mara.html` | The same v0.8 build under its version name |
+| `index.html` | Current live build (v0.9) |
+| `chama-digital-v0.9-mara.html` | The same v0.9 build under its version name |
+| `chama-digital-v0.8-mara.html` | Previous build (v0.8) |
 | `chama-digital-v0.7-mara.html` | Previous build (v0.7) |
 | `chama-digital-v0.6-fixed.html` | Original prototype (v0.6) |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
+
+## New in v0.9
+- **Excel upload** when registering a Chama (setup wizard), adding a community group, or updating an existing group
+  (Members → Import from Excel; Settings → Chama & groups). Accepts .xlsx, .xls and .csv. A template is included.
+  Community groups and VSLAs named in the file are created; existing members are matched by member number or phone
+  and updated; nothing is deleted; problems are listed before anything is saved; every change is in the audit trail.
+- **Live data**: with Supabase connected, every open screen picks up changes from other devices every 15 seconds
+  (and immediately when a tab is reopened). Without Supabase, changes appear across tabs of the same browser.
+- Sample data now has **15 VSLAs** (5 per community group, names pending) and 15 members per community group.
 
 ## New in v0.8
 - Community groups Olemoncho, Mbitin and Nterere, each linked to its school, with their VSLAs

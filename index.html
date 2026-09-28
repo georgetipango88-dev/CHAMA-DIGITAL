@@ -1947,7 +1947,7 @@ const settingsViewObj={title:'Settings',render:()=>settingsView()};
 function setBare(html){document.body.dataset.mode='bare';$('#bare').innerHTML=html;window.scrollTo(0,0)}
 function welcomeScreen(){
   document.body.classList.remove('nav-open');
-  setBare(`<div class="welcome"><div class="w-left">${photoShow()}<a class="brand" href="#/welcome" title="Back to the landing page">${LOGO}<div><b>CHAMA DIGITAL</b><span>Pilot build · Nairobi, KE</span></div></a>
+  setBare(`<div class="welcome"><div class="w-left">${photoShow()}<a class="brand" href="#/welcome" title="Back to the landing page">${LOGO}<div><b>CHAMA DIGITAL</b><span>Aitong · Mara</span></div></a>
    <p class="w-prog" title="Human Practice Foundation (HPF) Micro Enterprise Program">HPF Micro Enterprise Program</p><h1>Your Chama.<br>Your records.<br>Your future.</h1><p class="pos">Transparent · Accountable · Digital</p>
    <p class="lead">A digital record-keeping system built for Kenyan Chamas: contributions, savings, internal loans and member records, all in one place · replacing the exercise book.</p>
    <div class="chips no-print w-actions"><a class="btn btn-primary" href="#/register">${icon('plus')}Register a Chama</a><a class="btn btn-secondary" href="#/demo">${icon('eye')}See a demo Chama</a></div>

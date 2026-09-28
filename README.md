@@ -16,6 +16,17 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.3
+- **Learning assistant (chatbot)**: an "Ask" button on every page opens a chat where members learn about saving,
+  VSLAs, loans, guarantors, repayments, contributions (Social Fund, School Feeding), fines, meetings, privacy, USSD/SMS
+  and the HPF Micro Enterprise Program. It answers in **English or Kiswahili**, with suggested questions to tap.
+- It gives personal answers from the member's **own** records only: savings to date, loan qualification today, loan
+  limit, what is owed and when, unpaid fines, the next meeting's agenda and venue, and who the group's officials are.
+- Answers about the program come from the program's own records (community groups, schools, VSLAs, members).
+  Nothing about HPF is invented: the **Secretary or Chairperson can add answers** (English and Kiswahili, with
+  keywords), which the assistant uses first. Additions and removals are in the audit trail.
+- It runs entirely in the browser, with no outside AI service, and questions are not saved.
+
 ## New in v0.9.2
 Changes requested from the client's field notes.
 - **Enterprise details**: the "how often it earns" list now runs Daily → Weekly → Monthly → Quarterly → Other, and

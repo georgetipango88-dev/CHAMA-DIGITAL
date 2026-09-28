@@ -365,6 +365,25 @@ table.rt{width:100%;border-collapse:collapse;font-size:.875rem}
 }
 /* ===== v0.7 Mara Enterprise additions ===== */
 [hidden]{display:none!important}
+#cb-fab{display:none;position:fixed;right:20px;bottom:20px;z-index:80;align-items:center;gap:6px;padding:12px 18px;border:0;border-radius:999px;background:var(--teal-700);color:#fff;font:600 .95rem/1 'Inter',system-ui,sans-serif;box-shadow:0 6px 20px rgba(6,57,60,.3);cursor:pointer}
+#cb-fab svg{width:20px;height:20px}#cb-fab:hover{background:var(--teal-800)}#cb-fab:focus-visible{outline:3px solid var(--teal-200);outline-offset:2px}
+body[data-mode="app"] #cb-fab{display:inline-flex}
+#cb-panel{position:fixed;right:20px;bottom:84px;z-index:81;width:min(400px,calc(100vw - 32px));height:min(620px,calc(100vh - 120px));display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 50px rgba(20,39,43,.25);overflow:hidden}
+#cb-panel[hidden]{display:none}
+.cb-h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px;background:var(--teal-700);color:#fff}.cb-h .btn{color:#fff}.cb-sub{font-size:.8rem;opacity:.85}
+.cb-lang{padding:8px 12px 0}
+.cb-log{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.cb-msg{max-width:88%;padding:9px 12px;border-radius:14px;font-size:.9rem;line-height:1.45;overflow-wrap:anywhere}
+.cb-msg ul,.cb-msg ol{margin:6px 0 0;padding-left:18px}.cb-msg li{margin-top:3px}
+.cb-bot{align-self:flex-start;background:var(--surface);border:1px solid var(--line-soft);border-bottom-left-radius:4px}
+.cb-me{align-self:flex-end;background:var(--teal-600);color:#fff;border-bottom-right-radius:4px}
+.cb-src{margin-top:6px;font-size:.75rem;color:var(--muted)}
+.cb-chips{padding:8px 12px;gap:6px;border-top:1px solid var(--line-soft);max-height:92px;overflow-y:auto}
+.cb-chips .chip{font-size:.8rem}
+.cb-form{display:flex;gap:8px;padding:8px 12px}.cb-form input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:inherit}
+.cb-foot{display:flex;justify-content:space-between;gap:8px;padding:0 12px 10px;font-size:.72rem;color:var(--muted)}
+@media (max-width:720px){#cb-fab{bottom:88px;right:14px;padding:12px 14px}#cb-panel{right:8px;left:8px;width:auto;bottom:80px;height:calc(100vh - 150px)}}
+@media print{#cb-root{display:none}}
 .tracker{display:flex;list-style:none;margin:6px 0 0;padding:0;overflow-x:auto}
 .tracker li{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;padding:0 4px}
 .tracker li:not(:first-child)::before{content:"";position:absolute;top:13px;right:50%;width:100%;height:3px;background:#e2ddd3;z-index:0}
@@ -496,7 +515,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.2 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.3 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -4800,6 +4819,212 @@ function removeMeetingDoc(mid,did){
   return f(t);
 }}
 setTimeout(function autoRem(){try{if(S&&document.body.dataset.mode==='app')runAutoReminders()}catch(e){console.warn('reminders',e)}setTimeout(autoRem,60000)},4000);
+
+
+/* =====================================================================
+   v0.9.3 · Learning assistant (chatbot) for members: saving, loans,
+   the group's own rules and the HPF Micro Enterprise Program.
+   Runs entirely in the browser: no outside AI service, no chat log
+   stored. Answers about the group come from the group's own records
+   and rules; nothing about HPF is invented (officials add answers).
+   ===================================================================== */
+const CHAT_LANGS=[['en','English'],['sw','Kiswahili']];
+const chatStore=()=>{S.chama.chatFaq=S.chama.chatFaq||[];return S.chama.chatFaq};
+const canEditChat=()=>can('manageMeetings')||can('editChama');
+function chatState(){
+  if(!UI.chat){const m=S&&me();UI.chat={open:false,lang:m&&typeof memberLang==='function'&&memberLang(m)==='sw'?'sw':'en',msgs:[]}}
+  return UI.chat;
+}
+const T2=(en,sw)=>chatState().lang==='sw'?sw:en;
+const chatNorm=s=>' '+String(s||'').toLowerCase().replace(/[^a-z0-9À-ɏ\s]/g,' ').replace(/\s+/g,' ').trim()+' ';
+const CHAT_INTENTS=[
+  ['hello',['hi','hello','hey','habari','jambo','hujambo','mambo','sasa','takwenya','supa','good morning','good afternoon','salama']],
+  ['help',['help','what can you do','what else','menu','msaada','nisaidie','unaweza']],
+  ['basics',['what is saving','why save','why should i save','importance','benefit','benefits','faida','kwa nini','umuhimu','akiba ni nini','kuweka akiba','saving mean']],
+  ['tips',['tip','tips','advice','save more','budget','plan','ushauri','vidokezo','bajeti','mpango','how can i save','ninawezaje']],
+  ['mysavings',['my savings','my balance','how much have i saved','how much i saved','balance','akiba yangu','salio','nimeweka','nimeokoa','my statement','statement']],
+  ['saverules',['minimum','maximum','min','max','how much can i save','saving rule','saving rules','savings rule','kiwango','kiasi cha chini','kiasi cha juu','sheria za akiba']],
+  ['vsla',['vsla','village savings','savings group','what is a group','chama','kikundi','vikundi vya akiba']],
+  ['hpf',['hpf','human practice','foundation','program','programme','mep','micro enterprise','mradi','shirika','mpango wa hpf']],
+  ['groups',['olemoncho','mbitin','nterere','community group','community groups','schools','school','shule','vikundi','how many members','members are there','wanachama wangapi']],
+  ['loan',['loan','loans','borrow','qualify','qualification','apply','mkopo','mikopo','kukopa','kustahili','omba']],
+  ['limit',['loan limit','my limit','limit','how much can i borrow','increase my limit','kikomo','ongeza kikomo']],
+  ['guarantor',['guarantor','guarantors','guarantee','mdhamini','wadhamini','dhamana']],
+  ['repay',['repay','repayment','pay back','late','instalment','installment','deadline','lipa mkopo','marejesho','kuchelewa','rejesha']],
+  ['contrib',['contribution','contributions','social fund','welfare','school feeding','feeding','mchango','michango','ustawi','chakula','lishe']],
+  ['fines',['miss a meeting','miss the meeting','fine','fines','absent','absence','attendance','apology','faini','mahudhurio','adhabu','kutohudhuria']],
+  ['meeting',['meeting','next meeting','agenda','venue','mkutano','ajenda','mahali','enkiguena']],
+  ['enterprise',['enterprise','business','goats','beadwork','shop','biashara','mbuzi','shanga','duka']],
+  ['privacy',['privacy','private','who can see','secret','my data','faragha','siri','nani anaona']],
+  ['phone',['ussd','sms','basic phone','feature phone','simu','ujumbe','reminder','reminders','language','lugha','kiswahili','maa']],
+  ['officials',['chair','chairperson','treasurer','secretary','officials','who do i contact','contact','leaders','viongozi','mwenyekiti','mweka hazina','katibu']],
+  ['thanks',['thank','thanks','asante','ashe','shukran']],
+];
+function chatIntent(q){
+  const n=chatNorm(q);let best=null,score=0;
+  CHAT_INTENTS.forEach(([id,keys])=>{let s=0;keys.forEach(k=>{if(n.includes(' '+k+' ')||(k.length>5&&n.includes(k)))s+=k.includes(' ')?2:1});if(s>score){score=s;best=id}});
+  return best;
+}
+function chatCustom(q){
+  const n=chatNorm(q);let best=null,score=0;
+  chatStore().forEach(f=>{const keys=[f.q,...String(f.keys||'').split(',')].map(x=>chatNorm(x).trim()).filter(Boolean);let s=0;keys.forEach(k=>{if(n.includes(' '+k+' ')||(k.length>4&&n.includes(k)))s+=k.split(' ').length});if(s>score){score=s;best=f}});
+  return score?best:null;
+}
+const chatMe=()=>{const m=S&&me();return m&&!String(m.id).startsWith('unassigned-')?m:null};
+const kv=(v,pend)=>isNum(v)?ksh(v):pend;
+function chatAnswer(q){
+  const c=chatCustom(q);
+  if(c){const L=chatState().lang;return{html:esc((L==='sw'&&c.sw)||c.en).replace(/\n/g,'<br>'),src:T2('Answer added by your group officials','Jibu limeongezwa na viongozi wa kikundi'),chips:['What else can you do?']}}
+  const id=chatIntent(q),m=chatMe(),g=m?S.groups.find(x=>x.groupId===m.groupId):curGroup(),gid=g?g.groupId:UI.group,R=rules(gid),PEND=T2('pending confirmation by the group','bado kuthibitishwa na kikundi');
+  const P=S.chama.program||{},prog=S.chama.name;
+  switch(id){
+    case 'hello':return{html:T2(`Hello${m?' '+esc(firstName(m.name)):''}! I can explain saving, loans, contributions and the ${esc(prog)}, and show your own savings and loan limit. What would you like to know?`,`Habari${m?' '+esc(firstName(m.name)):''}! Ninaweza kueleza kuhusu akiba, mikopo, michango na ${esc(prog)}, na kukuonyesha akiba yako na kikomo chako cha mkopo. Ungependa kujua nini?`),chips:CHAT_STARTERS()};
+    case 'help':return{html:T2('You can ask me things like: <i>Why should I save?</i>, <i>How much have I saved?</i>, <i>How do I qualify for a loan?</i>, <i>What is a guarantor?</i>, <i>What is HPF MEP?</i>, <i>When is the next meeting?</i>','Unaweza kuniuliza: <i>Kwa nini niweke akiba?</i>, <i>Nimeweka akiba kiasi gani?</i>, <i>Nitastahili mkopo vipi?</i>, <i>Mdhamini ni nani?</i>, <i>HPF MEP ni nini?</i>, <i>Mkutano ujao ni lini?</i>'),chips:CHAT_STARTERS()};
+    case 'thanks':return{html:T2('You are welcome. Keep saving a little every time!','Karibu. Endelea kuweka akiba kidogo kila mara!'),chips:['Saving tips']};
+    case 'basics':return{html:T2(`<b>Saving</b> means keeping part of what you earn today so you have money later. Saving together in a group helps because:<ul><li>small amounts add up over months and years;</li><li>your savings are the base for your <b>loan limit</b>, so saving regularly lets you borrow more for your enterprise;</li><li>the group's records show what you saved, so nothing is forgotten;</li><li>you are ready for emergencies, school fees and good business chances.</li></ul>`,`<b>Kuweka akiba</b> ni kutunza sehemu ya unachopata leo ili uwe na pesa baadaye. Kuweka akiba pamoja katika kikundi husaidia kwa sababu:<ul><li>kiasi kidogo huongezeka kwa miezi na miaka;</li><li>akiba yako ndiyo msingi wa <b>kikomo chako cha mkopo</b>, hivyo kuweka akiba mara kwa mara hukuwezesha kukopa zaidi kwa biashara yako;</li><li>kumbukumbu za kikundi zinaonyesha ulichoweka, hakuna kinachosahaulika;</li><li>uko tayari kwa dharura, karo ya shule na nafasi nzuri za biashara.</li></ul>`),chips:['Saving tips','How much have I saved?','How is my loan limit worked out?']};
+    case 'tips':return{html:T2(`Some simple habits that help:<ol><li><b>Save first</b>: put aside your saving as soon as you are paid or sell something, before spending.</li><li><b>Same amount, every meeting</b>: a small regular amount is better than a big amount once in a while.</li><li><b>Keep a note</b> of what you earn and spend for one week; small daily spending adds up.</li><li><b>Separate business money</b> from household money.</li><li><b>Repay loans on time</b>: in this group that also raises your loan limit.</li><li>Borrow for things that <b>earn money</b> (stock, animals, materials) rather than for everyday spending.</li></ol>`,`Tabia rahisi zinazosaidia:<ol><li><b>Weka akiba kwanza</b>: tenga akiba mara unapolipwa au kuuza kitu, kabla ya kutumia.</li><li><b>Kiasi kilekile kila mkutano</b>: kiasi kidogo cha mara kwa mara ni bora kuliko kikubwa mara moja moja.</li><li><b>Andika</b> unachopata na kutumia kwa wiki moja; matumizi madogo ya kila siku huongezeka.</li><li><b>Tenganisha pesa za biashara</b> na za nyumbani.</li><li><b>Lipa mkopo kwa wakati</b>: katika kikundi hiki hiyo pia huongeza kikomo chako cha mkopo.</li><li>Kopa kwa vitu <b>vinavyoleta mapato</b> (bidhaa, mifugo, malighafi) badala ya matumizi ya kila siku.</li></ol>`),chips:['How much have I saved?','Why should I save?']};
+    case 'mysavings':{
+      if(!m)return{html:T2('Switch to a member account to see your own savings.','Ingia kama mwanachama ili kuona akiba yako.')};
+      const ms=memberStats(m.id),sv=ms.recs.filter(e=>e.type==='saving').sort((a,b)=>a.date<b.date?1:-1),last=sv[0];
+      const yr=sum(sv.filter(e=>e.date.slice(0,4)===todayISO().slice(0,4)));
+      return{html:T2(`<b>${esc(firstName(m.name))}, you have saved ${ksh(ms.savingsTotal)}</b> in total (${plural(sv.length,'saving')}).<br>This year: ${ksh(yr)}.${last?`<br>Last saving: ${ksh(last.amount)} on ${fmtDate(last.date)}.`:''}<br><span class="muted small">For a full statement with a running balance (up to 10 years), open Reports and choose "Savings statement".</span>`,`<b>${esc(firstName(m.name))}, umeweka akiba ya ${ksh(ms.savingsTotal)}</b> kwa jumla (mara ${sv.length}).<br>Mwaka huu: ${ksh(yr)}.${last?`<br>Akiba ya mwisho: ${ksh(last.amount)} tarehe ${fmtDate(last.date)}.`:''}<br><span class="muted small">Kwa taarifa kamili yenye salio (hadi miaka 10), fungua Ripoti uchague "Savings statement".</span>`),chips:['How is my loan limit worked out?','Saving tips'],go:['reports',T2('Open my statements','Fungua taarifa zangu')]};
+    }
+    case 'saverules':{
+      const s=R.savings||{};
+      return{html:T2(`In <b>${esc(g.groupName)}</b> each saving must be between <b>${kv(s.min,PEND)}</b> and <b>${kv(s.max,PEND)}</b>${s.frequency?`, saved ${esc(String(s.frequency).toLowerCase())}`:''}. An amount below the minimum or above the maximum is not accepted, so the records stay fair for everyone.`,`Katika <b>${esc(g.groupName)}</b> kila akiba lazima iwe kati ya <b>${kv(s.min,PEND)}</b> na <b>${kv(s.max,PEND)}</b>. Kiasi chini ya kiwango cha chini au juu ya kiwango cha juu hakikubaliwi, ili kumbukumbu ziwe za haki kwa wote.`),chips:['How much have I saved?','Why should I save?']};
+    }
+    case 'vsla':return{html:T2(`A <b>VSLA</b> (Village Savings and Loan Association) is a small group of people who meet regularly, save together, and lend to each other from their own savings. Members agree their own rules: how much to save, the interest on loans, fines and the social fund. ${g?`${esc(g.groupName)} has ${plural(vslasOf(g.groupId).length,'VSLA')}${m&&m.vslaId?`; you are in <b>${esc(vslaName(m.vslaId))}</b>`:''}.`:''}`,`<b>VSLA</b> (Chama cha Akiba na Mikopo cha Kijiji) ni kikundi kidogo cha watu wanaokutana mara kwa mara, kuweka akiba pamoja, na kukopeshana kutoka akiba yao wenyewe. Wanachama hukubaliana sheria zao: kiasi cha akiba, riba ya mkopo, faini na mfuko wa ustawi. ${g?`${esc(g.groupName)} kina VSLA ${vslasOf(g.groupId).length}${m&&m.vslaId?`; wewe uko katika <b>${esc(vslaName(m.vslaId))}</b>`:''}.`:''}`),chips:['What is HPF MEP?','How do I qualify for a loan?']};
+    case 'hpf':case 'groups':{
+      const G=S.groups,act=S.members.filter(x=>x.status==='Active').length;
+      const list=G.map(x=>`<li><b>${esc(x.groupName)}</b>${x.school?` (${esc(x.school)} school)`:''}: ${plural(vslasOf(x.groupId).length,'VSLA')}, ${S.members.filter(y=>y.groupId===x.groupId&&y.status==='Active').length} active members</li>`).join('');
+      const listSw=G.map(x=>`<li><b>${esc(x.groupName)}</b>${x.school?` (shule ya ${esc(x.school)})`:''}: VSLA ${vslasOf(x.groupId).length}, wanachama ${S.members.filter(y=>y.groupId===x.groupId&&y.status==='Active').length}</li>`).join('');
+      return{html:T2(`The <b>${esc(prog)}</b>${P.partner?` is a program of the <b>${esc(P.partner)}</b> (${esc(P.partnerShort||'')})`:''}. It brings together ${plural(G.length,'community group')} with their savings groups (VSLAs):<ul>${list}</ul>In total: ${S.vslas?S.vslas.length:0} VSLAs and ${act} active members. Members save, borrow for their enterprises, and contribute to the social fund and school feeding.<br><span class="muted small">For more about the foundation's work, ask your officials. They can add answers here.</span>`,`<b>${esc(prog)}</b>${P.partner?` ni mpango wa <b>${esc(P.partner)}</b> (${esc(P.partnerShort||'')})`:''}. Unaunganisha vikundi ${G.length} vya jamii pamoja na vikundi vyao vya akiba (VSLA):<ul>${listSw}</ul>Jumla: VSLA ${S.vslas?S.vslas.length:0} na wanachama ${act}. Wanachama huweka akiba, hukopa kwa biashara zao, na kuchangia mfuko wa ustawi na chakula cha shule.<br><span class="muted small">Kwa zaidi kuhusu kazi ya shirika, waulize viongozi wako. Wanaweza kuongeza majibu hapa.</span>`),chips:['What is a VSLA?','What are contributions for?']};
+    }
+    case 'loan':{
+      if(!m)return{html:T2('A member qualifies for a loan by meeting the group\'s checks: membership period, savings, contribution record, no overdue loan, and confirmed guarantors. Switch to a member account to see your own result.','Mwanachama anastahili mkopo kwa kutimiza vigezo vya kikundi: muda wa uanachama, akiba, rekodi ya michango, kutokuwa na mkopo uliochelewa, na wadhamini waliothibitisha.')};
+      const E=loanEligibility(m.id),bad=E.checks.filter(c=>c.res==='fail'),rev=E.checks.filter(c=>c.res==='review');
+      const word={'Eligible':T2('you qualify','unastahili'),'Needs Review':T2('your result needs review','matokeo yako yanahitaji kukaguliwa'),'Not Eligible':T2('you do not qualify yet','bado hustahili')}[E.outcome];
+      return{html:T2(`Today <b>${word}</b>. The group checks your membership period, savings, contribution record, open loans, fines and guarantors.`,`Leo <b>${word}</b>. Kikundi hukagua muda wa uanachama, akiba, rekodi ya michango, mikopo iliyopo, faini na wadhamini.`)+(bad.length?`<br><b>${T2('Not met','Haijatimizwa')}:</b><ul>${bad.map(c=>`<li>${esc(c.label)}: ${esc(c.text)}</li>`).join('')}</ul>`:'')+(rev.length?`<br><b>${T2('Needs review','Inahitaji ukaguzi')}:</b> ${rev.map(c=>esc(c.label)).join(', ')}.`:''),chips:['How is my loan limit worked out?','What is a guarantor?'],go:['loan-apps',T2('Open Loan Applications','Fungua Maombi ya Mkopo')]};
+    }
+    case 'limit':{
+      const L=R.loans||{};
+      const how=isNum(L.limitMultiple)?T2(`Your limit is your savings × <b>${L.limitMultiple}</b>. Every loan you repay fully on time adds <b>${isNum(L.onTimeBonusPct)?L.onTimeBonusPct+'%':PEND}</b>${isNum(L.maxLimitMultiple)?`, up to savings × ${L.maxLimitMultiple}`:''}.`,`Kikomo chako ni akiba yako × <b>${L.limitMultiple}</b>. Kila mkopo unaolipa kikamilifu kwa wakati huongeza <b>${isNum(L.onTimeBonusPct)?L.onTimeBonusPct+'%':PEND}</b>${isNum(L.maxLimitMultiple)?`, hadi akiba × ${L.maxLimitMultiple}`:''}.`):T2(`The loan limit rule is ${PEND}.`,`Sheria ya kikomo cha mkopo iko ${PEND}.`);
+      let mine='';if(m){const li=loanLimit(m.id);if(!li.pending)mine=T2(`<br><b>Your limit today: ${ksh(li.limit)}</b>${li.borrowed?`, with ${ksh(li.available)} available after ${ksh(li.borrowed)} still owed`:''}.`,`<br><b>Kikomo chako leo: ${ksh(li.limit)}</b>${li.borrowed?`, ${ksh(li.available)} kinapatikana baada ya deni la ${ksh(li.borrowed)}`:''}.`)}
+      return{html:how+mine+T2('<br>So: <b>save regularly and repay on time</b> to borrow more.','<br>Kwa hiyo: <b>weka akiba mara kwa mara na ulipe kwa wakati</b> ili ukope zaidi.'),chips:['How do I qualify for a loan?','Saving tips']};
+    }
+    case 'guarantor':{
+      const need=(R.loans||{}).guarantorsRequired;
+      const asks=m&&typeof guarantorAsks==='function'?guarantorAsks(m.id).filter(({a,g})=>gStatus(g)==='Pending'&&appOpen(a)).length:0;
+      return{html:T2(`A <b>guarantor</b> is a fellow member who agrees to support your loan: if you cannot repay, the group can look to them. In ${esc(g.groupName)} you need <b>${isNum(need)?need:PEND}</b> guarantor(s) who answer <b>Yes</b>. Each guarantor answers Yes or No in their own account, or tells the Secretary. Only a Yes counts. Agree to guarantee only someone you trust to repay.`,`<b>Mdhamini</b> ni mwanachama mwenzako anayekubali kuunga mkono mkopo wako: usipoweza kulipa, kikundi kinaweza kumtegemea. Katika ${esc(g.groupName)} unahitaji wadhamini <b>${isNum(need)?need:PEND}</b> wanaojibu <b>Ndiyo</b>. Kila mdhamini hujibu Ndiyo au Hapana katika akaunti yake, au humwambia Katibu. Ndiyo pekee ndiyo huhesabiwa. Mdhamini mtu unayemwamini atalipa tu.`)+(asks?T2(`<br><b>You have ${plural(asks,'guarantor request')} waiting for your answer.</b>`,`<br><b>Una maombi ${asks} ya udhamini yanayosubiri jibu lako.</b>`):''),chips:['How do I qualify for a loan?'],go:asks?['loan-apps',T2('Answer now','Jibu sasa')]:null};
+    }
+    case 'repay':{
+      let mine='';if(m){const open=memberStats(m.id).loans.filter(l=>l.status!=='Repaid');const n=open.find(l=>l.next);if(open.length)mine=T2(`<br>You owe <b>${ksh(sum(open,l=>l.outstanding))}</b>${n?`; next instalment ${ksh(Math.min(n.inst,n.outstanding))} due ${fmtDate(n.next.due)}`:''}${open.some(l=>l.status==='Overdue')?'. <b>A payment is late</b>: please pay as soon as you can.':'.'}`,`<br>Unadaiwa <b>${ksh(sum(open,l=>l.outstanding))}</b>${n?`; awamu ijayo ${ksh(Math.min(n.inst,n.outstanding))} tarehe ${fmtDate(n.next.due)}`:''}${open.some(l=>l.status==='Overdue')?'. <b>Malipo yamechelewa</b>: tafadhali lipa haraka.':'.'}`);else mine=T2('<br>You have no open loan.','<br>Huna mkopo unaodaiwa.')}
+      return{html:T2('Each loan is repaid in instalments with a deadline for each. Paying every instalment <b>on or before its deadline</b> keeps your record clean and <b>raises your loan limit</b> for next time.','Kila mkopo hulipwa kwa awamu, kila moja na tarehe yake ya mwisho. Kulipa kila awamu <b>kabla au siku ya mwisho</b> huweka rekodi yako safi na <b>huongeza kikomo chako cha mkopo</b>.')+mine,chips:['How is my loan limit worked out?'],go:['loans',T2('Open my repayments','Fungua marejesho yangu')]};
+    }
+    case 'contrib':{
+      const cats=catsOf(gid);
+      return{html:T2(`Besides savings, members contribute to shared funds. In ${esc(g.groupName)}: ${cats.length?cats.map(c=>`<b>${esc(c.name)}</b>`).join(', '):PEND}. The <b>Social Fund / Welfare</b> helps members in times of need (with dates, reasons and amounts recorded), and <b>School Feeding</b> supports meals at ${esc((R.schoolFeeding&&R.schoolFeeding.schools||[]).join(', ')||g.school||'the school')}. The amount you pay can depend on your savings level, as the group agreed.`,`Mbali na akiba, wanachama huchangia mifuko ya pamoja. Katika ${esc(g.groupName)}: ${cats.length?cats.map(c=>`<b>${esc(c.name)}</b>`).join(', '):PEND}. <b>Mfuko wa Ustawi</b> husaidia wanachama wakati wa shida (tarehe, sababu na kiasi hurekodiwa), na <b>Chakula cha Shule</b> husaidia milo katika ${esc((R.schoolFeeding&&R.schoolFeeding.schools||[]).join(', ')||g.school||'shule')}. Kiasi unacholipa kinaweza kutegemea kiwango cha akiba yako, kama kikundi kilivyokubaliana.`),chips:['Why should I save?'],go:['contributions',T2('Open my contributions','Fungua michango yangu')]};
+    }
+    case 'fines':{
+      const f=(R.fines||{}).absenteeism;let mine='';
+      if(m){const out=sum(S.fines.filter(x=>x.memberId===m.id).map(fineInfo),x=>x.outstanding);mine=out?T2(`<br>You have <b>${ksh(out)}</b> in unpaid fines.`,`<br>Una faini ambazo hazijalipwa za <b>${ksh(out)}</b>.`):T2('<br>You have no unpaid fines.','<br>Huna faini ambazo hazijalipwa.')}
+      return{html:T2(`At every meeting the Secretary marks <b>✓</b> present, <b>Ⓔ</b> absent with apology, or <b>X</b> absent without apology. An X creates an absenteeism fine automatically of <b>${kv(f,PEND)}</b>. If you cannot come, send an apology before the meeting.`,`Katika kila mkutano Katibu huweka <b>✓</b> alihudhuria, <b>Ⓔ</b> hakuhudhuria kwa taarifa, au <b>X</b> hakuhudhuria bila taarifa. X huleta faini ya kutohudhuria moja kwa moja ya <b>${kv(f,PEND)}</b>. Ukishindwa kuja, toa taarifa kabla ya mkutano.`)+mine,chips:['When is the next meeting?']};
+    }
+    case 'meeting':{
+      const n=S.meetings.filter(x=>x.groupId===gid&&x.status==='Scheduled'&&x.date>=todayISO()).sort((a,b)=>a.date<b.date?-1:1)[0];
+      if(!n)return{html:T2(`No upcoming meeting is scheduled yet for ${esc(g.groupName)}. The Secretary will schedule it, and you will get a reminder.`,`Bado hakuna mkutano uliopangwa kwa ${esc(g.groupName)}. Katibu ataupanga, na utapata ukumbusho.`),chips:['What happens if I miss a meeting?']};
+      return{html:T2(`The next <b>${esc(g.groupName)}</b> meeting is on <b>${fmtDay(n.date)}</b> at <b>${esc(n.time)}</b>, at <b>${esc(n.location)}</b>.`,`Mkutano ujao wa <b>${esc(g.groupName)}</b> ni <b>${fmtDay(n.date)}</b> saa <b>${esc(n.time)}</b>, mahali: <b>${esc(n.location)}</b>.`)+`<br><b>${T2('Agenda','Ajenda')}:</b><ol>${(n.agenda||[]).map(a=>`<li>${esc(a)}</li>`).join('')}</ol>`,chips:['What happens if I miss a meeting?'],go:['meetings',T2('Open Meetings','Fungua Mikutano')]};
+    }
+    case 'enterprise':{
+      const e=R.enterprise||{};
+      return{html:T2(`Loans in the program help members grow a small enterprise, for example ${ENTERPRISE_TYPES.slice(0,5).map(x=>x.split(' (')[0].toLowerCase()).join(', ')}. When you apply, you choose the enterprise type and how often it earns (daily, weekly, monthly or quarterly). ${e.type?`${esc(g.groupName)}'s main enterprise: <b>${esc(e.type)}</b>${e.schedule?`, ${esc(String(e.schedule).toLowerCase())}`:''}.`:''} Tip: keep business money separate and note what you buy and sell.`,`Mikopo katika mpango husaidia wanachama kukuza biashara ndogo, kwa mfano biashara ya mifugo, shanga na kazi za mikono, duka, kilimo cha mboga na matunda, au kuku. Unapoomba, unachagua aina ya biashara na mara ngapi inaleta mapato (kila siku, wiki, mwezi au robo mwaka). ${e.type?`Biashara kuu ya ${esc(g.groupName)}: <b>${esc(e.type)}</b>.`:''} Ushauri: tenganisha pesa za biashara na uandike unachonunua na kuuza.`),chips:['How do I qualify for a loan?','Saving tips']};
+    }
+    case 'privacy':return{html:T2('Your own records (savings, loans, fines) are shown to you and to your group\'s officials only. Other members see group totals, not your details. This assistant only reads your own records and does not store your questions.','Kumbukumbu zako (akiba, mikopo, faini) zinaonekana kwako na kwa viongozi wa kikundi chako tu. Wanachama wengine huona jumla ya kikundi, si maelezo yako. Msaidizi huyu husoma kumbukumbu zako tu na hahifadhi maswali yako.')};
+    case 'phone':return{html:T2('You do not need a smartphone. With a basic phone you can use the <b>USSD menu</b> to check your balance and loan, and you receive <b>SMS reminders</b> for meetings, loans and fines in English, Kiswahili or Maa. Choose your language under Messages → My reminder language. (SMS and USSD are simulated in this pilot.)','Huhitaji simu janja. Kwa simu ya kawaida unaweza kutumia <b>menyu ya USSD</b> kuangalia salio na mkopo, na unapokea <b>ukumbusho kwa SMS</b> wa mikutano, mikopo na faini kwa Kiingereza, Kiswahili au Maa. Chagua lugha yako katika Ujumbe → My reminder language. (SMS na USSD ni za majaribio katika awamu hii.)'),go:['communications',T2('Open Messages','Fungua Ujumbe')]};
+    case 'officials':{
+      const off=S.members.filter(x=>x.groupId===gid&&x.status==='Active'&&x.role!=='Member');
+      return{html:T2(`Officials of <b>${esc(g.groupName)}</b>:`,`Viongozi wa <b>${esc(g.groupName)}</b>:`)+(off.length?`<ul>${off.map(x=>`<li><b>${esc(x.role)}</b>: ${esc(x.name)}</li>`).join('')}</ul>`:T2(' not yet assigned.',' bado hawajachaguliwa.'))+T2('The Secretary handles meetings and attendance; the Treasurer records money; the Chairperson leads decisions.','Katibu hushughulikia mikutano na mahudhurio; Mweka Hazina hurekodi pesa; Mwenyekiti huongoza maamuzi.')};
+    }
+  }
+  return{html:T2("Sorry, I did not understand that yet. Try one of these, or ask your group's officials, who can add answers here.",'Samahani, sijaelewa bado. Jaribu mojawapo ya haya, au waulize viongozi wa kikundi chako, wanaweza kuongeza majibu hapa.'),chips:CHAT_STARTERS()};
+}
+function CHAT_STARTERS(){return chatState().lang==='sw'?['Kwa nini niweke akiba?','Nimeweka akiba kiasi gani?','Nitastahili mkopo vipi?','HPF MEP ni nini?','Mdhamini ni nani?','Mkutano ujao ni lini?']:['Why should I save?','How much have I saved?','How do I qualify for a loan?','What is HPF MEP?','What is a guarantor?','When is the next meeting?']}
+
+/* ---------- panel ---------- */
+function chatMsgHtml(x){
+  if(x.who==='me')return `<div class="cb-msg cb-me">${esc(x.text)}</div>`;
+  return `<div class="cb-msg cb-bot">${x.html}${x.src?`<div class="cb-src">${esc(x.src)}</div>`:''}${x.go?`<div style="margin-top:8px"><button type="button" class="btn btn-secondary btn-sm" data-chat-go="${esc(x.go[0])}">${esc(x.go[1])}</button></div>`:''}</div>`;
+}
+function renderChat(){
+  const st=chatState(),p=$('#cb-panel');if(!p)return;
+  p.hidden=!st.open;$('#cb-fab').setAttribute('aria-expanded',String(st.open));
+  if(!st.open)return;
+  if(!st.msgs.length){const a=chatAnswer('hello');st.msgs.push({who:'bot',...a})}
+  const last=st.msgs.filter(x=>x.who==='bot').at(-1);
+  $('#cb-lang').innerHTML=CHAT_LANGS.map(([l,n])=>`<button type="button" class="chip" aria-pressed="${st.lang===l}" data-chat-lang="${l}">${n}</button>`).join('');
+  $('#cb-log').innerHTML=st.msgs.map(chatMsgHtml).join('');
+  $('#cb-chips').innerHTML=(last&&last.chips||CHAT_STARTERS()).map(c=>`<button type="button" class="chip" data-chat-q="${esc(c)}">${esc(c)}</button>`).join('');
+  $('#cb-manage').hidden=!canEditChat();
+  const log=$('#cb-log');log.scrollTop=log.scrollHeight;
+}
+function chatAsk(q){
+  q=String(q||'').trim().slice(0,300);if(!q)return;const st=chatState();
+  st.msgs.push({who:'me',text:q});st.msgs.push({who:'bot',...chatAnswer(q)});
+  if(st.msgs.length>60)st.msgs=st.msgs.slice(-60);
+  renderChat();
+}
+function ensureChat(){
+  if(!document.getElementById('cb-fab')){
+    const w=document.createElement('div');w.id='cb-root';
+    w.innerHTML=`<button type="button" id="cb-fab" aria-controls="cb-panel" aria-expanded="false" title="Ask the learning assistant">${icon('msg')}<span>Ask</span></button>
+      <section id="cb-panel" role="dialog" aria-label="Learning assistant" hidden>
+        <header class="cb-h"><div><b>Learning assistant</b><div class="cb-sub">Saving, loans and the HPF program</div></div><button type="button" class="btn btn-ghost btn-sm" data-chat-close aria-label="Close">${icon('x')}</button></header>
+        <div class="cb-lang chips" id="cb-lang" role="group" aria-label="Language"></div>
+        <div id="cb-log" class="cb-log" aria-live="polite"></div>
+        <div id="cb-chips" class="cb-chips chips"></div>
+        <form id="cb-form" class="cb-form" autocomplete="off"><label for="cb-in" class="sr-only">Your question</label><input id="cb-in" maxlength="300" placeholder="Type a question…"><button type="submit" class="btn btn-primary btn-sm">Send</button></form>
+        <div class="cb-foot"><span>Works offline in your browser. Your questions are not saved.</span><button type="button" class="link-btn tiny" id="cb-manage" data-chat-manage hidden>Manage answers</button></div>
+      </section>`;
+    document.body.appendChild(w);
+    $('#cb-fab').addEventListener('click',()=>{const st=chatState();st.open=!st.open;renderChat();if(st.open)setTimeout(()=>$('#cb-in')&&$('#cb-in').focus(),30)});
+    $('#cb-form').addEventListener('submit',e=>{e.preventDefault();const i=$('#cb-in');chatAsk(i.value);i.value='';i.focus()});
+    w.addEventListener('click',e=>{
+      const t=e.target.closest('[data-chat-q],[data-chat-lang],[data-chat-close],[data-chat-go],[data-chat-manage]');if(!t)return;
+      if(t.dataset.chatQ!==undefined)chatAsk(t.dataset.chatQ);
+      else if(t.dataset.chatLang){const st=chatState();st.lang=t.dataset.chatLang;st.msgs.push({who:'bot',...chatAnswer('help')});renderChat()}
+      else if(t.hasAttribute('data-chat-close')){chatState().open=false;renderChat();$('#cb-fab').focus()}
+      else if(t.dataset.chatGo){chatState().open=window.innerWidth>720;location.hash='#/'+t.dataset.chatGo;renderChat()}
+      else if(t.hasAttribute('data-chat-manage'))openChatFaq();
+    });
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.chat&&UI.chat.open&&!overlayStack.length){UI.chat.open=false;renderChat()}});
+  }
+  if(S)renderChat();
+}
+{const f=route;route=function(){const r=f.apply(this,arguments);try{ensureChat()}catch(e){console.warn('chat',e)}return r}}
+
+/* ---------- officials add answers (for HPF details, local facts, Maa wording) ---------- */
+function openChatFaq(){
+  if(!canEditChat()){toast('Only the Secretary or Chairperson can manage answers.','error');return}
+  const F=chatStore();
+  openModal({title:'Assistant answers',desc:'Add answers the assistant should give, for example about the foundation\'s work, local contacts or events. Added answers are used before the built-in ones.',wide:true,body:`${F.length?`<ul class="rows" style="margin-bottom:14px">${F.map(f=>`<li style="align-items:flex-start"><div class="grow"><b>${esc(f.q)}</b><div class="muted small">${esc(f.en)}</div>${f.sw?`<div class="muted small"><span class="pill pill-info">Kiswahili</span> ${esc(f.sw)}</div>`:''}<div class="muted tiny">Keywords: ${esc(f.keys||'-')} · ${esc(firstName(mName(f.by)))}, ${fmtDate(String(f.at).slice(0,10))}</div></div><button type="button" class="btn btn-ghost btn-sm" data-act="chat-faq-del" data-id="${f.id}">${icon('x')}Remove</button></li>`).join('')}</ul>`:'<p class="muted">No answers added yet.</p>'}
+    <form id="frm-cf" data-form="chat-faq" novalidate><div class="fgrid">
+      ${field({label:'Question',name:'q',required:true,cls:'full',err:'Enter the question (at least 4 characters).',hint:'For example: When did HPF start working in Aitong?'})}
+      ${field({label:'Other words members might use',name:'keys',opt:true,cls:'full',hint:'Separate with commas, for example: started, history, mwanzo'})}
+      ${field({label:'Answer (English)',name:'en',type:'textarea',rows:3,required:true,cls:'full',attrs:'maxlength="800"',err:'Enter the answer (at least 4 characters).'})}
+      ${field({label:'Answer (Kiswahili)',name:'sw',type:'textarea',rows:3,opt:true,cls:'full',attrs:'maxlength="800"'})}</div></form>`,footer:modalFooter('Add answer','frm-cf')});
+}
+FORMS['chat-faq']=(form,d)=>{
+  if(!canEditChat())return;const err={};
+  if(String(d.q).trim().length<4)err.q='x';if(String(d.en).trim().length<4)err.en='x';if(!applyErrors(form,err))return;
+  const f={id:nextSeq(chatStore(),'FAQ',3),q:String(d.q).trim(),keys:String(d.keys||'').trim(),en:String(d.en).trim(),sw:String(d.sw||'').trim(),by:me().id,at:nowStamp()};
+  chatStore().push(f);
+  logAudit({action:'Assistant answer added',target:f.id,detail:f.q,kind:'settings',groupId:'',next:f.en.slice(0,120)});
+  saveState();closeAllOverlays();openChatFaq();toast('Answer added. The assistant will use it straight away.');
+};
+{const f=actV7;actV7=function(name,el,ev){
+  if(name==='chat-faq-del'){if(!canEditChat())return;const F=chatStore(),x=F.find(y=>y.id===el.dataset.id);if(!x)return;S.chama.chatFaq=F.filter(y=>y.id!==x.id);logAudit({action:'Assistant answer removed',target:x.id,detail:x.q,kind:'settings',groupId:'',prev:x.en.slice(0,120)});saveState();closeAllOverlays();openChatFaq();toast('Answer removed.');return}
+  return f(name,el,ev);
+}}
 
 /* ---------- memoised calculations (see memo() above) ---------- */
 {const f=periodStatus;periodStatus=function(m,k,c){return memo('ps|'+m+'|'+k+'|'+(c||''),()=>f(m,k,c))}}

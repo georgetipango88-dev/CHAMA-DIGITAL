@@ -16,6 +16,16 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.5
+- **Every community group has its own officials.** The role switcher now lists the Chairperson, Treasurer, Secretary
+  and a Member of the community group that is selected (for example "Chairperson · Soila" in Mbitin), and each of
+  them sees only their own group. Mbitin has its own sample officials; Nterere's roles show "not assigned" until
+  officials are set from its real member list.
+- **No group is the default.** On entering, a "Choose your community group" page lists each group with its school,
+  VSLAs, members and officials; pick a group and enter as an official or a member. Switch at any time in the top bar.
+- **HPF program admin** (formerly Platform Owner/Admin) is HPF staff, not a group member, and is the only role that
+  sees all community groups on one page.
+
 ## New in v0.9.4
 - **Nterere Community Group now holds its real member list**: 55 members in four VSLAs from the handwritten
   registers (Oldoinyo 14, Oxbiti 14, Oloomisigiyo 13, Enkusero 14), replacing Nterere's fictional sample members.

@@ -365,6 +365,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:.875rem}
 }
 /* ===== v0.7 Mara Enterprise additions ===== */
 [hidden]{display:none!important}
+.choose-g .card-b{display:flex;flex-direction:column;height:100%}.choose-g .chips{margin-top:auto}
 #cb-fab{display:none;position:fixed;right:20px;bottom:20px;z-index:80;align-items:center;gap:6px;padding:12px 18px;border:0;border-radius:999px;background:var(--teal-700);color:#fff;font:600 .95rem/1 'Inter',system-ui,sans-serif;box-shadow:0 6px 20px rgba(6,57,60,.3);cursor:pointer}
 #cb-fab svg{width:20px;height:20px}#cb-fab:hover{background:var(--teal-800)}#cb-fab:focus-visible{outline:3px solid var(--teal-200);outline-offset:2px}
 body[data-mode="app"] #cb-fab{display:inline-flex}
@@ -515,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.4 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.5 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -980,7 +981,7 @@ const FORMS={}; /* form handlers, keyed by data-form */
 const UI={role:'Treasurer',group:null,tab:{},f:{},report:null,reg:null,focus:null};
 function resetDemo(opts={}){S=seedDemo(opts);ensureV07Data();saveState()}
 const byId=id=>S.members.find(m=>m.id===id);
-const mName=id=>id==='ledger-import'?'Ledger import':id==='system'?'System (automatic)':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
+const mName=id=>id==='ledger-import'?'Ledger import':id==='system'?'System (automatic)':id==='hpf-admin'?'HPF program admin':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
 function me(){
   const a=byId(S.actors[UI.role]);
   if(a&&(a.role===UI.role||UI.role==='Member'||UI.role==='Platform Owner/Admin'&&a.role!=='Member'))return a;
@@ -5069,6 +5070,91 @@ function applyNterereRoster(st){
     if(nm.length&&nm.every(m=>m.placeholder)){applyNterereRoster(S);if(typeof recomputeActors==='function')recomputeActors()}
   }}}
 
+
+/* =====================================================================
+   v0.9.5 · Officials belong to their own community group. The role
+   switcher acts as the Chairperson / Treasurer / Secretary / a Member of
+   the group that is selected; only the HPF program admin sees all groups.
+   No group is chosen by default: the user picks one on entry.
+   ===================================================================== */
+const HPF_ADMIN_ID='hpf-admin';
+const hpfAdmin=()=>({id:HPF_ADMIN_ID,name:'HPF program admin',role:'Platform Owner/Admin',groupAccess:'ALL',groupId:UI.group||((S&&S.groups[0])||{}).groupId,status:'Active',accessMode:'',phone:''});
+function roleHolder(role,gid){
+  if(!S||role==='Platform Owner/Admin')return null;
+  const ok=m=>m&&m.groupId===gid&&m.status==='Active'&&m.role===role;
+  const pick=((S.groupActors||{})[gid]||{})[role];
+  for(const id of [(S.actors||{})[role],pick]){const a=byId(id);if(ok(a))return a}
+  return S.members.find(ok)||null;
+}
+function me(){
+  if(!S)return null;
+  if(UI.role==='Platform Owner/Admin')return hpfAdmin();
+  const gid=S.groups.some(g=>g.groupId===UI.group)?UI.group:(S.groups[0]||{}).groupId;
+  return roleHolder(UI.role,gid)||{id:'unassigned-'+UI.role,name:UI.role+' (not assigned)',role:UI.role,groupAccess:[gid],groupId:gid,status:'Active',accessMode:'',phone:''};
+}
+function allowedGroups(){
+  if(!S||!S.groups)return[];
+  if(isPlatformOwner())return S.groups;
+  const g=S.groups.find(x=>x.groupId===UI.group)||S.groups[0];
+  return g?[g]:[];
+}
+function syncGroup(){if(S&&S.groups&&S.groups.length&&!S.groups.some(g=>g.groupId===UI.group))UI.group=S.groups[0].groupId}
+
+/* sample data: Mbitin gets its own (fictional) officials; every official is scoped to their own group */
+const SAMPLE_OFFICIALS={'GRP-02':{Chairperson:'Soila Letoya',Treasurer:'Nasieku Keriako',Secretary:'Semeyian Tipis'}};
+function scopeOfficials(st){
+  const old={};['Chairperson','Treasurer','Secretary'].forEach(r=>{const m=st.members.find(x=>x.groupId==='GRP-01'&&x.role===r);if(m)old[r]=m.id});
+  Object.entries(SAMPLE_OFFICIALS).forEach(([gid,roles])=>{
+    if(!st.groups.some(g=>g.groupId===gid)||st.members.some(m=>m.groupId===gid&&m.role!=='Member'))return;
+    const map={};
+    Object.entries(roles).forEach(([r,n])=>{const m=st.members.find(x=>x.groupId===gid&&x.name===n&&x.placeholder);if(m){m.role=r;if(old[r])map[old[r]]=m.id}});
+    /* records in this group were "recorded by" the Olemoncho officials: credit this group's own officials instead */
+    const fix=o=>{if(!o||o.groupId!==gid)return;Object.keys(o).forEach(k=>{if(k!=='memberId'&&typeof o[k]==='string'&&map[o[k]])o[k]=map[o[k]]});if(o.attendance)Object.values(o.attendance).forEach(a=>{if(a&&map[a.by])a.by=map[a.by]})};
+    ['ledger','fines','meetings','welfare','loanApps','cashbook','sfpSpend','submissions','audit'].forEach(k=>(st[k]||[]).forEach(fix));
+  });
+  st.members.forEach(m=>{if(m.role!=='Member')m.groupAccess=[m.groupId]});
+  st.groupActors={};st.groups.forEach(g=>{st.groupActors[g.groupId]={};ROLES.filter(r=>r!=='Platform Owner/Admin').forEach(r=>{const m=st.members.find(x=>x.groupId===g.groupId&&x.status==='Active'&&x.role===r);if(m)st.groupActors[g.groupId][r]=m.id})});
+  st.actors=st.actors||{};st.actors['Platform Owner/Admin']=HPF_ADMIN_ID;
+  st.scopedOfficials=true;
+  return st;
+}
+{const f=seedDemo;seedDemo=function(opts={}){const st=f(opts);return opts.noRoster?st:scopeOfficials(st)}}
+{const f=ensureV07Data;ensureV07Data=function(){f.apply(this,arguments);if(S&&S.demo&&!S.scopedOfficials&&S.chama&&S.chama.chamaId===CLIENT_DATA.organization.chamaId)scopeOfficials(S)}}
+
+/* top bar: every community group can be picked; roles are listed for the selected group */
+{const f=renderNav;renderNav=function(){
+  f.apply(this,arguments);if(!S)return;
+  const gs=$('#group-select');
+  if(gs){gs.innerHTML=S.groups.map(g=>`<option value="${g.groupId}" ${g.groupId===UI.group?'selected':''}>${esc(g.groupName)}</option>`).join('');gs.disabled=S.groups.length<2;gs.title='Switch community group: you then act as that group\'s officials or one of its members'}
+  const sel=$('#role-select');
+  if(sel){const g=curGroup();
+    sel.innerHTML=`<option value="Platform Owner/Admin" ${UI.role==='Platform Owner/Admin'?'selected':''}>HPF program admin · all groups</option><optgroup label="${esc(g.groupName)}">${ROLES.filter(r=>r!=='Platform Owner/Admin').map(r=>{const p=roleHolder(r,g.groupId);return `<option value="${r}" ${r===UI.role?'selected':''}>${r} · ${p?esc(firstName(p.name)):'not assigned'}</option>`}).join('')}</optgroup>`}
+}}
+
+/* choose a community group on entry (no group is the default) */
+function groupChooser(){
+  const card1=g=>{const vs=vslasOf(g.groupId),ms=S.members.filter(m=>m.groupId===g.groupId&&m.status==='Active');
+    const offs=['Chairperson','Treasurer','Secretary'].map(r=>{const p=roleHolder(r,g.groupId);return `<li><span class="muted">${r}:</span> ${p?esc(p.name):'<i class="muted">not assigned yet</i>'}</li>`}).join('');
+    return `<section class="card choose-g"><div class="card-b"><h2 style="margin:0">${esc(g.groupName)}</h2><p class="muted small" style="margin:2px 0 10px">${g.school?esc(g.school)+' school · ':''}${plural(vs.length,'VSLA')} · ${plural(ms.length,'member')}</p>
+      <ul class="small" style="list-style:none;padding:0;margin:0 0 12px">${offs}</ul>
+      <div class="chips">${['Chairperson','Treasurer','Secretary','Member'].map(r=>`<button type="button" class="btn ${r==='Member'?'btn-secondary':'btn-primary'} btn-sm" data-act="choose-group" data-g="${g.groupId}" data-role="${r}">${r==='Member'?'Enter as a member':'Enter as '+r}</button>`).join('')}</div></div></section>`};
+  return `${pageHeader({title:'Choose your community group',desc:'Each community group has its own officials and members. Pick a group and how you want to enter. You can switch group or role at any time in the top bar.'})}
+    <div class="grid-3">${S.groups.map(card1).join('')}</div><div style="height:14px"></div>
+    ${card({title:'HPF program view',sub:'For Human Practice Foundation staff: all community groups and VSLAs on one page.',body:btn('choose-group','Enter as HPF program admin',{ic:'chart',cls:'btn-secondary',data:'data-g="" data-role="Platform Owner/Admin"'})})}`;
+}
+{const f=route;route=function(){
+  const pg=(parseHash()||{}).page;
+  if(S&&!UI.groupPicked&&pg&&!['welcome','demo','register'].includes(pg)){
+    document.body.dataset.mode='app';syncGroup();currentPage='dashboard';renderNav();renderView('x','x',groupChooser);
+    try{ensureChat()}catch(e){}return;
+  }
+  return f.apply(this,arguments);
+}}
+{const f=actV7;actV7=function(name,el,ev){
+  if(name==='choose-group'){if(el.dataset.g)UI.group=el.dataset.g;UI.role=el.dataset.role;UI.groupPicked=true;syncGroup();UI.f={};UI.tab={};UI.report=null;UI.chat=null;saveGroupPref();saveRolePref();renderNav();route();window.scrollTo(0,0);return}
+  return f(name,el,ev);
+}}
+
 /* ---------- memoised calculations (see memo() above) ---------- */
 {const f=periodStatus;periodStatus=function(m,k,c){return memo('ps|'+m+'|'+k+'|'+(c||''),()=>f(m,k,c))}}
 {const f=memberStats;memberStats=function(id){if(!byId(id))return{periods:0,paid:0,onTime:0,missed:0,contribTotal:0,savingsTotal:0,loans:[],loanOutstanding:0,lastContrib:null,recs:[]};return memo('mst|'+id,()=>f(id))}}
@@ -5600,8 +5686,8 @@ document.addEventListener('change',e=>{
   const t=e.target;
   if(changeV7(t))return;
   if(t.matches('[data-change="filter"]')){UI.f[t.dataset.scope][t.dataset.key]=t.value;UI.f[t.dataset.scope].limit=25;renderListOnly(t.dataset.scope)}
-  else if(t.id==='role-select'){UI.role=t.value;syncGroup();UI.f={};UI.tab={};UI.smsc=null;UI.ussd=null;UI.report=null;saveRolePref();renderNav();route()}
-  else if(t.id==='group-select'){UI.group=t.value;syncGroup();UI.f={};UI.smsc=null;UI.ussd=null;UI.report=null;saveGroupPref();renderNav();route()}
+  else if(t.id==='role-select'){UI.role=t.value;UI.groupPicked=true;UI.chat=null;syncGroup();UI.f={};UI.tab={};UI.smsc=null;UI.ussd=null;UI.report=null;saveRolePref();renderNav();route()}
+  else if(t.id==='group-select'){UI.group=t.value;UI.groupPicked=true;UI.chat=null;syncGroup();UI.f={};UI.smsc=null;UI.ussd=null;UI.report=null;saveGroupPref();renderNav();route()}
   else if(t.id==='cp'){UI.f.cperiod=t.value;renderView('x','x',()=>contributionsView())}
   else if(t.matches('[data-change="set-role"]'))setRole(t.dataset.id,t.value);
   else if(t.matches('[data-change="method-hint"]')){const box=t.closest('form');const hint=$(`[data-fld="ref"] .hint`,box);if(hint)hint.textContent=refHint(t.value);if(box.id==='frm-c')contribCheck(box)}
@@ -5631,7 +5717,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   window.addEventListener('hashchange',route);
   showBootScreen();
   await bootData();
-  {const g=readGroupPref();if(g)UI.group=g}
+  {const g=readGroupPref();if(g){UI.group=g;UI.groupPicked=true}}
   ensureV07Data();
   if(S)saveState();
   if(needsLockScreen()){lockScreen();return}

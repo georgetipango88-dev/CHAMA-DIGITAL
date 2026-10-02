@@ -515,7 +515,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.3 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.4 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -2038,7 +2038,7 @@ function regScreen(){
   const first=$('#bare input,#bare select');first&&first.focus();
 }
 function regBuildChama(){
-  const r=regState(),base=seedDemo();
+  const r=regState(),base=seedDemo({noRoster:true});
   const founder={id:'CHM-001',name:r.leaderName.trim(),phone:r.phone.trim()||'Not added',joined:todayISO(),role:r.leaderRole,status:'Active'};
   const others=r.members2.filter(m=>m.name.trim()).map((m,i)=>({id:'CHM-'+String(i+2).padStart(3,'0'),name:m.name.trim(),phone:m.phone.trim()||'Not added',joined:todayISO(),role:'Member',status:'Active'}));
   const members=[founder,...others];
@@ -4587,14 +4587,14 @@ function sendReminder(memberId,ev,vars,{lang,mode='Manual',key}={}){
   return{m,L,msg};
 }
 /* who is due a reminder today, for one event in one group */
-function remDue(ev,gid=UI.group){
+function remDue(ev,gid=UI.group,opts={}){
   const t=todayISO(),cfg=remCfg(gid),out=[],act=S.members.filter(m=>m.groupId===gid&&m.status==='Active');
   if(ev==='late-loan'){
     act.forEach(m=>memberStats(m.id).loans.filter(l=>l.status==='Overdue').forEach(l=>{const s=l.sched.find(x=>!x.paid&&x.due<t);if(s)out.push({m,key:`late-loan|${l.id}|${s.n}`,vars:{amount:num(l.overdueAmt),loan:l.id,date:fmtDate(s.due)},repeat:true})}));
   }else if(ev==='unpaid-fine'){
     act.forEach(m=>{const F=S.fines.filter(f=>f.memberId===m.id).map(fineInfo).filter(f=>f.outstanding>0).sort((a,b)=>a.date<b.date?-1:1);if(F.length)out.push({m,key:`unpaid-fine|${m.id}|${F.map(f=>f.id).join('+')}`,vars:{amount:num(sum(F,f=>f.outstanding)),reason:F.length>1?`${F.length} fines, first: ${F[0].type}`:F[0].type,date:fmtDate(F[0].date)},repeat:true})});
   }else if(ev==='meeting'){
-    const mt=S.meetings.filter(x=>x.groupId===gid&&x.status==='Scheduled'&&x.date>=t&&x.date<=addDays(t,+cfg.meetingDays||3)).sort((a,b)=>a.date<b.date?-1:1)[0];
+    const mt=opts.meetingId?S.meetings.find(x=>x.id===opts.meetingId&&x.groupId===gid&&x.status==='Scheduled'):S.meetings.filter(x=>x.groupId===gid&&x.status==='Scheduled'&&x.date>=t&&x.date<=addDays(t,+cfg.meetingDays||3)).sort((a,b)=>a.date<b.date?-1:1)[0];
     if(mt)act.filter(m=>m.joined<=mt.date).forEach(m=>out.push({m,key:`meeting|${mt.id}|${m.id}`,vars:{group:groupName(gid),date:fmtDate(mt.date),time:mt.time,venue:mt.location,agenda:(mt.agenda||[]).slice(0,3).join('; ')+((mt.agenda||[]).length>3?'; ...':'')},meeting:mt}));
   }else if(ev==='loan-approved'){
     S.loanApps.filter(a=>a.groupId===gid&&a.status==='Approved').forEach(a=>{const m=byId(a.memberId);if(m)out.push({m,key:`loan-approved|${a.id}`,vars:{app:a.id,amount:num(a.amount)}})});
@@ -4605,8 +4605,8 @@ function remDue(ev,gid=UI.group){
   out.forEach(x=>{const last=log[x.key];x.last=last||'';x.fresh=!last||(x.repeat&&last<=addDays(t,-rep))});
   return out;
 }
-function sendReminderBatch(ev,gid,{lang='member',mode='Manual',onlyFresh=true}={}){
-  const due=remDue(ev,gid).filter(x=>!onlyFresh||x.fresh);if(!due.length)return 0;
+function sendReminderBatch(ev,gid,{lang='member',mode='Manual',onlyFresh=true,meetingId}={}){
+  const due=remDue(ev,gid,{meetingId}).filter(x=>!onlyFresh||x.fresh);if(!due.length)return 0;
   const langs={};due.forEach(x=>{const r=sendReminder(x.m.id,ev,x.vars,{lang,mode,key:x.key});if(r)langs[r.L]=(langs[r.L]||0)+1});
   logAudit({action:mode==='Automatic'?'Automatic reminders sent':'Reminders sent',target:REM_EVENTS[ev].label,detail:`${plural(due.length,'message')} to ${groupName(gid)} members · ${Object.entries(langs).map(([l,n])=>`${langName(l)} ${n}`).join(', ')} · simulated SMS and in-app notice`,kind:'settings',groupId:gid,...(mode==='Automatic'?{userId:'system'}:{})});
   return due.length;
@@ -4742,7 +4742,7 @@ FORMS['sched-meeting']=(form,d)=>{
   }
   logAudit({action:'Meeting scheduled',target:id,detail:`${d.type}, ${fmtDate(d.date)}`,kind:'meeting'});
   const cfg=remCfg();
-  if(d.date<=addDays(t,+cfg.meetingDays||3))sendReminderBatch('meeting',UI.group,{mode:'Automatic'});
+  if(d.date<=addDays(t,+cfg.meetingDays||3))sendReminderBatch('meeting',UI.group,{mode:'Automatic',meetingId:id});
   commit(`Meeting scheduled for ${fmtDate(d.date)}. Members are reminded ${cfg.meetingDays} days before, in their own language.`);
 };
 
@@ -5025,6 +5025,49 @@ FORMS['chat-faq']=(form,d)=>{
   if(name==='chat-faq-del'){if(!canEditChat())return;const F=chatStore(),x=F.find(y=>y.id===el.dataset.id);if(!x)return;S.chama.chatFaq=F.filter(y=>y.id!==x.id);logAudit({action:'Assistant answer removed',target:x.id,detail:x.q,kind:'settings',groupId:'',prev:x.en.slice(0,120)});saveState();closeAllOverlays();openChatFaq();toast('Answer removed.');return}
   return f(name,el,ev);
 }}
+
+
+/* =====================================================================
+   v0.9.4 · Nterere Community Group member list
+   ===================================================================== */
+const NTERERE_ROSTER=[["Noolkisaruni Mpoe","287","Oldoinyo VSLA",1],["Ntiti Mereru","029","Oldoinyo VSLA",1],["Mary Sulantoi","763","Oldoinyo VSLA",0],["Peninah Sitany","155","Oldoinyo VSLA",0],["Beatrice Sapur","795","Oldoinyo VSLA",0],["Ntoorian Sikona","837","Oldoinyo VSLA",1],["Kanasa Mereru","896","Oldoinyo VSLA",0],["Noomali Sikona","917","Oldoinyo VSLA",0],["Meliyo Kumum","604","Oldoinyo VSLA",0],["Kibarisho Rakwa","837","Oldoinyo VSLA",1],["Nashiru Kumum","318","Oldoinyo VSLA",0],["Noorparakuo Kumum","","Oldoinyo VSLA",1],["Kisaru Sikona","","Oldoinyo VSLA",1],["Kimanyisho Soit","877","Oldoinyo VSLA",1],["Jane Pasi","197","Oxbiti VSLA",1],["Eunice Ndoinyo","399","Oxbiti VSLA",1],["Noonkokwa Pesi","901","Oxbiti VSLA",0],["Nasha Rakwa","978","Oxbiti VSLA",0],["Nasejo Sikona","637","Oxbiti VSLA",1],["Nanyikae Sikona","598","Oxbiti VSLA",0],["Ntua Pesi","936","Oxbiti VSLA",0],["Naramat Sikona","950","Oxbiti VSLA",0],["Nalotuasha Mpoe","839","Oxbiti VSLA",0],["Nemuta Mpoe","721","Oxbiti VSLA",1],["Kimere Njapit","370","Oxbiti VSLA",0],["Hellen Sitany","472","Oxbiti VSLA",0],["Kimanyisho Rakwa","841","Oxbiti VSLA",1],["Mariamu Solol","416","Oxbiti VSLA",0],["Lucy Sailepu","343","Oloomisigiyo VSLA",0],["Selina Pesi","806","Oloomisigiyo VSLA",0],["Diana Kisemei","135","Oloomisigiyo VSLA",0],["Kinyikita Parmuat","751","Oloomisigiyo VSLA",1],["Magrate Sengeny","169","Oloomisigiyo VSLA",1],["Kanasa Kamakia","083","Oloomisigiyo VSLA",1],["Tampeyian Pesi","546","Oloomisigiyo VSLA",0],["Nesale Njapit","625","Oloomisigiyo VSLA",0],["Noorparakuo Pesi","301","Oloomisigiyo VSLA",0],["Nteta Kisemei","481","Oloomisigiyo VSLA",1],["Evaline Pesi","","Oloomisigiyo VSLA",1],["Janet Kisemei","575","Oloomisigiyo VSLA",0],["Evaline Parmuat","674","Oloomisigiyo VSLA",0],["Noolkibrit Siololo","487","Enkusero VSLA",1],["Nolari Pesi","609","Enkusero VSLA",0],["Noomali Mereru","819","Enkusero VSLA",0],["Faith Soit","638","Enkusero VSLA",1],["Nolari Sikona","939","Enkusero VSLA",0],["Ntajiri Sinchore","739","Enkusero VSLA",0],["Nasha Kisaika","408","Enkusero VSLA",1],["Nolepeta Kirok","334","Enkusero VSLA",0],["Lucy Sinchore","686","Enkusero VSLA",0],["Mary Soit","116","Enkusero VSLA",0],["Ntajiri Kirok","937","Enkusero VSLA",0],["Lucy Siololo","069","Enkusero VSLA",0],["Nelly Soit","438","Enkusero VSLA",0],["Nataana Siololo","478","Enkusero VSLA",0]];
+
+/* Nterere Community Group: the real member list from the four VSLA registers
+   (Oldoinyo, Oxbiti, Oloomisigiyo, Enkusero). The public site shows names only,
+   with phone numbers masked to the last 3 digits; the full numbers are added
+   privately by importing the Excel file (matched by member number).
+   These members have NO financial records: nothing is generated for them. */
+const NTERERE_GID='GRP-03',NTERERE_LISTED='2026-10-02';
+function applyNterereRoster(st){
+  const gid=NTERERE_GID,g=st.groups.find(x=>x.groupId===gid);if(!g)return st;
+  const gone=new Set(st.members.filter(m=>m.groupId===gid).map(m=>m.id));
+  const keep=x=>x.groupId!==gid&&!gone.has(x.memberId);
+  ['ledger','fines','meetings','welfare','loanApps','cashbook','sfpSpend','submissions','sms'].forEach(k=>{if(Array.isArray(st[k]))st[k]=st[k].filter(keep)});
+  st.audit=(st.audit||[]).filter(a=>a.groupId!==gid&&!gone.has(a.memberId)&&!gone.has(a.userId));
+  st.members=st.members.filter(m=>m.groupId!==gid);
+  st.vslas=(st.vslas||[]).filter(v=>v.groupId!==gid);
+  const vid=n=>{let v=st.vslas.find(x=>x.groupId===gid&&x.name===n);if(!v){v={vslaId:'VSLA-'+String(st.vslas.reduce((a,x)=>Math.max(a,+String(x.vslaId).split('-')[1]||0),0)+1).padStart(3,'0'),chamaId:st.chama.chamaId,groupId:gid,name:n,namePending:false,status:'Active',source:'VSLA register',createdAt:NTERERE_LISTED+'T09:00',updatedAt:NTERERE_LISTED+'T09:00'};st.vslas.push(v)}return v.vslaId};
+  NTERERE_ROSTER.forEach(([name,last3,vsla,check],i)=>{
+    const id=`${g.code||'NTR'}-${String(i+1).padStart(3,'0')}`;
+    st.members.push({id,memberId:id,memberNumber:id,chamaId:st.chama.chamaId,groupId:gid,vslaId:vid(vsla),name,role:'Member',status:'Active',
+      phone:last3?`07xx xxx ${last3}`:'Not added',phoneMasked:!!last3,joined:NTERERE_LISTED,joinedNote:'Date joined not given on the VSLA list',
+      accessMode:'Not recorded',kycStatus:'Not Started',groupAccess:[gid],placeholder:false,source:'VSLA register',
+      note:check?'Check this entry against the paper list (handwriting unclear or phone missing).':'',createdAt:NTERERE_LISTED+'T10:00',updatedAt:NTERERE_LISTED+'T10:00'});
+  });
+  const ids=new Set(st.members.map(m=>m.id));
+  Object.keys(st.actors||{}).forEach(r=>{if(!ids.has(st.actors[r])){const f=st.members.find(m=>m.role===r)||st.members.find(m=>m.groupId!==gid&&m.role==='Member');if(f)st.actors[r]=f.id}});
+  const mx=()=>st.audit.reduce((a,x)=>Math.max(a,+String(x.id).split('-')[1]||0),0);
+  [...new Set(NTERERE_ROSTER.map(r=>r[2]))].forEach(v=>st.audit.push({id:'AU-'+String(mx()+1).padStart(5,'0'),ts:NTERERE_LISTED+'T10:00',userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:gid,action:'Member list added from the VSLA register',target:v,detail:`${v}: ${NTERERE_ROSTER.filter(r=>r[2]===v).length} members (names from the handwritten list; phone numbers masked on the public site)`,kind:'member',memberId:'',status:'Completed',reason:'',prev:'',next:''}));
+  st.nterereRoster=NTERERE_LISTED;
+  return st;
+}
+{const f=seedDemo;seedDemo=function(opts={}){const st=f(opts);return opts.noRoster?st:applyNterereRoster(st)}}
+/* saved demo data from before the roster: switch Nterere over, but only while every Nterere member is still a sample placeholder */
+{const f=ensureV07Data;ensureV07Data=function(){f.apply(this,arguments);
+  if(S&&S.demo&&!S.nterereRoster&&S.chama&&S.chama.chamaId===CLIENT_DATA.organization.chamaId){
+    const nm=S.members.filter(m=>m.groupId===NTERERE_GID);
+    if(nm.length&&nm.every(m=>m.placeholder)){applyNterereRoster(S);if(typeof recomputeActors==='function')recomputeActors()}
+  }}}
 
 /* ---------- memoised calculations (see memo() above) ---------- */
 {const f=periodStatus;periodStatus=function(m,k,c){return memo('ps|'+m+'|'+k+'|'+(c||''),()=>f(m,k,c))}}

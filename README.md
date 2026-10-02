@@ -16,6 +16,17 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.4
+- **Nterere Community Group now holds its real member list**: 55 members in four VSLAs from the handwritten
+  registers (Oldoinyo 14, Oxbiti 14, Oloomisigiyo 13, Enkusero 14), replacing Nterere's fictional sample members.
+  Olemoncho and Mbitin keep their sample data.
+- **Privacy**: this site is public, so phone numbers are shown masked (`07xx xxx 287`). The full numbers are never
+  in this repository; officials load them privately with Members → Import from Excel, using the member-number
+  column (NTR-001 to NTR-055) so the existing members are updated rather than duplicated.
+- No money records are invented for these members: contributions, savings, loans, fines and meetings start empty.
+  Entries that were hard to read on the paper lists carry a "check this entry" note.
+- Scheduling a meeting now sends the reminder for that meeting, not for an earlier one.
+
 ## New in v0.9.3
 - **Learning assistant (chatbot)**: an "Ask" button on every page opens a chat where members learn about saving,
   VSLAs, loans, guarantors, repayments, contributions (Social Fund, School Feeding), fines, meetings, privacy, USSD/SMS

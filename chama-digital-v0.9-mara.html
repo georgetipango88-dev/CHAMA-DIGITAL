@@ -516,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.6 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.7 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -983,7 +983,7 @@ const FORMS={}; /* form handlers, keyed by data-form */
 const UI={role:'Treasurer',group:null,tab:{},f:{},report:null,reg:null,focus:null};
 function resetDemo(opts={}){S=seedDemo(opts);ensureV07Data();saveState()}
 const byId=id=>S.members.find(m=>m.id===id);
-const mName=id=>id==='ledger-import'?'Ledger import':id==='system'?'System (automatic)':id==='hpf-admin'?'HPF program admin':id==='vpbn'?'VPBN':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
+const mName=id=>id==='ledger-import'?'Ledger import':id==='vsla-book'?'VSLA book':String(id||'').startsWith('vsla:')?vslaName(String(id).slice(5))+' (VSLA total)':id==='system'?'System (automatic)':id==='hpf-admin'?'HPF program admin':id==='vpbn'?'VPBN':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
 function me(){
   const a=byId(S.actors[UI.role]);
   if(a&&(a.role===UI.role||UI.role==='Member'||UI.role==='Platform Owner/Admin'&&a.role!=='Member'))return a;
@@ -1633,7 +1633,7 @@ function savingsList(){
 function savingsView(){
   const all=can('viewAll'),tab=UI.tab.savings||'records',f=sf(),T=totals(),k=curKey();
   const recs=visibleLedger().filter(e=>e.type==='saving'&&valid(e));
-  const thisMonth=sum(recs.filter(e=>monthKey(e.date)===k)),savers=new Set(recs.map(e=>e.memberId)).size;
+  const thisMonth=sum(recs.filter(e=>monthKey(e.date)===k)),savers=new Set(recs.filter(e=>!e.bookRef).map(e=>e.memberId)).size,savedBy=sum(recs.filter(e=>!e.bookRef));
   const items=all?[{id:'records',label:'All records'},{id:'monthly',label:'Monthly assessment'},{id:'members',label:'By member'}]:[{id:'records',label:'My records'},{id:'monthly',label:'My monthly assessment'}];
   let body;
   if(tab==='monthly'){body=savingsMonthlyTab()}
@@ -1646,7 +1646,7 @@ function savingsView(){
   return `${pageHeader({title:all?'Savings':'My savings',desc:'A record of what each member has saved with the Chama.',actions:can('recordFinance')?btn('rec-saving','Record savings',{ic:'plus'}):''})}
   ${notice('These pages keep a record of savings. Chama Digital does not hold, receive or move money.',{ic:'info',tone:'teal'})}
   ${savingsRuleCard()}
-  <div class="stats">${statCard({label:all?'Total savings recorded':'My recorded savings',value:ksh(sum(recs)),sub:`${recs.length} records`,ic:'coins'})}${statCard({label:`Saved in ${keyLabel(k)}`,value:ksh(thisMonth),sub:'Recorded this month',ic:'deposit'})}${all?statCard({label:'Members saving',value:`${savers} of ${GM().length}`,sub:savers?`Average ${ksh(sum(recs)/savers)} each`:'',ic:'users'}):''}</div>
+  <div class="stats">${statCard({label:all?'Total savings recorded':'My recorded savings',value:ksh(sum(recs)),sub:`${recs.length} records`,ic:'coins'})}${statCard({label:`Saved in ${keyLabel(k)}`,value:ksh(thisMonth),sub:'Recorded this month',ic:'deposit'})}${all?statCard({label:'Members saving',value:`${savers} of ${GM().length}`,sub:savers?`Average ${ksh(savedBy/savers)} each`:recs.length?'VSLA totals only: members not itemised yet':'',ic:'users'}):''}</div>
   ${tabs('savings',items,tab)}<div role="tabpanel" aria-labelledby="tab-savings-${tab}">${body}</div>`;
 }
 const savingsViewObj={title:'Savings',render:savingsView};
@@ -1751,7 +1751,7 @@ function openRecord(id){
   if(e.status==='Corrected')flow=notice(`This record was corrected. It is kept for the audit trail but no longer counted. The current version is ${idBtn(e.replacedBy)}. <b>Reason:</b> ${esc(e.reason)}.`,{ic:'edit'});
   if(e.status==='Reversed')flow=notice(`This record was reversed and is not counted in any total. <b>Reason:</b> ${esc(e.reason)}.`,{ic:'undo',tone:'maroon'});
   if(e.correctionOf)flow+=notice(`This record replaces ${idBtn(e.correctionOf)} after a correction.`,{ic:'edit',tone:'teal'});
-  const canFix=can('correct')&&e.status==='Recorded';
+  const canFix=can('correct')&&e.status==='Recorded'&&!e.bookRef;
   const hasReps=e.type==='loan'&&S.ledger.some(x=>x.type==='repayment'&&x.loanId===e.id&&valid(x));
   const body=`${flow}<div class="card" style="padding:18px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px">${who(e.memberId,TYPE_LABEL[e.type])}${recPill(e)}</div>
    <div class="val" style="font:600 1.75rem 'Sora',sans-serif;margin-bottom:12px">${recAmt(e)}</div>
@@ -2139,7 +2139,7 @@ function cashEntries(gid=UI.group){
   S.fines.filter(f=>f.groupId===gid).forEach(f=>(f.payments||[]).filter(p=>!p.status||p.status==='Recorded').forEach(p=>rows.push({date:p.date,at:p.at||p.date,ref:p.ref||p.id,src:f.id,by:p.by,memberId:f.memberId,groupId:gid,desc:`${f.type} fine payment · ${mName(f.memberId)}`,in:p.amount,out:0,cat:'Fine payment',fund:'Fines',manual:false})));
   S.welfare.filter(w=>w.groupId===gid&&w.status==='Paid').forEach(w=>rows.push({date:w.date,at:w.createdAt||w.date,ref:w.ref||w.id,src:w.id,by:w.recordedBy,memberId:w.memberId,groupId:gid,desc:`Welfare payout (${w.category}) · ${mName(w.memberId)}`,in:0,out:w.amount,cat:'Welfare payout',fund:WELFARE_FUND,manual:false}));
   (S.sfpSpend||[]).filter(x=>x.groupId===gid&&x.status==='Recorded').forEach(x=>rows.push({date:x.date,at:x.at||x.date,ref:x.ref,src:x.id,by:x.by,memberId:'',groupId:gid,desc:`School feeding: ${x.description} (${x.school})`,in:0,out:x.amount,cat:'Programme spending',fund:SFP_FUND,manual:false}));
-  S.cashbook.filter(c=>c.groupId===gid&&c.status==='Recorded').forEach(c=>rows.push({date:c.date,at:c.at||c.date,ref:c.ref,src:c.id,by:c.by,memberId:'',groupId:gid,desc:c.description,in:c.direction==='in'?c.amount:0,out:c.direction==='out'?c.amount:0,cat:c.category,fund:c.category===LOAN_ROUND_CAT?'Loans':'General',manual:true}));
+  S.cashbook.filter(c=>c.groupId===gid&&c.status==='Recorded').forEach(c=>rows.push({date:c.date,at:c.at||c.date,ref:c.ref,src:c.id,by:c.by,memberId:'',groupId:gid,desc:c.description,in:c.direction==='in'?c.amount:0,out:c.direction==='out'?c.amount:0,cat:c.category,fund:c.category===LOAN_ROUND_CAT||c.bookFund==='Loans'?'Loans':'General',manual:!c.bookRef}));
   rows.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.at<b.at?-1:a.at>b.at?1:0);
   const r=rules(gid),opening=isNum(r.cashbook.openingBalance)?+r.cashbook.openingBalance:0;
   let bal=opening;rows.forEach(x=>{bal+=x.in-x.out;x.balance=bal});
@@ -5347,6 +5347,62 @@ function applyOlemonchoRoster(st){
     if(om.length&&om.every(m=>m.placeholder)){applyOlemonchoRoster(S);if(typeof recomputeActors==='function')recomputeActors()}
   }}}
 
+/* ---------- VSLA book totals in Savings, Contributions, Social Fund, School Feeding and the Cash Book ----------
+   Each dated meeting total in a VSLA's book becomes a group-level record (members not itemised):
+   savings and contributions in the ledger, loans given out and cash in/out in the cash book.
+   The VSLA book stays the single source: these records are rebuilt from it after every change. */
+const BOOK_POST={savings:{type:'saving',suf:'SV'},socialFund:{type:'contribution',cat:'CAT-SOCIAL',suf:'SF'},schoolFeeding:{type:'contribution',cat:'CAT-SFP',suf:'SFP'}};
+const BOOK_CASH={loan:{dir:'out',suf:'LN',cat:'Loans given out (VSLA book)',desc:'loans given out at the meeting (borrowers not itemised)',fund:'Loans'},cashIn:{dir:'in',suf:'IN',cat:'Cash in (VSLA book)',desc:'cash in'},cashOut:{dir:'out',suf:'OUT',cat:'Cash out (VSLA book)',desc:'cash out'}};
+function postVslaBooks(st,{audit=false}={}){
+  st.ledger=(st.ledger||[]).filter(e=>!e.bookRef);st.cashbook=(st.cashbook||[]).filter(c=>!c.bookRef);
+  const done={};
+  (st.vslas||[]).forEach(v=>(v.book||[]).forEach(b=>{
+    if(!b.date)return; /* a total without a date cannot be placed in a month */
+    const at=b.date+'T12:00',ref=`VSLA book · ${b.label}`,cats=((st.rules||{})[v.groupId]||{}).contributionCategories||[];
+    const base={chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,memberId:'vsla:'+v.vslaId,date:b.date,status:'Recorded',by:'vsla-book',method:'Cash',ref,bookRef:b.id,bookLabel:b.label,source:'vsla-book',note:'VSLA total for the meeting, as written in the VSLA book (members not itemised).',at};
+    Object.entries(BOOK_POST).forEach(([k,p])=>{if(b[k]==null)return;if(p.cat&&!cats.some(c=>c.id===p.cat))return;
+      st.ledger.push({...base,id:`${b.id}-${p.suf}`,type:p.type,amount:+b[k],...(p.type==='contribution'?{category:p.cat,period:monthKey(b.date),expected:null}:{})});done[v.groupId]=(done[v.groupId]||0)+1});
+    Object.entries(BOOK_CASH).forEach(([k,p])=>{if(b[k]==null)return;
+      st.cashbook.push({id:`${b.id}-${p.suf}`,chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,direction:p.dir,date:b.date,ref,description:`${v.name}: ${p.desc}`,category:p.cat,bookFund:p.fund||'',amount:+b[k],approvedBy:'',reason:'From the VSLA book',status:'Recorded',by:'vsla-book',bookRef:b.id,source:'vsla-book',at});done[v.groupId]=(done[v.groupId]||0)+1});
+  }));
+  if(audit)Object.entries(done).forEach(([gid,n])=>{const mx=(st.audit||[]).reduce((a,x)=>Math.max(a,+String(x.id).split('-')[1]||0),0);
+    st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:gid,action:'VSLA book totals posted',target:gid,detail:`${n} VSLA meeting figures added to Savings, Contributions (Social Fund, School Feeding) and the Cash Book as VSLA totals (members not itemised)`,kind:'record',memberId:'',status:'Completed',reason:'',prev:'',next:''})});
+  st.vslaBooksPosted=true;
+  return st;
+}
+{const f=applyOlemonchoRoster;applyOlemonchoRoster=function(st){return postVslaBooks(f(st),{audit:true})}}
+/* saved data from v0.9.6 (Olemoncho list already in place, totals only on the VSLA page): post them once */
+{const f=ensureV07Data;ensureV07Data=function(){f.apply(this,arguments);if(S&&S.olemonchoRoster&&!S.vslaBooksPosted)postVslaBooks(S,{audit:true})}}
+
+/* a VSLA total opens as what it is: one meeting's figure from the book */
+{const f=openRecord;openRecord=function(id){
+  const e=S.ledger.find(x=>x.id===id);if(!e||!e.bookRef)return f.apply(this,arguments);
+  if(!can('viewAll')||(!isPlatformOwner()&&!allowedGroups().some(g=>g.groupId===e.groupId)))return;
+  openDrawer({title:`${TYPE_LABEL[e.type]} ${e.id}`,desc:'VSLA total from the VSLA book',body:`${notice(`This is the total written in the VSLA book for one meeting; members are not itemised. ${can('editChama')?'To change it, edit the meeting on the VSLA groups page; Savings, Contributions and the Cash Book follow automatically.':'VPBN changes it on the VSLA groups page.'}`,{ic:'book',tone:'teal'})}
+    <div class="card" style="padding:18px"><dl class="kv"><dt>VSLA</dt><dd>${esc(vslaName(e.vslaId))}</dd><dt>Meeting</dt><dd>${esc(e.bookLabel||'')}</dd><dt>Date</dt><dd>${fmtDate(e.date)}</dd>${e.type==='contribution'?`<dt>Fund</dt><dd>${esc(catName(e.category,e.groupId))}</dd>`:''}<dt>Amount</dt><dd class="num"><b>${ksh(e.amount)}</b></dd></dl></div>
+    <div style="margin-top:14px"><a class="btn btn-secondary btn-sm" href="#/vslas">${icon('book')}Open VSLA groups</a></div>`});
+}}
+{const f=openCorrect;openCorrect=function(id){const e=S.ledger.find(x=>x.id===id);if(e&&e.bookRef){toast('This is a VSLA total: change it on the VSLA groups page.','error');return}return f.apply(this,arguments)}}
+{const f=openReverse;openReverse=function(id){const e=S.ledger.find(x=>x.id===id);if(e&&e.bookRef){toast('This is a VSLA total: change it on the VSLA groups page.','error');return}return f.apply(this,arguments)}}
+{const f=openCashReverse;openCashReverse=function(id){const c=S.cashbook.find(x=>x.id===id);if(c&&c.bookRef){toast('This comes from the VSLA book: change it on the VSLA groups page.','error');return}return f.apply(this,arguments)}}
+
+/* VSLA charts and league tables count the VSLA totals too */
+{const f=vslaStats;vslaStats=function(v){const r=f.apply(this,arguments),B=S.ledger.filter(e=>e.bookRef&&e.vslaId===v.vslaId&&valid(e));r.savings+=sum(B.filter(e=>e.type==='saving'));r.contributions+=sum(B.filter(e=>e.type==='contribution'));return r}}
+
+/* say plainly on each page where the figures come from */
+const afterHeader=(h,extra)=>{const m=h.match(/^\s*<div class="ph">[\s\S]*?<\/div><\/div>/);return m?m[0]+extra+h.slice(m[0].length):extra+h};
+const bookRecs=(t,gid=UI.group)=>S.ledger.filter(e=>e.bookRef&&e.groupId===gid&&valid(e)&&(!t||e.type===t));
+const bookLoansNote=(gid=UI.group)=>{const L=vbLoans(vslasOf(gid));return L.n||L.open?` Members' loans written in the books (${vbAmt(L)}) are not in the cash book yet, because their dates are still to be confirmed.`:''};
+{const f=savingsView;savingsView=function(){const h=f.apply(this,arguments),B=bookRecs('saving');if(!B.length||UI.role==='Member')return h;
+  return afterHeader(h,notice(`These figures include <b>${ksh(sum(B))}</b> of VSLA savings totals from the VSLA books (${plural(B.length,'meeting total')}, members not itemised). Each member's own savings show here once recorded.`,{ic:'book',tone:'teal',title:'From the VSLA books.'}))}}
+{const f=contributionsView;contributionsView=function(){const h=f.apply(this,arguments),B=bookRecs('contribution');if(!B.length||UI.role==='Member')return h;
+  return afterHeader(h,notice(`These figures include <b>${ksh(sum(B))}</b> of Social Fund and School Feeding totals from the VSLA books (members not itemised), so "members paid" stays at 0 until members' own contributions are recorded.`,{ic:'book',tone:'teal',title:'From the VSLA books.'}))}}
+savingsViewObj.render=savingsView;contributionsViewObj.render=contributionsView; /* the router holds these references */
+{const f=cashbookView;cashbookView=function(){const h=f.apply(this,arguments),B=bookRecs(),C=S.cashbook.filter(c=>c.bookRef&&c.groupId===UI.group&&c.status==='Recorded');if(!B.length&&!C.length)return h;
+  return afterHeader(h,notice(`Money in and out written in the VSLA books is included: savings, Social Fund and School Feeding as money in${C.length?', and loans given out and cash in/out as written':''}.${bookLoansNote()}`,{ic:'book',tone:'teal',title:'From the VSLA books.'}))}}
+{const f=dashKPIs;dashKPIs=function(){const h=f.apply(this,arguments);if(!bookRecs().length)return h;const n=bookLoansNote();if(!n)return h;
+  return h.replace(/(Cash balance \(cash book\)<\/div><div class="val">[^<]*<\/div><div class="sub">)/,`$1Members' loans not included yet (dates to confirm) · `)}}
+
 /* ---------- only VPBN changes data: a safety net under every form, button and selector ---------- */
 const VPBN_ACTS=new Set(['rec-contrib','rec-saving','rec-loan','rec-repay','add-member','edit-member','sched-meeting','correct-record','reverse-record','edit-chama','reset-demo','erase-data','fine-pay','ledger-import','resolve-issue','import-members','add-group','add-vsla','rename-vsla','sfp-spend','submit-contrib','confirm-sub','reject-sub','set-loan-rate','fine-waive','add-fine','meeting-fine','set-rule','rec-welfare','welfare-review','apply-loan','app-decision','disburse','cash-in','cash-out','cash-reverse','sms-queue','edit-group-rules','load-illus','edit-group','sb-push','sb-pull','sb-disconnect','guar-respond','rem-send','rem-tpl','sched-mode','record-past','mtg-doc-del','chat-faq-del','att-set','att-all','vb-total','vb-member']);
 const VPBN_FREE_FORMS=new Set(['ussd']);
@@ -5538,7 +5594,7 @@ FORMS['vb-total']=(form,d)=>{
   b.updatedAt=nowStamp();b.updatedBy=me().id;v.updatedAt=nowStamp();
   const next=BOOK_FIELDS.filter(([k])=>b[k]!=null).map(([k,l])=>`${l} ${num(b[k])}`).join(', ');
   logAudit({action:form.dataset.id?'VSLA book totals corrected':'VSLA book totals recorded',target:b.id,detail:`${v.name} · ${b.label}${b.dateText||b.date?' ('+(b.dateText||fmtDate(b.date))+')':''}`,kind:'record',groupId:v.groupId,prev,next});
-  UI.tab.vslas=v.vslaId;commit(`${v.name}: ${b.label} saved.`);
+  postVslaBooks(S);UI.tab.vslas=v.vslaId;commit(`${v.name}: ${b.label} saved.`);
 };
 function openVbMember(id){
   if(!needPerm('editChama'))return;const m=byId(id);if(!m||!inAllowedGroup(m))return;const b=m.vslaBook||{};

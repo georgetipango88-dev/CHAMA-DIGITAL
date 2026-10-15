@@ -16,6 +16,19 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.7
+- **The VSLA book totals now show on every money page.** Each dated meeting total from the VSLA books is posted as a
+  **VSLA total** (members not itemised): savings on the Savings page and dashboard, Social Fund and School Feeding
+  under Contributions, Social Fund / Welfare and the School Feeding Programme, and all of them as money in on the
+  Cash Book. Loans given out at a meeting and Olchoro's cash in / cash out are in the Cash Book as written.
+- For Olemoncho this shows savings KSh 300,200, Social Fund KSh 16,300, School Feeding KSh 13,600, cash in
+  KSh 425,500 and cash out KSh 109,430, with the monthly figures and charts filled in.
+- The VSLA book stays the single source: when VPBN edits a meeting on the VSLA groups page, the posted figures
+  follow. VSLA totals cannot be corrected or reversed one by one, and they are not counted as members.
+- Members' loans written in the books are not in the Cash Book yet, because their dates are still to be confirmed;
+  each page says so.
+- Saved data from v0.9.6 gets the totals posted once, with an audit entry.
+
 ## New in v0.9.6
 - **Only VPBN changes data.** A new **VPBN** role (in the role switcher and on "Choose your community group") is the
   only one that can add, edit or correct anything: records, members, meetings, loans, rules and the VSLA books.

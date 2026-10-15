@@ -16,6 +16,19 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.9
+- **Members' loans from the VSLA books are tracked like any internal loan** (Loan Repayments): deadline, amount
+  repaid, outstanding, status (Active, Overdue, repaid) and whether it was paid on time or after the deadline, with the
+  reason for the loan in its own column. Loans still waiting for a meeting date are listed separately until dated.
+- **Olemoncho loan rules** (set from the client's instructions; VPBN can change them in Group rules): a member can
+  borrow up to her own savings (1× savings); repay any time, in part or in full, but the whole loan is due within
+  3 months of the meeting it was given ("Any time, in full by the deadline"). The interest rate and the on-time
+  limit bonus are not decided yet and show as pending. Mbitin and Nterere keep their own rules.
+- **Guarantors come from the borrower's own VSLA**: the loan application lists only members of the applicant's VSLA
+  and refuses a guarantor from another VSLA.
+- Until members' own savings are recorded, Olemoncho members' loan limit is KSh 0, so new applications show
+  "Not eligible" with the reason.
+
 ## New in v0.9.8
 - **Paid fines go to the group's savings.** Every fine payment is counted in the savings of the member's VSLA (or
   community group), not in the member's own savings, and it is counted once in the Cash Book.

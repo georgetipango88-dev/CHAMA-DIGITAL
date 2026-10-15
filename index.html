@@ -516,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.8 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.9 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -1168,13 +1168,16 @@ const totals=()=>{
   const loans=rec('loan').map(loanInfo);
   return{contrib:c,savings:s,lent,repaid:rep,balance:cashSummary().balance,outstanding:sum(loans,l=>l.outstanding),activeLoans:loans.filter(l=>l.status!=='Repaid').length,overdueLoans:loans.filter(l=>l.status==='Overdue').length,loans};
 };
+const FLEX_FREQ='Any time, in full by the deadline';
+function loanSchedText(l){return l.flexible?`pay any time; in full within ${l.months} months`:`${l.months} monthly instalments`}
 function loanInfo(loan){
   const ratePending=!isNum(loan.interestPct),rate=ratePending?0:+loan.interestPct;
-  const total=Math.round(loan.amount*(1+rate/100)),inst=Math.ceil(total/loan.months);
+  const flexible=loan.flexible!=null?!!loan.flexible:((S&&S.rules&&S.rules[loan.groupId]||{}).loans||{}).repaymentFrequency===FLEX_FREQ,nInst=flexible?1:loan.months;
+  const total=Math.round(loan.amount*(1+rate/100)),inst=Math.ceil(total/nInst);
   const reps=repaysOf(loan.id).filter(valid).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.at<b.at?-1:1);
   const repaid=sum(reps),outstanding=Math.max(0,total-repaid),t=todayISO();
   const sched=[];let cum=0;
-  for(let i=1;i<=loan.months;i++){const amt=i<loan.months?inst:total-inst*(loan.months-1);cum+=amt;sched.push({n:i,due:addMonths(loan.date,i),amount:amt,cum,paid:repaid>=cum,partial:repaid<cum&&repaid>cum-amt})}
+  for(let i=1;i<=nInst;i++){const amt=i<nInst?inst:total-inst*(nInst-1);cum+=amt;sched.push({n:i,due:addMonths(loan.date,flexible?loan.months:i),amount:amt,cum,paid:repaid>=cum,partial:repaid<cum&&repaid>cum-amt})}
   /* each repayment is matched to the instalment it pays, so its status is explainable */
   let before=0;
   const repRows=reps.map(r=>{
@@ -1193,7 +1196,7 @@ function loanInfo(loan){
   const status=outstanding<=0?(ratePending?'Interest pending':'Repaid'):overdueAmt>0?'Overdue':'Active';
   const daysToNext=next?Math.round((parseISO(next.due)-parseISO(t))/864e5):null;
   const repaidOnTime=!ratePending&&status==='Repaid'&&sched.every(s=>s.onTime);
-  return{...loan,rate,ratePending,total,inst,repaid,outstanding,sched,next,overdueAmt,status,reps,repRows,interest:total-loan.amount,pctPaid:pct(repaid,total),daysToNext,repaidOnTime};
+  return{...loan,flexible,rate,ratePending,total,inst,repaid,outstanding,sched,next,overdueAmt,status,reps,repRows,interest:total-loan.amount,pctPaid:pct(repaid,total),daysToNext,repaidOnTime};
 }
 function memberStats(id){
   const m=byId(id),cons=periodKeysFor(m).map(k=>periodStatus(id,k));
@@ -1654,7 +1657,7 @@ const savingsViewObj={title:'Savings',render:savingsView};
 /* ---------- 14. Internal Chama loans & repayments ---------- */
 const LOAN_NOTE=`These are loans the <b>Chama itself</b> has made to its own members from pooled funds, under the Chama's own rules. Chama Digital only records the loan and its repayments. It does not lend, approve, or move any money.`;
 function loanCard(l){
-  return card({title:`${l.id} · ${ksh(l.amount)}`,sub:`Issued ${fmtDate(l.date)} · ${l.months} monthly instalments`,actions:loanPill(l.status),body:`${bar(l.pctPaid,l.status==='Overdue'?'maroon':'')}<div style="display:flex;justify-content:space-between;margin:8px 0 14px" class="small muted"><span>${ksh(l.repaid)} repaid</span><span>${ksh(l.outstanding)} left</span></div><button type="button" class="btn btn-secondary btn-sm" data-act="open-loan" data-id="${l.id}">View repayment history</button>`,cls:''}).replace('<section class="card ','<section style="margin-bottom:12px" class="card ');
+  return card({title:`${l.id} · ${ksh(l.amount)}`,sub:`Issued ${fmtDate(l.date)} · ${loanSchedText(l)}`,actions:loanPill(l.status),body:`${bar(l.pctPaid,l.status==='Overdue'?'maroon':'')}<div style="display:flex;justify-content:space-between;margin:8px 0 14px" class="small muted"><span>${ksh(l.repaid)} repaid</span><span>${ksh(l.outstanding)} left</span></div><button type="button" class="btn btn-secondary btn-sm" data-act="open-loan" data-id="${l.id}">View repayment history</button>`,cls:''}).replace('<section class="card ','<section style="margin-bottom:12px" class="card ');
 }
 const lf=()=>UI.f.loans||(UI.f.loans={status:'all',q:'',limit:25});
 function loansList(){
@@ -1663,13 +1666,15 @@ function loansList(){
   const shown=rows.slice(0,f.limit);
   const t=rows.length?table({caption:'Internal Chama loans',cols:[
     {label:'Member',render:l=>who(l.memberId,`<button type="button" class="link-btn tiny" data-act="open-loan" data-id="${l.id}">${l.id}</button>`)},
+    {label:'Reason',render:l=>`<span class="tiny" style="white-space:normal;display:block;max-width:180px">${esc(l.purpose||l.enterprise||'Not recorded')}</span>`},
     {label:'Original loan',cls:'r',render:l=>`<span class="num"><b>${ksh(l.amount)}</b></span>`},
     {label:'Issued',render:l=>fmtDate(l.date)},
-    {label:'Repayment schedule',render:l=>`${l.months} × ${ksh(l.inst)}<div class="muted tiny">${l.ratePending?'Interest rate pending confirmation':'Interest '+l.rate+'% flat'}</div>`},
+    {label:'Repayment schedule',render:l=>`${l.flexible?`Any time, in full by ${fmtDate(l.sched[0].due)}`:`${l.months} × ${ksh(l.inst)}`}<div class="muted tiny">${l.ratePending?'Interest rate pending confirmation':'Interest '+l.rate+'% flat'}</div>`},
     {label:'Repaid',render:l=>`<div style="min-width:120px"><span class="num">${ksh(l.repaid)}</span>${bar(l.pctPaid,l.status==='Overdue'?'maroon':'')}</div>`},
     {label:'Outstanding',cls:'r',render:l=>`<span class="num"><b>${ksh(l.outstanding)}</b></span>`},
     {label:'Next deadline',render:l=>l.next?`${fmtDate(l.next.due)}<div class="muted tiny">${ksh(l.status==='Overdue'?l.overdueAmt:Math.min(l.inst,l.outstanding))}${l.status==='Overdue'?' overdue':` · ${deadlineText(l.daysToNext)}`}</div>`:'-'},
-    {label:'Status',render:l=>loanPill(l.status)},
+    {label:'Status',render:l=>{const last=l.sched[l.sched.length-1],done=l.outstanding<=0||l.status==='Interest pending';
+      return `${loanPill(l.status)}<div class="muted tiny" style="margin-top:3px">${done?(last&&last.paidOn?(l.sched.every(x=>x.onTime)?'Paid on time':'Paid after the deadline'):'Paid'):l.status==='Overdue'?`Deadline passed ${fmtDate((l.sched.find(x=>!x.paid)||last).due)}`:(l.repaid?`${ksh(l.repaid)} paid so far · `:'Nothing paid yet · ')+deadlineText(l.daysToNext)}</div>`}},
   ],rows:shown,rowHref:l=>'@loan:'+l.id}):emptyState({ic:'loan',title:all.length?'No loans match':'No internal loans recorded',text:all.length?'Try another filter.':(can('recordFinance')?'If the Chama has lent to a member, record it here so repayments can be tracked.':'Any loan the Chama makes to you will appear here.'),action:!all.length&&can('recordFinance')?btn('rec-loan','Record internal loan',{ic:'plus'}):''});
   return `${t}<div class="list-meta" aria-live="polite"><span>${rows.length} ${rows.length===1?'loan':'loans'}</span>${rows.length>shown.length?`<button type="button" class="link-btn" data-act="more" data-scope="loans">Show more</button>`:''}</div>`;
 }
@@ -1692,7 +1697,7 @@ function openLoan(id){
   const body=`${notice(LOAN_NOTE,{ic:'info',tone:'maroon'})}
    <div class="card" style="padding:18px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px">${who(l.memberId,esc(l.id))}${loanPill(l.status)}</div>
    ${bar(l.pctPaid,l.status==='Overdue'?'maroon':'')}<div class="small muted" style="display:flex;justify-content:space-between;margin:8px 0 14px"><span>${ksh(l.repaid)} repaid</span><span>${ksh(l.outstanding)} outstanding</span></div>
-   <dl class="kv"><dt>Original internal loan</dt><dd class="num">${ksh(l.amount)}</dd><dt>Interest rate (at issue)</dt><dd>${l.ratePending?PEND:l.rate+'% flat ('+ksh(l.interest)+')'}</dd><dt>Total to repay</dt><dd class="num">${ksh(l.total)}</dd><dt>Issued by the Chama</dt><dd>${fmtDate(l.date)}</dd><dt>Agreed schedule</dt><dd>${l.months} monthly instalments</dd><dt>Purpose</dt><dd>${esc(l.purpose||'Not recorded')}</dd><dt>Enterprise</dt><dd>${esc(l.enterprise||'-')}</dd><dt>Guarantor(s)</dt><dd>${(l.guarantors||[]).map(g=>esc(g.name)).join(', ')||'None recorded'}</dd>${l.loanAppId?`<dt>Application</dt><dd>${esc(l.loanAppId)}</dd>`:''}${l.next?`<dt>Next deadline</dt><dd>${fmtDate(l.next.due)} · ${deadlineText(l.daysToNext)}</dd>`:''}<dt>Chama decision</dt><dd>${esc(l.approval||'Not recorded')}</dd>${l.status==='Overdue'?`<dt>Overdue now</dt><dd class="minus num">${ksh(l.overdueAmt)}</dd>`:''}</dl></div>
+   <dl class="kv"><dt>Original internal loan</dt><dd class="num">${ksh(l.amount)}</dd><dt>Interest rate (at issue)</dt><dd>${l.ratePending?PEND:l.rate+'% flat ('+ksh(l.interest)+')'}</dd><dt>Total to repay</dt><dd class="num">${ksh(l.total)}</dd><dt>Issued by the Chama</dt><dd>${fmtDate(l.date)}</dd><dt>Agreed schedule</dt><dd>${loanSchedText(l)}${l.flexible?` (deadline ${fmtDate(l.sched[0].due)})`:''}</dd><dt>Purpose</dt><dd>${esc(l.purpose||'Not recorded')}</dd><dt>Enterprise</dt><dd>${esc(l.enterprise||'-')}</dd><dt>Guarantor(s)</dt><dd>${(l.guarantors||[]).map(g=>esc(g.name)).join(', ')||'None recorded'}</dd>${l.loanAppId?`<dt>Application</dt><dd>${esc(l.loanAppId)}</dd>`:''}${l.next?`<dt>Next deadline</dt><dd>${fmtDate(l.next.due)} · ${deadlineText(l.daysToNext)}</dd>`:''}<dt>Chama decision</dt><dd>${esc(l.approval||'Not recorded')}</dd>${l.status==='Overdue'?`<dt>Overdue now</dt><dd class="minus num">${ksh(l.overdueAmt)}</dd>`:''}</dl></div>
    ${can('recordFinance')&&!['Repaid','Interest pending'].includes(l.status)?`<div style="margin-bottom:14px">${btn('rec-repay','Record repayment',{ic:'plus',data:`data-loan="${l.id}"`})}</div>`:''}
    ${l.ratePending&&can('correct')?`<div style="margin-bottom:14px">${notice('This loan was recorded before the group confirmed its interest rate. Set the agreed rate to complete the repayment schedule.',{ic:'info',tone:'warn'})}${btn('set-loan-rate','Set the agreed interest rate',{ic:'edit',cls:'btn-secondary btn-sm',data:`data-id="${l.id}"`})}</div>`:''}
    ${card({title:'Repayment schedule',flush:true,body:table({caption:'Repayment schedule',cols:[{label:'#',render:s=>s.n},{label:'Due',render:s=>fmtDate(s.due)},{label:'Amount',cls:'r',render:s=>`<span class="num">${ksh(s.amount)}</span>`},{label:'Paid on',render:s=>s.paidOn?fmtDate(s.paidOn):'-'},{label:'Status',render:s=>s.paid?(s.onTime?pill('ok','Paid on time','check'):pill('warn','Paid late','clock')):s.partial?pill('warn','Part paid','clock'):s.due<todayISO()?pill('bad','Overdue','alert'):pill('neutral','Upcoming')}],rows:l.sched})})}
@@ -2872,7 +2877,7 @@ function repaymentDeadlinesCard(){
   const rows=loans.flatMap(l=>l.sched.filter(s=>!s.paid).slice(0,3).map(s=>{const paidTowards=Math.max(0,l.repaid-(s.cum-s.amount));return{l,s,due:Math.max(0,s.amount-paidTowards),days:Math.round((parseISO(s.due)-parseISO(t))/864e5)}})).sort((a,b)=>a.s.due<b.s.due?-1:1).slice(0,15);
   return card({flush:true,title:'Repayment deadlines',sub:'Next unpaid instalments, soonest first',body:rows.length?table({caption:'Repayment deadlines',cols:[
     ...(can('viewAll')?[{label:'Member',render:r=>who(r.l.memberId,esc(r.l.id))}]:[{label:'Loan',render:r=>esc(r.l.id)}]),
-    {label:'Instalment',render:r=>`${r.s.n} of ${r.l.months}`},{label:'Deadline',render:r=>`<b>${fmtDate(r.s.due)}</b>`},
+    {label:'Instalment',render:r=>r.l.flexible?'Full amount':`${r.s.n} of ${r.l.sched.length}`},{label:'Deadline',render:r=>`<b>${fmtDate(r.s.due)}</b>`},
     {label:'Amount due',cls:'r',render:r=>`<span class="num">${ksh(r.due)}</span>`},
     {label:'Time',render:r=>r.days<0?pill('bad',deadlineText(r.days),'alert'):r.days<=7?pill('warn',deadlineText(r.days),'clock'):pill('neutral',deadlineText(r.days))},
     ...(can('recordFinance')?[{label:'',nolabel:true,cls:'r',render:r=>btn('rec-repay','Record',{cls:'btn-ghost btn-sm',data:`data-loan="${r.l.id}"`})}]:[]),
@@ -3119,7 +3124,7 @@ function openEditGroupRules(){
   <div class="rules-sec"><h3>Add a contribution category</h3><div class="fgrid">${field({label:'New category name',name:'newcat',opt:true})}${field({label:'Fund',name:'newcat-fund',opts:[WELFARE_FUND,'School Feeding Programme','General','Enterprise'],value:'General'})}</div></div>
   <div class="rules-sec"><h3>Savings</h3><div class="fgrid">${n('Minimum per saving (KSh)','sav-min',r.savings.min)}${n('Maximum per saving (KSh)','sav-max',r.savings.max)}${field({label:'Frequency',name:'sav-freq',opts:['Monthly','Weekly','Every meeting'],value:r.savings.frequency||'Monthly'})}</div></div>
   <div class="rules-sec"><h3>Meetings & fines</h3><div class="fgrid">${field({label:'Meeting frequency',name:'meet-freq',value:r.meeting.frequency||'',opt:true})}${field({label:'Meeting place',name:'meet-place',value:r.meeting.place||'',opt:true})}${n('Absenteeism fine (KSh)','fine-abs',r.fines.absenteeism)}${field({label:'Other fines (one per line: Name = amount)',name:'fine-other',type:'textarea',rows:2,value:r.fines.other.map(o=>`${o.name} = ${isNum(o.amount)?o.amount:''}`).join('\n'),opt:true})}</div></div>
-  <div class="rules-sec"><h3>Loans</h3><div class="fgrid">${field({label:'Internal loans',name:'loan-enabled',opts:[['yes','Enabled'],['no','Not enabled']],value:L.enabled?'yes':'no'})}${n('Interest rate (flat %)','loan-rate',L.interestRate,'min="0" max="100" step="0.5"')}${n('Longest repayment period (months)','loan-max',L.maxMonths,'min="1" max="36" step="1"')}${field({label:'Repayment schedule',name:'loan-freq',opts:['Monthly','Weekly','Every meeting'],value:L.repaymentFrequency||'Monthly'})}${n('Guarantors required','loan-guar',L.guarantorsRequired,'min="0" max="5" step="1"')}${n('Loan limit (× savings)','loan-mult',L.limitMultiple,'min="0" step="0.5"')}${n('On-time bonus (% per loan repaid on time)','loan-bonus',L.onTimeBonusPct,'min="0" max="100" step="1"')}${n('Maximum limit (× savings)','loan-maxmult',L.maxLimitMultiple,'min="0" step="0.5"')}</div>
+  <div class="rules-sec"><h3>Loans</h3><div class="fgrid">${field({label:'Internal loans',name:'loan-enabled',opts:[['yes','Enabled'],['no','Not enabled']],value:L.enabled?'yes':'no'})}${n('Interest rate (flat %)','loan-rate',L.interestRate,'min="0" max="100" step="0.5"')}${n('Longest repayment period (months)','loan-max',L.maxMonths,'min="1" max="36" step="1"')}${field({label:'Repayment schedule',name:'loan-freq',opts:['Monthly','Weekly','Every meeting',FLEX_FREQ],value:L.repaymentFrequency||'Monthly'})}${n('Guarantors required','loan-guar',L.guarantorsRequired,'min="0" max="5" step="1"')}${n('Loan limit (× savings)','loan-mult',L.limitMultiple,'min="0" step="0.5"')}${n('On-time bonus (% per loan repaid on time)','loan-bonus',L.onTimeBonusPct,'min="0" max="100" step="1"')}${n('Maximum limit (× savings)','loan-maxmult',L.maxLimitMultiple,'min="0" step="0.5"')}</div>
   <p class="muted small" style="margin:12px 0 6px"><b>Qualification</b></p><div class="fgrid">${n('Minimum membership (months)','q-months',Q.minMembershipMonths,'min="0" step="1"')}${n('Minimum savings (KSh)','q-sav',Q.minSavings)}${n('Contribution record (% of periods paid)','q-pct',Q.minContributionPct,'min="0" max="100" step="1"')}${n('Open loans allowed at a time','q-active',Q.maxActiveLoans,'min="0" step="1"')}</div>
   <label class="checkrow" style="margin-top:10px"><input type="checkbox" name="q-nooverdue" ${Q.noOverdue!==false?'checked':''}><span>No overdue loan instalments allowed</span></label><label class="checkrow" style="margin-top:8px"><input type="checkbox" name="q-nofines" ${Q.noOutstandingFines?'checked':''}><span>Fines must be cleared first</span></label>
   <p class="muted small" style="margin:12px 0 6px"><b>Late repayment</b></p><div class="fgrid">${field({label:'Late repayment rule',name:'late-type',opts:[['none','No rule'],['fixed','Fixed charge per late instalment'],['percent','Percentage of the late instalment']],value:L.late&&L.late.enabled?L.late.type:'none'})}${n('Charge (KSh or %)','late-amt',L.late?.amount)}${n('Grace days','late-grace',L.late?.graceDays,'min="0" step="1"')}${field({label:'Description',name:'late-desc',value:L.late?.description||'',opt:true})}</div></div>
@@ -4461,7 +4466,7 @@ function openLoanApp(){
   if(!needPerm('applyLoan'))return;
   const own=UI.role==='Member',mid=own?me().id:(memberOpts()[0]||[])[0];if(!mid){toast('Add a member first.','error');return}
   const L=rules().loans,ent=rules().enterprise||{},gopts=[['','None'],...GM().filter(m=>m.status==='Active').map(m=>[m.id,`${m.name} (${m.id})`])];
-  const gRow=i=>field({label:`Guarantor ${i}`,name:'g'+i,opts:gopts,value:''})+(own?`<input type="hidden" name="g${i}s" value="Pending">`:field({label:`Guarantor ${i} confirmed?`,name:`g${i}s`,opts:G_STATUS.map(x=>[x,x==='Yes'?'Yes (confirmed)':x==='No'?'No (declined)':'Pending (not yet asked or no reply)']),value:'Pending'}));
+  const gRow=i=>field({label:`Guarantor ${i}`,name:'g'+i,opts:gopts,value:'',hint:'Only members of the applicant\'s own VSLA can guarantee.'})+(own?`<input type="hidden" name="g${i}s" value="Pending">`:field({label:`Guarantor ${i} confirmed?`,name:`g${i}s`,opts:G_STATUS.map(x=>[x,x==='Yes'?'Yes (confirmed)':x==='No'?'No (declined)':'Pending (not yet asked or no reply)']),value:'Pending'}));
   openModal({title:own?'Apply for a loan':'New loan application (assisted member)',desc:esc(curGroup().groupName),wide:true,body:`<form id="frm-la" data-form="loan-app" novalidate><div class="fgrid">
     ${own?`<input type="hidden" name="memberId" value="${mid}"><div class="fld full"><span class="lbl">Applicant</span>${who(mid,esc(mid))}</div>`:field({label:'Applicant',name:'memberId',opts:memberOpts(),value:mid,required:true,cls:'full'})}
     ${field({label:'Amount requested',name:'amount',type:'number',required:true,prefix:'KSh',attrs:'min="1" step="1" inputmode="numeric"',err:'Enter an amount above zero.'})}
@@ -5356,7 +5361,7 @@ function applyOlemonchoRoster(st){
    • each fine payment → the group's savings (the member's VSLA), never the member's own savings. */
 const BOOK_POST={savings:{type:'saving',suf:'SV'},socialFund:{type:'contribution',cat:'CAT-SOCIAL',suf:'SF'},schoolFeeding:{type:'contribution',cat:'CAT-SFP',suf:'SFP'}};
 const BOOK_CASH={cashIn:{dir:'in',suf:'IN',cat:'Cash in (VSLA book)',desc:'cash in'},cashOut:{dir:'out',suf:'OUT',cat:'Cash out (VSLA book)',desc:'cash out'}};
-const isGroupRec=e=>!!(e&&(e.bookRef||e.fineRef));
+const isGroupRec=e=>!!(e&&e.type!=='loan'&&(e.bookRef||e.fineRef)); /* a VSLA book loan belongs to its member */
 const OLM_BOOK_REV=2;
 function postVslaBooks(st,{audit=false}={}){
   st.ledger=(st.ledger||[]).filter(e=>!e.bookRef&&!e.fineRef);st.cashbook=(st.cashbook||[]).filter(c=>!c.bookRef);
@@ -5370,9 +5375,11 @@ function postVslaBooks(st,{audit=false}={}){
     Object.entries(BOOK_CASH).forEach(([k,p])=>{if(b[k]==null)return;
       st.cashbook.push({id:`${b.id}-${p.suf}`,chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,direction:p.dir,date:b.date,ref,description:`${v.name}: ${p.desc}`,category:p.cat,amount:+b[k],approvedBy:'',reason:'From the VSLA book',status:'Recorded',by:'vsla-book',bookRef:b.id,source:'vsla-book',at});add(v.groupId)});
   }));
-  /* members' loans from the VSLA books, on the date of the meeting they were given */
-  (st.members||[]).forEach(m=>{const b=m.vslaBook;if(!b||b.loan==null||!b.loanDate)return;const v=(st.vslas||[]).find(x=>x.vslaId===m.vslaId);
-    st.cashbook.push({id:`VL-${m.id}`,chamaId:st.chama.chamaId,groupId:m.groupId,vslaId:m.vslaId||'',direction:'out',date:b.loanDate,ref:`VSLA book loan · ${m.id}`,description:`Loan to ${m.name}${b.business?' for '+b.business:''}${v?' · '+v.name:''}`,category:'Member loan (VSLA book)',bookFund:'Loans',amount:+b.loan,approvedBy:'',reason:'From the VSLA book',status:'Recorded',by:'vsla-book',bookRef:'loan:'+m.id,source:'vsla-book',at:b.loanDate+'T12:30'});add(m.groupId)});
+  /* members' loans from the VSLA books, given at the meeting written in the margin: tracked as internal loans
+     (deadline, repayments, overdue) under the group's loan rules; the Cash Book counts them as money out */
+  (st.members||[]).forEach(m=>{const b=m.vslaBook;if(!b||b.loan==null||!b.loanDate)return;const v=(st.vslas||[]).find(x=>x.vslaId===m.vslaId),L=((st.rules||{})[m.groupId]||{}).loans||{};
+    st.ledger.push({id:`VL-${m.id}`,type:'loan',chamaId:st.chama.chamaId,groupId:m.groupId,vslaId:m.vslaId||'',memberId:m.id,date:b.loanDate,amount:+b.loan,interestPct:isNum(L.interestRate)?+L.interestRate:null,months:isNum(L.maxMonths)?+L.maxMonths:3,flexible:L.repaymentFrequency===FLEX_FREQ||!isNum(L.maxMonths)?true:undefined,
+      purpose:b.business||'',enterprise:b.business||'',guarantors:[],approval:'Written in the VSLA book',approvedBy:'vsla-book',status:'Recorded',by:'vsla-book',method:'Cash',ref:`VSLA book loan${v?' · '+v.name:''}`,note:'Loan as written in the VSLA book; given at the meeting on this date.',bookRef:'loan:'+m.id,source:'vsla-book',at:b.loanDate+'T12:30'});add(m.groupId)});
   /* paid fines go to the group's savings: the member's VSLA (or the community group if the member has none) */
   let fines=0,fineAmt=0;
   (st.fines||[]).forEach(f=>(f.payments||[]).filter(p=>!p.status||p.status==='Recorded').forEach((p,i)=>{
@@ -5397,11 +5404,22 @@ function syncOlemonchoBook(st){
     st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:OLM_GID,action:'VSLA book loans updated',target:OLM_GID,detail:`${plural(n,'member')}: loan amounts and meeting dates updated from the client's confirmation`,kind:'record',memberId:'',status:'Completed',reason:'',prev:'',next:''})}
   st.olemonchoBookRev=OLM_BOOK_REV;return st;
 }
-{const f=applyOlemonchoRoster;applyOlemonchoRoster=function(st){const r=f(st);r.olemonchoBookRev=OLM_BOOK_REV;return postVslaBooks(r,{audit:true})}}
+/* Olemoncho's loan rules as the client set them: borrow up to your own savings; repay any time, in full within
+   3 months. Interest and the on-time limit bonus are not decided yet, so they stay "pending". */
+const OLM_LOAN_RULES_REV=1;
+function setOlemonchoLoanRules(st){
+  const r=(st.rules||{})[OLM_GID];if(!r)return st;r.loans=r.loans||{};
+  Object.assign(r.loans,{enabled:true,maxMonths:3,repaymentFrequency:FLEX_FREQ,limitMultiple:1});
+  const mx=(st.audit||[]).reduce((a,x)=>Math.max(a,+String(x.id).split('-')[1]||0),0);
+  st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:OLM_GID,action:'Loan rules set',target:OLM_GID,detail:'Loan limit = the member\'s own savings (1×); repay any time, in full within 3 months; interest rate and on-time bonus pending',kind:'settings',memberId:'',status:'Completed',reason:'Set from the client\'s instructions',prev:'',next:''});
+  st.olemonchoLoanRulesRev=OLM_LOAN_RULES_REV;return st;
+}
+{const f=applyOlemonchoRoster;applyOlemonchoRoster=function(st){const r=f(st);r.olemonchoBookRev=OLM_BOOK_REV;setOlemonchoLoanRules(r);return postVslaBooks(r,{audit:true})}}
 /* saved data from earlier versions: bring the loans up to date and post everything once */
 {const f=ensureV07Data;ensureV07Data=function(){f.apply(this,arguments);if(!S||!S.chama)return;
   const rev=!!S.olemonchoRoster&&S.olemonchoBookRev!==OLM_BOOK_REV;if(rev)syncOlemonchoBook(S);
-  if(rev||!S.vslaBooksPosted)postVslaBooks(S,{audit:true})}}
+  const lr=!!S.olemonchoRoster&&S.olemonchoLoanRulesRev!==OLM_LOAN_RULES_REV;if(lr)setOlemonchoLoanRules(S);
+  if(rev||lr||!S.vslaBooksPosted)postVslaBooks(S,{audit:true})}}
 /* every save rebuilds them, so new fine payments and VPBN edits are always reflected */
 {const f=saveState;saveState=function(){if(S&&S.chama&&Array.isArray(S.ledger))postVslaBooks(S);return f.apply(this,arguments)}}
 
@@ -5417,7 +5435,7 @@ function syncOlemonchoBook(st){
     <div style="margin-top:14px"><a class="btn btn-secondary btn-sm" href="#/vslas">${icon('book')}Open VSLA groups</a></div>`});
 }}
 {const f=openCorrect;openCorrect=function(id){const e=S.ledger.find(x=>x.id===id);if(isGroupRec(e)){toast(e.fineRef?'This comes from a paid fine: change the fine payment instead.':'This is a VSLA total: change it on the VSLA groups page.','error');return}return f.apply(this,arguments)}}
-{const f=openReverse;openReverse=function(id){const e=S.ledger.find(x=>x.id===id);if(isGroupRec(e)){toast(e.fineRef?'This comes from a paid fine: change the fine payment instead.':'This is a VSLA total: change it on the VSLA groups page.','error');return}return f.apply(this,arguments)}}
+{const f=openReverse;openReverse=function(id){const e=S.ledger.find(x=>x.id===id);if(e&&e.type==='loan'&&e.bookRef){toast('This loan comes from the VSLA book: change it on the VSLA groups page.','error');return}if(isGroupRec(e)){toast(e.fineRef?'This comes from a paid fine: change the fine payment instead.':'This is a VSLA total: change it on the VSLA groups page.','error');return}return f.apply(this,arguments)}}
 {const f=openCashReverse;openCashReverse=function(id){const c=S.cashbook.find(x=>x.id===id);if(c&&c.bookRef){toast('This comes from the VSLA book: change it on the VSLA groups page.','error');return}return f.apply(this,arguments)}}
 
 /* VSLA charts and league tables count the VSLA totals and the fines in each VSLA's savings */
@@ -5427,25 +5445,46 @@ function syncOlemonchoBook(st){
 const bookLoanRows=(gid=UI.group)=>{const V=vslasOf(gid);return V.flatMap(v=>vbMembers(v).filter(m=>m.vslaBook&&(m.vslaBook.loan!=null||m.vslaBook.loanUnclear)).map(m=>({v,m})))
   .sort((a,b)=>{const da=a.m.vslaBook.loanDate||'9',db=b.m.vslaBook.loanDate||'9';return da<db?-1:da>db?1:(V.indexOf(a.v)-V.indexOf(b.v))||(a.m.id<b.m.id?-1:1)})};
 function vbLoansCard(){
-  const own=UI.role==='Member',all=bookLoanRows(),L=own?all.filter(x=>x.m.id===me().id):all;if(!L.length)return '';
+  const own=UI.role==='Member',all=bookLoanRows().filter(x=>!x.m.vslaBook.loanDate),L=own?all.filter(x=>x.m.id===me().id):all;
   const V=vslasOf(UI.group),beyond=own?[]:V.flatMap(v=>(v.book||[]).filter(b=>b.loan!=null).map(b=>({v,b})));
+  const beyondTxt=beyond.length?`Lent beyond savings (part of the members' loans, not extra): ${beyond.map(x=>`${esc(x.v.name)} ${ksh(+x.b.loan)} on ${x.b.date?fmtDate(x.b.date):esc(x.b.dateText||'-')}`).join('; ')}.`:'';
+  if(!L.length)return beyondTxt?notice(beyondTxt,{ic:'book',tone:'teal',title:'From the VSLA books.'}):'';
   const amt={amt:sum(L.filter(x=>x.m.vslaBook.loan!=null),x=>+x.m.vslaBook.loan),n:L.filter(x=>x.m.vslaBook.loan!=null).length,open:L.filter(x=>x.m.vslaBook.loan==null).length};
-  const undated=L.filter(x=>!x.m.vslaBook.loanDate).length;
-  return card({flush:true,title:own?'My loan from the VSLA book':'Members\' loans from the VSLA books',sub:`${plural(L.length,'loan')} as written in the books: the date of the meeting it was given, the member, the amount and what the loan is for.${undated?` ${plural(undated,'loan')} without a readable date show "Date to confirm".`:''} Repayments are not in the books yet.${beyond.length?` Lent beyond savings (part of these loans, not extra): ${beyond.map(x=>`${esc(x.v.name)} ${ksh(+x.b.loan)} on ${x.b.date?fmtDate(x.b.date):esc(x.b.dateText||'-')}`).join('; ')}.`:''}`,
+  return card({flush:true,title:own?'My loan from the VSLA book: date to confirm':'Loans from the VSLA books waiting for a date',sub:`${plural(L.length,'loan')} written in the books without a readable meeting date. Each one is tracked here (deadline, repayments, overdue) once its date is confirmed. ${beyondTxt}`,
     actions:own?'':`<a class="btn btn-ghost btn-sm" href="#/vslas">VSLA groups</a>`,
-    body:table({caption:'Loans from the VSLA books',cols:[
-      {label:'Date',render:x=>vbLoanDate(x.m.vslaBook)},
+    body:table({caption:'Loans from the VSLA books waiting for a date',cols:[
       {label:'Member',render:x=>`<a href="#/members/${x.m.id}" style="text-decoration:none;color:inherit">${who(x.m.id,esc(x.m.id))}</a>`},
       {label:'VSLA',render:x=>esc(x.v.name)},
       {label:'Reason for the loan (business)',render:x=>esc(x.m.vslaBook.business||'Not written')},
-      {label:'Amount',cls:'r',render:x=>x.m.vslaBook.loan!=null?`<span class="num" style="white-space:nowrap"><b>${ksh(+x.m.vslaBook.loan)}</b></span>`:`<span class="pend" title="${esc(x.m.vslaBook.loanUnclear||'')}">Not clear · to confirm</span>`}],rows:L,
-      foot:`<tfoot><tr><td class="cell-main">Total</td><td></td><td></td><td></td><td class="r" data-label="Amount">${vbAmt(amt)}</td></tr></tfoot>`})})+'<div style="height:16px"></div>';
+      {label:'Amount',cls:'r',render:x=>x.m.vslaBook.loan!=null?`<span class="num" style="white-space:nowrap"><b>${ksh(+x.m.vslaBook.loan)}</b></span>`:`<span class="pend" title="${esc(x.m.vslaBook.loanUnclear||'')}">Not clear · to confirm</span>`},
+      {label:'Date',render:()=>'<span class="pend">Date to confirm</span>'}],rows:L,
+      foot:`<tfoot><tr><td class="cell-main">Total</td><td></td><td></td><td class="r" data-label="Amount">${vbAmt(amt)}</td><td></td></tr></tfoot>`})})+'<div style="height:16px"></div>';
 }
 {const f=loansView;loansView=function(){const h=f.apply(this,arguments),c=vbLoansCard();return c?afterHeader(h,c):h}}
+/* the Loans page: the group's loan rules in one line, so members see how the limit and deadline work */
+{const f=repayBenefitsCard;repayBenefitsCard=function(){const L=rules().loans||{};if(L.repaymentFrequency!==FLEX_FREQ)return f.apply(this,arguments);
+  return notice(`A member can borrow up to <b>${isNum(L.limitMultiple)&&+L.limitMultiple===1?'what she has saved':isNum(L.limitMultiple)?L.limitMultiple+'× her savings':'her loan limit'}</b>. Repay any time, in part or in full, but the whole loan${isNum(L.interestRate)?` plus ${L.interestRate}% interest`:' (and interest, rate pending)'} is due within <b>${isNum(L.maxMonths)?L.maxMonths:3} months</b> of the meeting it was given. Repaying on time raises the next loan limit${isNum(L.onTimeBonusPct)?` by ${L.onTimeBonusPct}%`:' (how much is pending)'}. Guarantors must be members of the borrower's own VSLA.`,{ic:'info',tone:'teal',title:'Loan rules.'})+'<div style="height:16px"></div>'}}
 loansViewObj.render=loansView; /* the router holds this reference */
 {const f=loanAppsView;loanAppsView=function(){const h=f.apply(this,arguments),L=bookLoanRows();if(!L.length||UI.role==='Member')return h;
   const a=sum(L.filter(x=>x.m.vslaBook.loan!=null),x=>+x.m.vslaBook.loan);
   return afterHeader(h,notice(`${plural(L.length,'loan')} (${ksh(a)}) are already written in the VSLA books, with their dates and reasons. See them under <a href="#/loans">Loan Repayments</a> or on the <a href="#/vslas">VSLA groups</a> page.`,{ic:'book',tone:'teal',title:'Loans from the VSLA books.'}))}}
+
+/* ---------- guarantors come from the borrower's own VSLA (e.g. an Olosuae member is guaranteed by Olosuae members) ---------- */
+const sameVslaGuarantor=(applicantId,gId)=>{const a=byId(applicantId),g=byId(gId);if(!a||!g)return false;return !a.vslaId||g.vslaId===a.vslaId};
+{const f=laLive;laLive=function(form){
+  const d=formData(form),a=byId(d.memberId);
+  $$('select[name="g1"],select[name="g2"],select[name="g3"]',form).forEach(sel=>{
+    [...sel.options].forEach(o=>{if(!o.value)return;const ok=sameVslaGuarantor(d.memberId,o.value)&&o.value!==d.memberId;o.hidden=!ok;o.disabled=!ok});
+    if(sel.value&&sel.selectedOptions[0]&&sel.selectedOptions[0].disabled)sel.value='';
+    const h=sel.closest('.fld')&&sel.closest('.fld').querySelector('.hint');if(h&&a&&a.vslaId)h.textContent=`Only members of ${vslaName(a.vslaId)} can guarantee this loan.`;
+  });
+  return f.apply(this,arguments);
+}}
+{const f=FORMS['loan-app'];FORMS['loan-app']=(form,d)=>{
+  const a=byId(d.memberId),bad=[1,2,3].filter(i=>d['g'+i]&&!sameVslaGuarantor(d.memberId,d['g'+i]));
+  if(a&&bad.length){applyErrors(form,{['g'+bad[0]]:`A guarantor must be a member of ${vslaName(a.vslaId)}, the applicant's own VSLA.`});return}
+  return f(form,d);
+}}
 
 /* say plainly on each page where the figures come from */
 const afterHeader=(h,extra)=>{const m=h.match(/^\s*<div class="ph">[\s\S]*?<\/div><\/div>/);return m?m[0]+extra+h.slice(m[0].length):extra+h};
@@ -5463,7 +5502,7 @@ savingsViewObj.render=savingsView;contributionsViewObj.render=contributionsView;
   return afterHeader(h,notice(`Money in and out written in the VSLA books is included: savings, Social Fund and School Feeding as money in, members' loans as money out on the date of the meeting they were given, and cash in / cash out as written.${u.n?` ${plural(u.n,'loan')} without a readable date (${vbAmt(u)}) ${u.n===1?'is':'are'} not in the cash book yet.`:''} Paid fines are money in and go to the group's savings.`,{ic:'book',tone:'teal',title:'From the VSLA books.'}))}}
 {const f=dashKPIs;dashKPIs=function(){let h=f.apply(this,arguments);const L=bookLoanRows();if(!L.length)return h;
   const a=sum(L.filter(x=>x.m.vslaBook.loan!=null),x=>+x.m.vslaBook.loan),u=undatedLoans();
-  h=h.replace(/(Loans outstanding<\/div><div class="val">[^<]*<\/div><div class="sub">)/,`$1${ksh(a)} lent to members in the VSLA books (repayments not in the books yet) · `);
+  if(u.n)h=h.replace(/(Loans outstanding<\/div><div class="val">[^<]*<\/div><div class="sub">)/,`$1${plural(u.n,'VSLA book loan')} not tracked yet (date to confirm) · `);
   if(u.n)h=h.replace(/(Cash balance \(cash book\)<\/div><div class="val">[^<]*<\/div><div class="sub">)/,`$1${plural(u.n,'loan')} without a date not included yet · `);
   return h}}
 

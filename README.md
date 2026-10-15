@@ -16,6 +16,18 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.8
+- **Paid fines go to the group's savings.** Every fine payment is counted in the savings of the member's VSLA (or
+  community group), not in the member's own savings, and it is counted once in the Cash Book.
+- **Members' loans from the VSLA books are recorded** with the date of the meeting they were given (the date written in
+  the book margin), the member, the amount and the reason (the member's business). They show on Loan Repayments,
+  the VSLA groups page and each member's profile, and go into the Cash Book as money out on that date. Loans whose
+  margin date cannot be read show "Date to confirm" and stay out of the Cash Book until dated.
+- The three unclear loans are confirmed: Josphine Sairowua 22,300 (shop), Jenifer Nkoitoi 8,000 (kinyozi),
+  Nalotuesha Nkoitoi 3,700 (beadwork). The "Loan =" figures (Olosuae 2,000; Olemoncho A 12,030) are the part of the
+  members' loans lent beyond the savings, shown with the loans and not counted twice.
+- Saved data is updated automatically (members VPBN has edited are left as they are), with an audit entry.
+
 ## New in v0.9.7
 - **The VSLA book totals now show on every money page.** Each dated meeting total from the VSLA books is posted as a
   **VSLA total** (members not itemised): savings on the Savings page and dashboard, Social Fund and School Feeding

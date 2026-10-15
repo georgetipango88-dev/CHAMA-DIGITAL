@@ -8,13 +8,37 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 
 | File | What it is |
 |---|---|
-| `index.html` | Current live build (v0.9, updated through v0.9.2) |
+| `index.html` | Current live build (v0.9, updated through v0.9.6) |
 | `chama-digital-v0.9-mara.html` | The same build under its version name |
 | `chama-digital-v0.8-mara.html` | Previous build (v0.8) |
 | `chama-digital-v0.7-mara.html` | Previous build (v0.7) |
 | `chama-digital-v0.6-fixed.html` | Original prototype (v0.6) |
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
+
+## New in v0.9.6
+- **Only VPBN changes data.** A new **VPBN** role (in the role switcher and on "Choose your community group") is the
+  only one that can add, edit or correct anything: records, members, meetings, loans, rules and the VSLA books.
+  The Chairperson, Treasurer, Secretary, members and the HPF program admin **view only**: their edit buttons are
+  hidden, every page shows "View only", and any attempt to change data is refused.
+- **Olemoncho Community Group now holds its real VSLAs** from the handwritten VSLA books: **102 members in five
+  VSLAs** (Olchoro 21, Olosuae 20, Olemoncho B 21, Osero 20, Olemoncho A 20), replacing Olemoncho's fictional sample
+  members. Each member's business (the purpose of the loan) and loan taken are recorded as written, and each VSLA's meeting totals
+  (savings, Social Fund, School Feeding, loans given out) are shown with their dates, per meeting and in total.
+  Names, totals, dates and phone numbers that were unclear on the first photos were corrected from the client's
+  clarification sheet. The dates written in the book margins are not used as loan dates until it is confirmed
+  whether they are loan dates or the dates members registered.
+- **VSLA groups page** (new, under Members & communication): all VSLAs of the selected community group compared,
+  every meeting total listed by date, every member's loan with what it is for, then one tab per VSLA with its meeting totals, members, officials, businesses, loans and each member's own savings
+  once recorded. Members see only their own VSLA's totals and their own details. The dashboard shows the books'
+  totals per VSLA, and each member's profile shows their business and loan.
+- Nothing unreadable is guessed: amounts and phone digits that are not clear on the photos are **left out of every
+  total** and listed under "To confirm against the paper books" for VPBN to correct (each correction is audited).
+- **Privacy** as for Nterere: phone numbers are masked on the public site (`07xx xxx 702`). Full numbers are kept in
+  `private/` (ignored by Git and Vercel) and loaded with Members → Import from Excel, matched by member number
+  (OLM-001 to OLM-102). Two members may share one phone when each row gives its member number.
+  Phone numbers for Olchoro, Olosuae and Osero are still to come.
+- No individual savings are invented: the books give savings per meeting for the whole VSLA, not per member.
 
 ## New in v0.9.5
 - **Every community group has its own officials.** The role switcher now lists the Chairperson, Treasurer, Secretary

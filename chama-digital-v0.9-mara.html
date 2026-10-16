@@ -516,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.9 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.10 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -1073,7 +1073,7 @@ function syncGroup(){const a=allowedGroups().map(g=>g.groupId);if(!a.includes(UI
 const curGroup=()=>S.groups.find(g=>g.groupId===UI.group)||S.groups[0];
 const groupName=id=>(S.groups.find(g=>g.groupId===id)||{}).groupName||'-';
 const rules=(gid=UI.group)=>S.rules[gid]||defaultRules(gid);
-const inGroup=x=>x.groupId===UI.group&&(!x.chamaId||x.chamaId===S.chama.chamaId);
+const inGroup=x=>x.groupId===UI.group&&(!x.chamaId||x.chamaId===S.chama.chamaId)&&inSubgroup(x);
 /* Per-render memo and indexes. Cleared on every save (DATA_REV), on any change in collection sizes,
    and whenever S itself is replaced (reset, import, database reload). */
 let DATA_REV=0;
@@ -1087,8 +1087,8 @@ function memo(key,fn){memoFresh();if(MEMO.c.has(key))return MEMO.c.get(key);cons
 function bumpData(){DATA_REV++}
 function ledgerOf(mid){memoFresh();if(!MEMO.byMember){MEMO.byMember=new Map();for(const e of S.ledger){let a=MEMO.byMember.get(e.memberId);if(!a)MEMO.byMember.set(e.memberId,a=[]);a.push(e)}}return MEMO.byMember.get(mid)||[]}
 function repaysOf(lid){memoFresh();if(!MEMO.byLoan){MEMO.byLoan=new Map();for(const e of S.ledger)if(e.type==='repayment'){let a=MEMO.byLoan.get(e.loanId);if(!a)MEMO.byLoan.set(e.loanId,a=[]);a.push(e)}}return MEMO.byLoan.get(lid)||[]}
-const GM=()=>memo('GM|'+UI.group,()=>S.members.filter(inGroup));
-const GL=()=>memo('GL|'+UI.group,()=>S.ledger.filter(inGroup));
+const GM=()=>memo('GM|'+UI.group+'|'+(UI.vsla||''),()=>S.members.filter(inGroup));
+const GL=()=>memo('GL|'+UI.group+'|'+(UI.vsla||''),()=>S.ledger.filter(inGroup));
 const GMT=()=>S.meetings.filter(inGroup);
 const GF=()=>S.fines.filter(inGroup);
 const GW=()=>S.welfare.filter(inGroup);
@@ -2126,14 +2126,14 @@ function fineTotals(list){
 }
 function welfareSummary(gid=UI.group){
   const r=rules(gid),cats=r.contributionCategories.filter(c=>c.fund===WELFARE_FUND).map(c=>c.id);
-  const contribs=S.ledger.filter(e=>e.groupId===gid&&e.type==='contribution'&&valid(e)&&cats.includes(e.category));
-  const payouts=S.welfare.filter(w=>w.groupId===gid&&w.status==='Paid');
+  const contribs=S.ledger.filter(e=>e.groupId===gid&&e.type==='contribution'&&valid(e)&&cats.includes(e.category)&&subOk(e,gid));
+  const payouts=S.welfare.filter(w=>w.groupId===gid&&w.status==='Paid'&&subOk(w,gid));
   const opening=isNum(r.welfare.openingBalance)?+r.welfare.openingBalance:0;
   const cin=sum(contribs),out=sum(payouts);
   return{opening,openingPending:!isNum(r.welfare.openingBalance),contributions:cin,payouts:out,balance:opening+cin-out,contribs,payoutList:payouts};
 }
 function cashEntries(gid=UI.group){
-  const rows=[],L=S.ledger.filter(e=>e.groupId===gid&&valid(e));
+  const rows=[],L=S.ledger.filter(e=>e.groupId===gid&&valid(e)&&subOk(e,gid));
   L.forEach(e=>{
     const base={date:e.date,at:e.at||e.date,ref:e.ref||e.id,src:e.id,by:e.by,memberId:e.memberId,groupId:gid,manual:false};
     if(e.type==='contribution'){const c=catObj(e.category,gid);rows.push({...base,desc:`${catName(e.category,gid)} contribution · ${mName(e.memberId)}`,in:e.amount,out:0,cat:'Contribution',fund:(c&&c.fund)||'General'})}
@@ -2141,10 +2141,10 @@ function cashEntries(gid=UI.group){
     else if(e.type==='repayment')rows.push({...base,desc:`Loan repayment ${e.loanId} · ${mName(e.memberId)}`,in:e.amount,out:0,cat:'Loan repayment',fund:'Loans'});
     else if(e.type==='loan')rows.push({...base,desc:`Loan disbursement ${e.id} · ${mName(e.memberId)}`,in:0,out:e.amount,cat:'Loan disbursement',fund:'Loans'});
   });
-  S.fines.filter(f=>f.groupId===gid).forEach(f=>(f.payments||[]).filter(p=>!p.status||p.status==='Recorded').forEach(p=>rows.push({date:p.date,at:p.at||p.date,ref:p.ref||p.id,src:f.id,by:p.by,memberId:f.memberId,groupId:gid,desc:`${f.type} fine payment · ${mName(f.memberId)} → group savings`,in:p.amount,out:0,cat:'Fine payment',fund:'Group savings (fines)',manual:false})));
-  S.welfare.filter(w=>w.groupId===gid&&w.status==='Paid').forEach(w=>rows.push({date:w.date,at:w.createdAt||w.date,ref:w.ref||w.id,src:w.id,by:w.recordedBy,memberId:w.memberId,groupId:gid,desc:`Welfare payout (${w.category}) · ${mName(w.memberId)}`,in:0,out:w.amount,cat:'Welfare payout',fund:WELFARE_FUND,manual:false}));
-  (S.sfpSpend||[]).filter(x=>x.groupId===gid&&x.status==='Recorded').forEach(x=>rows.push({date:x.date,at:x.at||x.date,ref:x.ref,src:x.id,by:x.by,memberId:'',groupId:gid,desc:`School feeding: ${x.description} (${x.school})`,in:0,out:x.amount,cat:'Programme spending',fund:SFP_FUND,manual:false}));
-  S.cashbook.filter(c=>c.groupId===gid&&c.status==='Recorded').forEach(c=>rows.push({date:c.date,at:c.at||c.date,ref:c.ref,src:c.id,by:c.by,memberId:'',groupId:gid,desc:c.description,in:c.direction==='in'?c.amount:0,out:c.direction==='out'?c.amount:0,cat:c.category,fund:c.category===LOAN_ROUND_CAT||c.bookFund==='Loans'?'Loans':'General',manual:!c.bookRef}));
+  S.fines.filter(f=>f.groupId===gid&&subOk(f,gid)).forEach(f=>(f.payments||[]).filter(p=>!p.status||p.status==='Recorded').forEach(p=>rows.push({date:p.date,at:p.at||p.date,ref:p.ref||p.id,src:f.id,by:p.by,memberId:f.memberId,groupId:gid,desc:`${f.type} fine payment · ${mName(f.memberId)} → group savings`,in:p.amount,out:0,cat:'Fine payment',fund:'Group savings (fines)',manual:false})));
+  S.welfare.filter(w=>w.groupId===gid&&w.status==='Paid'&&subOk(w,gid)).forEach(w=>rows.push({date:w.date,at:w.createdAt||w.date,ref:w.ref||w.id,src:w.id,by:w.recordedBy,memberId:w.memberId,groupId:gid,desc:`Welfare payout (${w.category}) · ${mName(w.memberId)}`,in:0,out:w.amount,cat:'Welfare payout',fund:WELFARE_FUND,manual:false}));
+  (S.sfpSpend||[]).filter(x=>x.groupId===gid&&x.status==='Recorded'&&subOk(x,gid)).forEach(x=>rows.push({date:x.date,at:x.at||x.date,ref:x.ref,src:x.id,by:x.by,memberId:'',groupId:gid,desc:`School feeding: ${x.description} (${x.school})`,in:0,out:x.amount,cat:'Programme spending',fund:SFP_FUND,manual:false}));
+  S.cashbook.filter(c=>c.groupId===gid&&c.status==='Recorded'&&subOk(c,gid)).forEach(c=>rows.push({date:c.date,at:c.at||c.date,ref:c.ref,src:c.id,by:c.by,memberId:'',groupId:gid,desc:c.description,in:c.direction==='in'?c.amount:0,out:c.direction==='out'?c.amount:0,cat:c.category,fund:c.category===LOAN_ROUND_CAT||c.bookFund==='Loans'?'Loans':c.bookFund==='Bank'?'Bank':'General',manual:!c.bookRef}));
   rows.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.at<b.at?-1:a.at>b.at?1:0);
   const r=rules(gid),opening=isNum(r.cashbook.openingBalance)?+r.cashbook.openingBalance:0;
   let bal=opening;rows.forEach(x=>{bal+=x.in-x.out;x.balance=bal});
@@ -3547,8 +3547,8 @@ function monthEndBalance(rows,opening,keys){return keys.map(k=>{const last=[...r
 function sfpCats(gid=UI.group){return catsOf(gid).filter(c=>c.fund===SFP_FUND).map(c=>c.id)}
 function sfpSummary(gid=UI.group){
   const cats=sfpCats(gid),r=rules(gid).schoolFeeding||{};
-  const contribs=S.ledger.filter(e=>e.groupId===gid&&e.type==='contribution'&&valid(e)&&cats.includes(e.category));
-  const spend=(S.sfpSpend||[]).filter(x=>x.groupId===gid&&x.status==='Recorded');
+  const contribs=S.ledger.filter(e=>e.groupId===gid&&e.type==='contribution'&&valid(e)&&cats.includes(e.category)&&subOk(e,gid));
+  const spend=(S.sfpSpend||[]).filter(x=>x.groupId===gid&&x.status==='Recorded'&&subOk(x,gid));
   const cin=sum(contribs),out=sum(spend);
   const k=curKey(),y=k.slice(0,4),q=Math.floor((+k.slice(5)-1)/3);
   const inPeriod=e=>r.targetPeriod==='Year'?e.date.slice(0,4)===y:r.targetPeriod==='Quarter'?e.date.slice(0,4)===y&&Math.floor((+e.date.slice(5,7)-1)/3)===q:monthKey(e.date)===k;
@@ -5182,7 +5182,7 @@ const vpbnUser=()=>({id:VPBN_ID,name:'VPBN',role:VPBN,groupAccess:[UI.group],gro
 const OLM_VSLAS=[
  {key:'O1',name:'Olchoro VSLA',started:'2026-07-20',startedText:'20th July 2026 (written "VSLA taken on 20/07/2026")',book:[
    {l:'Start of the VSLA (initial)',d:'2026-07-20',dt:'20/07/2026',cin:95400,cout:95400,n:'Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". No separate savings, Social Fund or School Feeding figures are written for Olchoro.'}]},
- {key:'O2',name:'Olosuae VSLA',started:'2026-09-01',startedText:'1st September 2026',book:[
+ {key:'O2',name:'Oloisuai VSLA',started:'2026-09-01',startedText:'1st September 2026',book:[
    {l:'1st meeting (initial savings)',d:'2026-09-01',dt:'1st Sep 2026',sav:52200,sfp:1600,sf:3200},
    {l:'2nd meeting',d:'2026-09-30',dt:'30th Sep 2026',sav:19000,sf:3400,sfp:2300,loan:2000}]},
  {key:'O3',name:'Olemoncho B VSLA',started:'2026-09-02',startedText:'2nd September 2026 (first meeting)',book:[
@@ -5198,10 +5198,10 @@ const OLM_VSLAS=[
 /* members: [name, VSLA, phone shown as prefix-last 3 digits ('' = not given yet), role, business, loan taken, loan date (YYYY-MM-DD: the date of the meeting written in the book margin; '' = not readable), check note, why the loan amount is not recorded, phone note].
    Full phone numbers are NOT kept here (the site is public): VPBN imports them privately (Members → Import from Excel, matched by member number). */
 const OLM_ROSTER=[
- ['Edna Kimurmur','O1','','','Sheep',10000],
- ['Noomelin Nkoitoi','O1','','','Potatoes & sugar',15000],
+ ['Edna Kimurmur','O1','','Secretary','Sheep',10000],
+ ['Noomelin Nkoitoi','O1','','Treasurer','Potatoes & sugar',15000],
  ['Purity Nkoitoi','O1','','','Poultry',15000],
- ['Nalotuesha Nkoitoi','O1','','','Beads & beadwork',3700],
+ ['Nalotuesha Nkoitoi','O1','','Chairperson','Beads & beadwork',3700],
  ['Doreen Nkoitoi','O1','','','Sheep',20000],
  ['Mum Sampeyian','O1'],
  ['Kisunyunye Nkoitoi','O1','','','Ushanga (beads)',10000,'','Business word hard to read (Ushanga?).'],
@@ -5219,9 +5219,9 @@ const OLM_ROSTER=[
  ['Kiramaticho Nkoitoi','O1'],
  ['Kashumpa Nkoitoi','O1'],
  ['Naanyu Nkoitoi','O1','','','',null,'','First name hard to read.'],
- ['Naitayuang Liaram','O2'],
- ['Noomali Maleto','O2','','','Mtumba (second-hand clothes)',15000,'2026-09-01'],
- ['Naisae Lekakeng','O2','','','Buying lambs',18000,'2026-09-01'],
+ ['Naitayuang Liaram','O2','','Chairperson'],
+ ['Noomali Maleto','O2','','Treasurer','Mtumba (second-hand clothes)',15000,'2026-09-01'],
+ ['Naisae Lekakeng','O2','','Secretary','Buying lambs',18000,'2026-09-01'],
  ['Naibartuni Sairowua','O2'],
  ['Ndari Dorop','O2','','','Petrol',3000],
  ['Konga Maleto','O2','','','',null,'','Written over a crossed-out name ("Napolos Nkoitoi") and marked *.'],
@@ -5260,16 +5260,16 @@ const OLM_ROSTER=[
  ['Tori Nkoitoi','O3','07-289','','Petrol',5000,'2026-09-02','A word in brackets after the name is not clear.'],
  ['Nawuai Pesi','O3','07-079'],
  ['Noorkisaruni Naimodu','O3','','','',null,'','Phone number still to be sent (the number on the list is Noorkisaruni Nkoitoi\'s).'],
- ['Madline Yiale','O4','','','Mtumba (second-hand clothes)',20000,'2026-09-02'],
+ ['Macline Yiale','O4','','Secretary','Mtumba (second-hand clothes)',20000,'2026-09-02'],
  ['Ann Sairowua','O4'],
- ['Nolarami Sairowua','O4'],
+ ['Nolarami Sairowua','O4','','Treasurer'],
  ['Leah Sairowua','O4','','','Mtumba (second-hand clothes)',7400,'2026-10-02'],
  ['Lilian Mereru','O4'],
  ['Arami Sairowua','O4','','','Shuka shop',15000,'2026-09-02'],
  ['Noolaitete Tinka','O4','','','Beads',20000,'2026-09-02'],
  ['Ntiwal Mereru','O4','','','Rams',12900,'2026-09-02'],
  ['Norkitoip Sairowua','O4'],
- ['Nashiru Karia','O4','','','Shuka',4000,'2026-10-02'],
+ ['Nashiru Karia','O4','','Chairperson','Shuka',4000,'2026-10-02'],
  ['Ntiwal Naimodu','O4'],
  ['Lilian Pesi','O4'],
  ['Noomereyieki Mpoe','O4'],
@@ -5302,7 +5302,7 @@ const OLM_ROSTER=[
  ['Everline Lentir','O5','07-567','','Selling honey',10430],
 ];
 const OLM_GID='GRP-01',OLM_LISTED='2026-10-15';
-const BOOK_FIELDS=[['savings','Savings'],['socialFund','Social Fund'],['schoolFeeding','School Feeding'],['loan','Lent beyond savings'],['cashIn','Cash in'],['cashOut','Cash out']];
+const BOOK_FIELDS=[['savings','Savings'],['socialFund','Social Fund'],['schoolFeeding','School Feeding'],['loan','Loan repaid at the meeting'],['cashIn','Cash in (to the bank)'],['cashOut','Cash out (from the bank)']];
 const BOOK_SHORT={sav:'savings',sf:'socialFund',sfp:'schoolFeeding',loan:'loan',cin:'cashIn',cout:'cashOut'};
 
 function applyOlemonchoRoster(st){
@@ -5360,9 +5360,10 @@ function applyOlemonchoRoster(st){
    • each member's loan in the book that has a meeting date → money out in the cash book on that date.
    • each fine payment → the group's savings (the member's VSLA), never the member's own savings. */
 const BOOK_POST={savings:{type:'saving',suf:'SV'},socialFund:{type:'contribution',cat:'CAT-SOCIAL',suf:'SF'},schoolFeeding:{type:'contribution',cat:'CAT-SFP',suf:'SFP'}};
-const BOOK_CASH={cashIn:{dir:'in',suf:'IN',cat:'Cash in (VSLA book)',desc:'cash in'},cashOut:{dir:'out',suf:'OUT',cat:'Cash out (VSLA book)',desc:'cash out'}};
+const BOOK_CASH={loan:{dir:'in',suf:'RP',cat:'Loan repayments (VSLA total)',desc:'loan repayments received at the meeting (members not named)',fund:'Loans'},cashIn:{dir:'in',suf:'IN',cat:'Bank: cash in (VSLA book)',desc:'cash in, deposited in the bank (not savings)',fund:'Bank'},cashOut:{dir:'out',suf:'OUT',cat:'Bank: cash out (VSLA book)',desc:'cash out, withdrawn from the bank (not savings)',fund:'Bank'}};
 const isGroupRec=e=>!!(e&&e.type!=='loan'&&(e.bookRef||e.fineRef)); /* a VSLA book loan belongs to its member */
-const OLM_BOOK_REV=2;
+const OLM_BOOK_REV=3;
+const OLM_RENAMES={'OLM-063':['Madline Yiale','Macline Yiale']},OLM_VSLA_RENAMES={'Olosuae VSLA':'Oloisuai VSLA'};
 function postVslaBooks(st,{audit=false}={}){
   st.ledger=(st.ledger||[]).filter(e=>!e.bookRef&&!e.fineRef);st.cashbook=(st.cashbook||[]).filter(c=>!c.bookRef);
   const done={},add=gid=>{done[gid]=(done[gid]||0)+1};
@@ -5373,7 +5374,7 @@ function postVslaBooks(st,{audit=false}={}){
     Object.entries(BOOK_POST).forEach(([k,p])=>{if(b[k]==null)return;if(p.cat&&!cats.some(c=>c.id===p.cat))return;
       st.ledger.push({...base,id:`${b.id}-${p.suf}`,type:p.type,amount:+b[k],...(p.type==='contribution'?{category:p.cat,period:monthKey(b.date),expected:null}:{})});add(v.groupId)});
     Object.entries(BOOK_CASH).forEach(([k,p])=>{if(b[k]==null)return;
-      st.cashbook.push({id:`${b.id}-${p.suf}`,chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,direction:p.dir,date:b.date,ref,description:`${v.name}: ${p.desc}`,category:p.cat,amount:+b[k],approvedBy:'',reason:'From the VSLA book',status:'Recorded',by:'vsla-book',bookRef:b.id,source:'vsla-book',at});add(v.groupId)});
+      st.cashbook.push({id:`${b.id}-${p.suf}`,chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,direction:p.dir,date:b.date,ref,description:`${v.name}: ${p.desc}`,category:p.cat,bookFund:p.fund||'',amount:+b[k],approvedBy:'',reason:'From the VSLA book',status:'Recorded',by:'vsla-book',bookRef:b.id,source:'vsla-book',at});add(v.groupId)});
   }));
   /* members' loans from the VSLA books, given at the meeting written in the margin: tracked as internal loans
      (deadline, repayments, overdue) under the group's loan rules; the Cash Book counts them as money out */
@@ -5394,6 +5395,10 @@ function postVslaBooks(st,{audit=false}={}){
 /* refresh untouched Olemoncho members' loan details (amounts and meeting dates) from the client's confirmation */
 function syncOlemonchoBook(st){
   const g=(st.groups||[]).find(x=>x.groupId===OLM_GID);if(!g)return st;let n=0;
+  (st.vslas||[]).forEach(v=>{if(v.groupId===OLM_GID&&OLM_VSLA_RENAMES[v.name]){v.name=OLM_VSLA_RENAMES[v.name];n++}});
+  Object.entries(OLM_RENAMES).forEach(([id,[from,to]])=>{const m=st.members.find(x=>x.id===id);if(m&&m.name===from){m.name=to;n++}});
+  OLM_ROSTER.forEach(([name,key,ph='',role=''],i)=>{const m=st.members.find(x=>x.id===`${g.code||'OLM'}-${String(i+1).padStart(3,'0')}`);
+    if(m&&m.name===name&&role&&m.role==='Member'){m.role=role;m.groupAccess=[m.groupId];n++}});
   OLM_ROSTER.forEach(([name,key,ph='',role='',business='',loan=null,loanDate='',note='',loanUnclear=''],i)=>{
     const id=`${g.code||'OLM'}-${String(i+1).padStart(3,'0')}`,m=st.members.find(x=>x.id===id);
     if(!m||m.source!=='VSLA book'||m.name!==name||m.updatedAt!==OLM_LISTED+'T10:00')return; /* changed by VPBN, or not the same person: leave it */
@@ -5401,17 +5406,17 @@ function syncOlemonchoBook(st){
     m.vslaBook={business,loan,loanDate,loanUnclear};m.note=note;n++;
   });
   if(n){const mx=(st.audit||[]).reduce((a,x)=>Math.max(a,+String(x.id).split('-')[1]||0),0);
-    st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:OLM_GID,action:'VSLA book loans updated',target:OLM_GID,detail:`${plural(n,'member')}: loan amounts and meeting dates updated from the client's confirmation`,kind:'record',memberId:'',status:'Completed',reason:'',prev:'',next:''})}
+    st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:OLM_GID,action:'VSLA books updated',target:OLM_GID,detail:`${plural(n,'change')} from the client's confirmation: officials, names, loan amounts and meeting dates`,kind:'record',memberId:'',status:'Completed',reason:'',prev:'',next:''})}
   st.olemonchoBookRev=OLM_BOOK_REV;return st;
 }
 /* Olemoncho's loan rules as the client set them: borrow up to your own savings; repay any time, in full within
    3 months. Interest and the on-time limit bonus are not decided yet, so they stay "pending". */
-const OLM_LOAN_RULES_REV=1;
+const OLM_LOAN_RULES_REV=2;
 function setOlemonchoLoanRules(st){
   const r=(st.rules||{})[OLM_GID];if(!r)return st;r.loans=r.loans||{};
-  Object.assign(r.loans,{enabled:true,maxMonths:3,repaymentFrequency:FLEX_FREQ,limitMultiple:1});
+  Object.assign(r.loans,{enabled:true,maxMonths:3,repaymentFrequency:FLEX_FREQ,limitMultiple:1,interestRate:10,interestMethod:'Flat'});
   const mx=(st.audit||[]).reduce((a,x)=>Math.max(a,+String(x.id).split('-')[1]||0),0);
-  st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:OLM_GID,action:'Loan rules set',target:OLM_GID,detail:'Loan limit = the member\'s own savings (1×); repay any time, in full within 3 months; interest rate and on-time bonus pending',kind:'settings',memberId:'',status:'Completed',reason:'Set from the client\'s instructions',prev:'',next:''});
+  st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:OLM_GID,action:'Loan rules set',target:OLM_GID,detail:'Loan limit = the member\'s own savings (1×); 10% interest on the amount taken; repay any time, in full by exactly 3 months after the meeting; on-time bonus pending',kind:'settings',memberId:'',status:'Completed',reason:'Set from the client\'s instructions',prev:'',next:''});
   st.olemonchoLoanRulesRev=OLM_LOAN_RULES_REV;return st;
 }
 {const f=applyOlemonchoRoster;applyOlemonchoRoster=function(st){const r=f(st);r.olemonchoBookRev=OLM_BOOK_REV;setOlemonchoLoanRules(r);return postVslaBooks(r,{audit:true})}}
@@ -5442,12 +5447,12 @@ function setOlemonchoLoanRules(st){
 {const f=vslaStats;vslaStats=function(v){const r=f.apply(this,arguments),B=S.ledger.filter(e=>isGroupRec(e)&&e.vslaId===v.vslaId&&valid(e));r.savings+=sum(B.filter(e=>e.type==='saving'));r.contributions+=sum(B.filter(e=>e.type==='contribution'));return r}}
 
 /* ---------- members' loans from the VSLA books: date, member, amount and what the loan is for ---------- */
-const bookLoanRows=(gid=UI.group)=>{const V=vslasOf(gid);return V.flatMap(v=>vbMembers(v).filter(m=>m.vslaBook&&(m.vslaBook.loan!=null||m.vslaBook.loanUnclear)).map(m=>({v,m})))
+const bookLoanRows=(gid=UI.group)=>{const V=vslasOf(gid).filter(v=>subOk(v,gid));return V.flatMap(v=>vbMembers(v).filter(m=>m.vslaBook&&(m.vslaBook.loan!=null||m.vslaBook.loanUnclear)).map(m=>({v,m})))
   .sort((a,b)=>{const da=a.m.vslaBook.loanDate||'9',db=b.m.vslaBook.loanDate||'9';return da<db?-1:da>db?1:(V.indexOf(a.v)-V.indexOf(b.v))||(a.m.id<b.m.id?-1:1)})};
 function vbLoansCard(){
   const own=UI.role==='Member',all=bookLoanRows().filter(x=>!x.m.vslaBook.loanDate),L=own?all.filter(x=>x.m.id===me().id):all;
-  const V=vslasOf(UI.group),beyond=own?[]:V.flatMap(v=>(v.book||[]).filter(b=>b.loan!=null).map(b=>({v,b})));
-  const beyondTxt=beyond.length?`Lent beyond savings (part of the members' loans, not extra): ${beyond.map(x=>`${esc(x.v.name)} ${ksh(+x.b.loan)} on ${x.b.date?fmtDate(x.b.date):esc(x.b.dateText||'-')}`).join('; ')}.`:'';
+  const V=vslasOf(UI.group).filter(v=>subOk(v,UI.group)),beyond=own?[]:V.flatMap(v=>(v.book||[]).filter(b=>b.loan!=null).map(b=>({v,b})));
+  const beyondTxt=beyond.length?`Loan repayments received at meetings (VSLA totals, members not named): ${beyond.map(x=>`${esc(x.v.name)} ${ksh(+x.b.loan)} on ${x.b.date?fmtDate(x.b.date):esc(x.b.dateText||'-')}`).join('; ')}.`:'';
   if(!L.length)return beyondTxt?notice(beyondTxt,{ic:'book',tone:'teal',title:'From the VSLA books.'}):'';
   const amt={amt:sum(L.filter(x=>x.m.vslaBook.loan!=null),x=>+x.m.vslaBook.loan),n:L.filter(x=>x.m.vslaBook.loan!=null).length,open:L.filter(x=>x.m.vslaBook.loan==null).length};
   return card({flush:true,title:own?'My loan from the VSLA book: date to confirm':'Loans from the VSLA books waiting for a date',sub:`${plural(L.length,'loan')} written in the books without a readable meeting date. Each one is tracked here (deadline, repayments, overdue) once its date is confirmed. ${beyondTxt}`,
@@ -5486,10 +5491,40 @@ const sameVslaGuarantor=(applicantId,gId)=>{const a=byId(applicantId),g=byId(gId
   return f(form,d);
 }}
 
+/* ---------- subgroups (VSLAs): pick one and every page shows only that VSLA's records ----------
+   Records are linked to a VSLA directly (vslaId) or through their member; records with no VSLA link
+   (for example a community-group meeting) are shared and show under every VSLA. */
+const VSLA_KEY='chama.subgroup';
+function curVsla(){if(!UI.vsla||!S)return null;const v=vslaById(UI.vsla);return v&&v.groupId===UI.group?v:null}
+function recVsla(x){if(!x)return '';if(x.vslaId)return x.vslaId;const mid=x.memberId;if(mid&&!String(mid).includes(':')){const m=byId(mid);return m&&m.vslaId||''}return ''}
+function inSubgroup(x){const v=curVsla();if(!v)return true;const vid=x&&x.vslaId!==undefined&&x.groupId!==undefined&&x.name!==undefined&&x.book!==undefined?x.vslaId:recVsla(x);return !vid||vid===v.vslaId}
+function subOk(x,gid){return gid!==UI.group||inSubgroup(x)}
+function subKey(g){return g===UI.group&&curVsla()?UI.vsla:''}
+function saveVslaPref(){try{localStorage.setItem(VSLA_KEY,UI.vsla||'')}catch(e){}}
+try{UI.vsla=localStorage.getItem(VSLA_KEY)||''}catch(e){UI.vsla=''}
+function setSubgroup(id){UI.vsla=id&&id!=='all'?id:'';saveVslaPref();UI.f={};UI.report=null;renderNav();route();window.scrollTo(0,0)}
+/* the all-groups view and anything that switches group for a moment ignore the subgroup */
+{const f=withGroup;withGroup=function(gid,fn){const v=UI.vsla;UI.vsla='';try{return f(gid,fn)}finally{UI.vsla=v}}}
+/* the role switcher acts as the officials of the selected VSLA */
+{const f=roleHolder;roleHolder=function(role,gid){const v=curVsla();if(v&&S&&gid===UI.group&&role!=='Platform Owner/Admin'){return S.members.find(m=>m.vslaId===v.vslaId&&m.status==='Active'&&m.role===role)||null}return f.apply(this,arguments)}}
+/* sidebar: Subgroup (VSLA) under Community group */
+{const f=renderNav;renderNav=function(){
+  f.apply(this,arguments);if(!S)return;
+  const gp=document.querySelector('.chama-chip .group-pick');if(!gp)return;
+  let box=document.getElementById('vsla-pick');
+  if(!box){box=document.createElement('div');box.id='vsla-pick';box.className='group-pick';box.style.marginTop='8px';box.innerHTML='<label for="vsla-select">Subgroup (VSLA)</label><select id="vsla-select" aria-label="Select subgroup"></select>';gp.after(box)}
+  const V=vslasOf(UI.group);box.hidden=!V.length;
+  if(UI.vsla&&!curVsla())UI.vsla='';
+  document.getElementById('vsla-select').innerHTML=`<option value="">All ${V.length} VSLAs</option>`+V.map(v=>`<option value="${v.vslaId}" ${v.vslaId===UI.vsla?'selected':''}>${esc(v.name.replace(/ VSLA$/,''))}</option>`).join('');
+}}
+document.addEventListener('change',e=>{const t=e.target;if(t.id==='vsla-select'){e.stopImmediatePropagation();setSubgroup(t.value)}else if(t.id==='group-select'){UI.vsla='';saveVslaPref()}},true);
+/* every page says which subgroup it shows, with a way back to the whole community group */
+{const f=pageHeader;pageHeader=function(o){const v=inApp()&&UI.groupPicked&&curVsla();if(v&&o&&o.title!=='Choose your community group')o={...o,actions:(o.actions||'')+`<span class="pill pill-teal">${icon('users')}${esc(v.name)} only</span><button type="button" class="btn btn-ghost btn-sm" data-act="set-vsla" data-v="">Show all ${esc(curGroup().groupName)}</button>`};return f.call(this,o)}}
+
 /* say plainly on each page where the figures come from */
 const afterHeader=(h,extra)=>{const m=h.match(/^\s*<div class="ph">[\s\S]*?<\/div><\/div>/);return m?m[0]+extra+h.slice(m[0].length):extra+h};
-const bookRecs=(t,gid=UI.group)=>S.ledger.filter(e=>e.bookRef&&e.groupId===gid&&valid(e)&&(!t||e.type===t));
-const fineRecs=(gid=UI.group)=>S.ledger.filter(e=>e.fineRef&&e.groupId===gid&&valid(e));
+const bookRecs=(t,gid=UI.group)=>S.ledger.filter(e=>e.bookRef&&e.groupId===gid&&valid(e)&&(!t||e.type===t)&&subOk(e,gid));
+const fineRecs=(gid=UI.group)=>S.ledger.filter(e=>e.fineRef&&e.groupId===gid&&valid(e)&&subOk(e,gid));
 const undatedLoans=(gid=UI.group)=>{const L=bookLoanRows(gid).filter(x=>!x.m.vslaBook.loanDate);return{n:L.length,amt:sum(L.filter(x=>x.m.vslaBook.loan!=null),x=>+x.m.vslaBook.loan),open:L.filter(x=>x.m.vslaBook.loan==null).length}};
 {const f=savingsView;savingsView=function(){const h=f.apply(this,arguments),B=bookRecs('saving'),F=fineRecs();if((!B.length&&!F.length)||UI.role==='Member')return h;
   const parts=[B.length?`<b>${ksh(sum(B))}</b> of VSLA savings totals from the VSLA books (${plural(B.length,'meeting total')}, members not itemised)`:'',F.length?`<b>${ksh(sum(F))}</b> from ${plural(F.length,'paid fine')}: fines go to the group's savings`:''].filter(Boolean);
@@ -5499,7 +5534,7 @@ const undatedLoans=(gid=UI.group)=>{const L=bookLoanRows(gid).filter(x=>!x.m.vsl
 savingsViewObj.render=savingsView;contributionsViewObj.render=contributionsView; /* the router holds these references */
 {const f=cashbookView;cashbookView=function(){const h=f.apply(this,arguments),B=bookRecs(),C=S.cashbook.filter(c=>c.bookRef&&c.groupId===UI.group&&c.status==='Recorded');if(!B.length&&!C.length)return h;
   const u=undatedLoans();
-  return afterHeader(h,notice(`Money in and out written in the VSLA books is included: savings, Social Fund and School Feeding as money in, members' loans as money out on the date of the meeting they were given, and cash in / cash out as written.${u.n?` ${plural(u.n,'loan')} without a readable date (${vbAmt(u)}) ${u.n===1?'is':'are'} not in the cash book yet.`:''} Paid fines are money in and go to the group's savings.`,{ic:'book',tone:'teal',title:'From the VSLA books.'}))}}
+  return afterHeader(h,notice(`Money in and out written in the VSLA books is included: savings, Social Fund, School Feeding and loan repayments received at meetings as money in, members' loans as money out on the date of the meeting they were given, and Olchoro's bank cash in / cash out (not savings).${u.n?` ${plural(u.n,'loan')} without a readable date (${vbAmt(u)}) ${u.n===1?'is':'are'} not in the cash book yet.`:''} Paid fines are money in and go to the group's savings.`,{ic:'book',tone:'teal',title:'From the VSLA books.'}))}}
 {const f=dashKPIs;dashKPIs=function(){let h=f.apply(this,arguments);const L=bookLoanRows();if(!L.length)return h;
   const a=sum(L.filter(x=>x.m.vslaBook.loan!=null),x=>+x.m.vslaBook.loan),u=undatedLoans();
   if(u.n)h=h.replace(/(Loans outstanding<\/div><div class="val">[^<]*<\/div><div class="sub">)/,`$1${plural(u.n,'VSLA book loan')} not tracked yet (date to confirm) · `);
@@ -5617,10 +5652,10 @@ function vslaPage(){
     <div class="grid-eq">${card({title:'My business and loan',sub:'From the VSLA book',body:`<dl class="kv"><dt>Business (loan purpose)</dt><dd>${esc(b.business||'Not written')}</dd><dt>Loan taken</dt><dd class="num">${b.loan!=null?ksh(+b.loan):b.loanUnclear?'Not clear on the book page (to confirm)':'None written'}</dd>${b.loanDate?`<dt>Loan date</dt><dd>${vbLoanDate(b)}</dd>`:''}<dt>My savings</dt><dd>${vbOwnSavings(m.id)}</dd></dl>`})}
     ${card({flush:true,title:'Meeting totals',sub:'As written in the VSLA book',body:vbBookTable(v)})}</div>`;
   }
-  const tab=UI.tab.vslas&&V.some(v=>v.vslaId===UI.tab.vslas)?UI.tab.vslas:'all';
-  const M=V.flatMap(vbMembers),L=vbLoans(V);
+  const tab=curVsla()?curVsla().vslaId:'all',SV=tab==='all'?V:V.filter(v=>v.vslaId===tab);
+  const M=V.flatMap(vbMembers),L=vbLoans(V),SM=SV.flatMap(vbMembers),SL=vbLoans(SV);
   const head=pageHeader({title:`VSLA groups in ${g.groupName}`,crumbs:orgCrumb(),desc:`${plural(V.length,'VSLA')} and ${plural(M.length,'member')}${g.school?` (${esc(g.school)} school)`:''}. Names, businesses, loans and meeting totals are as written in each VSLA's book; amounts that could not be read are left out and listed under "To confirm".`,actions:can('editChama')?btn('vb-total','Add meeting totals',{ic:'plus'}):''});
-  const stats=`<div class="stats">${statCard({label:'Members',value:num(M.length),sub:`${plural(V.length,'VSLA')}`,ic:'users'})}${statCard({label:'Total savings written',value:vbAmt(vbSum(V,'savings')),sub:'All VSLA meetings',ic:'coins'})}${statCard({label:'Social Fund written',value:vbAmt(vbSum(V,'socialFund')),sub:'All VSLA meetings',ic:'heart'})}${statCard({label:'School Feeding written',value:vbAmt(vbSum(V,'schoolFeeding')),sub:'All VSLA meetings',ic:'building'})}${statCard({label:'Loans taken (members)',value:vbAmt(L),sub:`${plural(L.n,'member')} with a loan written`,ic:'loan',tone:'maroon'})}</div>`;
+  const stats=`<div class="stats">${statCard({label:'Members',value:num(SM.length),sub:tab==='all'?plural(V.length,'VSLA'):esc(SV[0].name),ic:'users'})}${statCard({label:'Total savings written',value:vbAmt(vbSum(SV,'savings')),sub:'All VSLA meetings',ic:'coins'})}${statCard({label:'Social Fund written',value:vbAmt(vbSum(SV,'socialFund')),sub:'All VSLA meetings',ic:'heart'})}${statCard({label:'School Feeding written',value:vbAmt(vbSum(SV,'schoolFeeding')),sub:'All VSLA meetings',ic:'building'})}${statCard({label:'Loans taken (members)',value:vbAmt(SL),sub:`${plural(SL.n,'member')} with a loan written`,ic:'loan',tone:'maroon'})}</div>`;
   const items=[{id:'all',label:'All VSLAs',count:V.length},...V.map(v=>({id:v.vslaId,label:v.name.replace(/ VSLA$/,''),count:vbMembers(v).length}))];
   let body='';
   if(tab==='all'){
@@ -5640,17 +5675,17 @@ function vslaPage(){
     body=`${v.nameCheck?notice(esc(v.nameCheck),{ic:'flag',tone:'warn'}):''}
     ${card({flush:true,title:`${esc(v.name)}: meeting totals`,sub:`Started ${esc(v.startedText||(v.started?fmtDate(v.started):'-'))} · savings, Social Fund and School Feeding as written in the book`,actions:can('editChama')?btn('vb-total','Add meeting totals',{ic:'plus',cls:'btn-secondary btn-sm',data:`data-v="${v.vslaId}"`}):'',body:vbBookTable(v)})}
     <div style="height:16px"></div>
-    ${card({flush:true,title:`${esc(v.name)}: members`,sub:`${plural(ms.length,'member')} · business and loan taken as written. Individual savings are not on the book pages yet; they show here once VPBN records them.`,body:ms.length?vbMemberTable(v,ms):emptyState({ic:'users',title:'No members in this VSLA yet',text:''})})}
+    ${card({flush:true,title:`${esc(v.name)}: members`,sub:`${plural(ms.length,'member')}${(()=>{const o=['Chairperson','Secretary','Treasurer'].map(r=>{const p=ms.find(m=>m.role===r);return p?`${r==='Chairperson'?'Chairlady':r}: ${esc(p.name)}`:''}).filter(Boolean);return o.length?' · '+o.join(' · '):''})()} · business and loan taken as written. Individual savings are not on the book pages yet; they show here once VPBN records them.`,body:ms.length?vbMemberTable(v,ms):emptyState({ic:'users',title:'No members in this VSLA yet',text:''})})}
     <div style="height:16px"></div>${vbConfirmCard([v])}`;
   }
-  return `${head}${stats}${tabs('vslas',items,tab)}<div role="tabpanel" aria-labelledby="tab-vslas-${tab}">${body}</div>`;
+  return `${head}${stats}${tabs('vslas',items,tab)}<div role="tabpanel" aria-labelledby="tab-vslas-${tab}">${body}</div>`.replace(/data-act="tab" data-tabs="vslas"/g,'data-act="set-vsla" data-tabs="vslas"');
 }
 document.addEventListener('DOMContentLoaded',()=>{ROUTES.vslas={render:()=>vslaPage()}}); /* ROUTES is declared further down */
 NAV[2].items.unshift({id:'vslas',label:'VSLA groups',mlabel:'My VSLA',short:'VSLAs',icon:'book'});
 
 /* dashboard: the books' totals per VSLA */
 function vslaBookDashCard(){
-  const V=vslasOf(UI.group).filter(v=>(v.book||[]).length||vbMembers(v).some(m=>m.vslaBook));if(!V.length)return '';
+  const V=vslasOf(UI.group).filter(v=>subOk(v,UI.group)&&((v.book||[]).length||vbMembers(v).some(m=>m.vslaBook)));if(!V.length)return '';
   return card({flush:true,title:'From the VSLA books',sub:'Savings, Social Fund, School Feeding and loans as written in each VSLA\'s book',actions:`<a class="btn btn-ghost btn-sm" href="#/vslas">Open VSLA groups</a>`,body:table({caption:'VSLA book totals',cols:[
     {label:'VSLA',render:v=>`<b>${esc(v.name)}</b><div class="muted tiny">${plural(vbMembers(v).length,'member')}</div>`},
     {label:'Savings',cls:'r',render:v=>vbAmt(vbSum([v],'savings'))},{label:'Social Fund',cls:'r',render:v=>vbAmt(vbSum([v],'socialFund'))},{label:'School Feeding',cls:'r',render:v=>vbAmt(vbSum([v],'schoolFeeding'))},{label:'Loans taken',cls:'r',render:v=>vbAmt(vbLoans([v]))}],rows:V,
@@ -5697,7 +5732,7 @@ FORMS['vb-total']=(form,d)=>{
   b.updatedAt=nowStamp();b.updatedBy=me().id;v.updatedAt=nowStamp();
   const next=BOOK_FIELDS.filter(([k])=>b[k]!=null).map(([k,l])=>`${l} ${num(b[k])}`).join(', ');
   logAudit({action:form.dataset.id?'VSLA book totals corrected':'VSLA book totals recorded',target:b.id,detail:`${v.name} · ${b.label}${b.dateText||b.date?' ('+(b.dateText||fmtDate(b.date))+')':''}`,kind:'record',groupId:v.groupId,prev,next});
-  postVslaBooks(S);UI.tab.vslas=v.vslaId;commit(`${v.name}: ${b.label} saved.`);
+  postVslaBooks(S);UI.vsla=v.vslaId;saveVslaPref();commit(`${v.name}: ${b.label} saved.`);
 };
 function openVbMember(id){
   if(!needPerm('editChama'))return;const m=byId(id);if(!m||!inAllowedGroup(m))return;const b=m.vslaBook||{};
@@ -5717,7 +5752,8 @@ FORMS['vb-member']=(form,d)=>{
   commit(`${m.name}'s VSLA book details saved.`);
 };
 {const f=actV7;actV7=function(name,el,ev){
-  if(name==='vb-total'){openVbTotal(el.dataset.v||(UI.tab.vslas!=='all'?UI.tab.vslas:''),el.dataset.id);return}
+  if(name==='vb-total'){openVbTotal(el.dataset.v||(curVsla()?curVsla().vslaId:''),el.dataset.id);return}
+  if(name==='set-vsla'){setSubgroup(el.dataset.tab!==undefined?el.dataset.tab:el.dataset.v);return}
   if(name==='vb-member'){openVbMember(el.dataset.id);return}
   return f(name,el,ev);
 }}
@@ -5726,10 +5762,10 @@ FORMS['vb-member']=(form,d)=>{
 {const f=periodStatus;periodStatus=function(m,k,c){return memo('ps|'+m+'|'+k+'|'+(c||''),()=>f(m,k,c))}}
 {const f=memberStats;memberStats=function(id){if(!byId(id))return{periods:0,paid:0,onTime:0,missed:0,contribTotal:0,savingsTotal:0,loans:[],loanOutstanding:0,lastContrib:null,recs:[]};return memo('mst|'+id,()=>f(id))}}
 {const f=loanInfo;loanInfo=function(l){return memo('li|'+l.id+'|'+l.interestPct+'|'+l.status,()=>f(l))}}
-{const f=monthSummary;monthSummary=function(k){return memo('msum|'+UI.group+'|'+k,()=>f(k))}}
-{const f=cashEntries;cashEntries=function(g=UI.group){return memo('cash|'+g,()=>f(g))}}
-{const f=welfareSummary;welfareSummary=function(g=UI.group){return memo('ws|'+g,()=>f(g))}}
-{const f=sfpSummary;sfpSummary=function(g=UI.group){return memo('sfp|'+g,()=>f(g))}}
+{const f=monthSummary;monthSummary=function(k){return memo('msum|'+UI.group+'|'+(UI.vsla||'')+'|'+k,()=>f(k))}}
+{const f=cashEntries;cashEntries=function(g=UI.group){return memo('cash|'+g+'|'+subKey(g),()=>f(g))}}
+{const f=welfareSummary;welfareSummary=function(g=UI.group){return memo('ws|'+g+'|'+subKey(g),()=>f(g))}}
+{const f=sfpSummary;sfpSummary=function(g=UI.group){return memo('sfp|'+g+'|'+subKey(g),()=>f(g))}}
 {const f=expectedTotal;expectedTotal=function(m,k){return memo('et|'+m+'|'+k,()=>f(m,k))}}
 
 /* ---------- 22. Router ---------- */

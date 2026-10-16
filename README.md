@@ -16,6 +16,21 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.10
+- **Subgroups (VSLAs).** Under Community group there is now a **Subgroup (VSLA)** selector. Choose Olemoncho, then one
+  of its five VSLAs (Olchoro, Oloisuai, Olemoncho B, Osero, Olemoncho A) and every page (dashboard, members,
+  savings, contributions, loans, cash book, reports) shows only that VSLA's records; "Show all" returns to the whole
+  community group. The role switcher acts as that VSLA's officials. The HPF all-groups view always shows whole groups.
+- **Officials for every Olemoncho VSLA**: Olchoro (Chairlady Nalotuesha Nkoitoi, Secretary Edna Kimurmur,
+  Treasurer Noomelin Nkoitoi), Osero (Chairlady Nashiru Karia, Secretary Macline Yiale, Treasurer Nolarami
+  Sairowua), Oloisuai (Chairlady Naitayuang Liaram, Secretary Naisae Lekakeng, Treasurer Noomali Maleto), as well as
+  Olemoncho A and B. Osero member #1 is renamed Macline Yiale; the VSLA name is Oloisuai.
+- **Loan terms**: 10% interest on the amount taken; the whole loan is due exactly 3 months after the meeting it was
+  given (part payments allowed before that); the limit is the member's own savings. On-time bonus still pending.
+- The "Loan =" figures (Oloisuai 2,000 on 30 Sep; Olemoncho A 12,030 on 7 Oct) are **loan repayments received at the
+  meeting** (VSLA totals, members not named), counted as money in. Olchoro's cash in / cash out are **bank deposits
+  and withdrawals**, not savings.
+
 ## New in v0.9.9
 - **Members' loans from the VSLA books are tracked like any internal loan** (Loan Repayments): deadline, amount
   repaid, outstanding, status (Active, Overdue, repaid) and whether it was paid on time or after the deadline, with the

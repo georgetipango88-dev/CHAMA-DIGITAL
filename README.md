@@ -16,6 +16,23 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.12
+- The role that changes data is called **VBBM** (it was spelled VPBN). Saved role choices and audit entries switch over.
+- **Every Olemoncho loan now has its date** (the date in the book margin is the date the member took the loan), so all
+  39 loans are tracked with their 3-month deadline: Olchoro 20 Jul / 17 Aug, Oloisuai 1 Sep / 30 Sep, Olemoncho B and
+  Osero 2 Sep / 2 Oct, Olemoncho A 4 Sep / 7 Oct 2026. Each meeting's loans match its savings (plus repayments).
+- Olchoro's cash out 95,400 on 20 July is the 7 loans given that day, so it is counted once (as the loans).
+- Corrected phone numbers for Noorkisaruni Nkoitoi and Noorkisaruni Naimodu (full numbers in the private file).
+
+## New in v0.9.11
+- **No separate subgroup list.** The sidebar picks the community group only: Mbitin, Nterere or Olemoncho. The
+  dashboard still opens on all 3 community groups (HPF view). Selecting **Olemoncho** opens it and shows **its 5 groups
+  as cards** (Olchoro, Oloisuai, Olemoncho A, Olemoncho B, Osero); clicking one shows only that group's records,
+  members, savings, contributions, loans and cash book, with buttons to switch group or go back to all 5.
+  Mbitin and Nterere show no groups inside them. (This replaces the v0.9.10 "Subgroup (VSLA)" sidebar list.)
+- **Cash Book: all community groups.** VBBM and the HPF admin see cash in, cash out and balance for Mbitin, Nterere and
+  Olemoncho, with Olemoncho's 5 groups under it, and the total. Group officials still see only their own group.
+
 ## New in v0.9.10
 - **Subgroups (VSLAs).** Under Community group there is now a **Subgroup (VSLA)** selector. Choose Olemoncho, then one
   of its five VSLAs (Olchoro, Oloisuai, Olemoncho B, Osero, Olemoncho A) and every page (dashboard, members,
@@ -35,7 +52,7 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 - **Members' loans from the VSLA books are tracked like any internal loan** (Loan Repayments): deadline, amount
   repaid, outstanding, status (Active, Overdue, repaid) and whether it was paid on time or after the deadline, with the
   reason for the loan in its own column. Loans still waiting for a meeting date are listed separately until dated.
-- **Olemoncho loan rules** (set from the client's instructions; VPBN can change them in Group rules): a member can
+- **Olemoncho loan rules** (set from the client's instructions; VBBM can change them in Group rules): a member can
   borrow up to her own savings (1× savings); repay any time, in part or in full, but the whole loan is due within
   3 months of the meeting it was given ("Any time, in full by the deadline"). The interest rate and the on-time
   limit bonus are not decided yet and show as pending. Mbitin and Nterere keep their own rules.
@@ -54,7 +71,7 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 - The three unclear loans are confirmed: Josphine Sairowua 22,300 (shop), Jenifer Nkoitoi 8,000 (kinyozi),
   Nalotuesha Nkoitoi 3,700 (beadwork). The "Loan =" figures (Olosuae 2,000; Olemoncho A 12,030) are the part of the
   members' loans lent beyond the savings, shown with the loans and not counted twice.
-- Saved data is updated automatically (members VPBN has edited are left as they are), with an audit entry.
+- Saved data is updated automatically (members VBBM has edited are left as they are), with an audit entry.
 
 ## New in v0.9.7
 - **The VSLA book totals now show on every money page.** Each dated meeting total from the VSLA books is posted as a
@@ -63,14 +80,14 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
   Cash Book. Loans given out at a meeting and Olchoro's cash in / cash out are in the Cash Book as written.
 - For Olemoncho this shows savings KSh 300,200, Social Fund KSh 16,300, School Feeding KSh 13,600, cash in
   KSh 425,500 and cash out KSh 109,430, with the monthly figures and charts filled in.
-- The VSLA book stays the single source: when VPBN edits a meeting on the VSLA groups page, the posted figures
+- The VSLA book stays the single source: when VBBM edits a meeting on the VSLA groups page, the posted figures
   follow. VSLA totals cannot be corrected or reversed one by one, and they are not counted as members.
 - Members' loans written in the books are not in the Cash Book yet, because their dates are still to be confirmed;
   each page says so.
 - Saved data from v0.9.6 gets the totals posted once, with an audit entry.
 
 ## New in v0.9.6
-- **Only VPBN changes data.** A new **VPBN** role (in the role switcher and on "Choose your community group") is the
+- **Only VBBM changes data.** A new **VBBM** role (in the role switcher and on "Choose your community group") is the
   only one that can add, edit or correct anything: records, members, meetings, loans, rules and the VSLA books.
   The Chairperson, Treasurer, Secretary, members and the HPF program admin **view only**: their edit buttons are
   hidden, every page shows "View only", and any attempt to change data is refused.
@@ -86,7 +103,7 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
   once recorded. Members see only their own VSLA's totals and their own details. The dashboard shows the books'
   totals per VSLA, and each member's profile shows their business and loan.
 - Nothing unreadable is guessed: amounts and phone digits that are not clear on the photos are **left out of every
-  total** and listed under "To confirm against the paper books" for VPBN to correct (each correction is audited).
+  total** and listed under "To confirm against the paper books" for VBBM to correct (each correction is audited).
 - **Privacy** as for Nterere: phone numbers are masked on the public site (`07xx xxx 702`). Full numbers are kept in
   `private/` (ignored by Git and Vercel) and loaded with Members → Import from Excel, matched by member number
   (OLM-001 to OLM-102). Two members may share one phone when each row gives its member number.

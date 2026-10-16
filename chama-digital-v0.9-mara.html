@@ -516,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.10 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.12 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -677,28 +677,28 @@ const LOGO=`<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height=
 const ROLES=['Platform Owner/Admin','Chairperson','Treasurer','Secretary','Member'];
 const ROLE_INFO={
  'Platform Owner/Admin':'View only. HPF program view of every community group. Real cross-Chama access requires backend authorization.',
- VPBN:'Changes data. The only role that can add, edit or correct records, members, meetings, loans, rules and the VSLA books.',
- Chairperson:'View only. Sees every record of the group and the audit trail; changes are made by VPBN.',
- Treasurer:'View only. Sees the financial records, reports and statements; changes are made by VPBN.',
- Secretary:'View only. Sees member records and meetings; changes are made by VPBN.',
+ VBBM:'Changes data. The only role that can add, edit or correct records, members, meetings, loans, rules and the VSLA books.',
+ Chairperson:'View only. Sees every record of the group and the audit trail; changes are made by VBBM.',
+ Treasurer:'View only. Sees the financial records, reports and statements; changes are made by VBBM.',
+ Secretary:'View only. Sees member records and meetings; changes are made by VBBM.',
  Member:'Sees their own records and statements, plus the Chama\'s shared summary and meetings.'
 };
-/* v0.9.6: only VPBN changes data. The Chairperson, Treasurer, Secretary, members and the HPF program admin view only. */
+/* v0.9.6: only VBBM changes data. The Chairperson, Treasurer, Secretary, members and the HPF program admin view only. */
 const PERMS={
  platformAdmin:{roles:['Platform Owner/Admin'],label:'View registered Chamas at platform level'},
- recordFinance:{roles:['VPBN'],label:'Record contributions, savings, internal loans and repayments'},
- correct:{roles:['VPBN'],label:'Correct or reverse a financial record (with a reason)'},
- manageMembers:{roles:['VPBN'],label:'Add members and edit member details'},
- manageMeetings:{roles:['VPBN'],label:'Schedule meetings, take attendance, record minutes'},
- viewAll:{roles:['Platform Owner/Admin','VPBN','Chairperson','Treasurer'],label:'See authorized Chama financial records'},
- reports:{roles:['Platform Owner/Admin','VPBN','Chairperson','Treasurer'],label:'Generate authorized Chama reports and member statements'},
- viewAudit:{roles:['Platform Owner/Admin','VPBN','Chairperson','Treasurer','Secretary'],label:'See the authorized activity trail'},
- manageRoles:{roles:['VPBN'],label:'Change member roles'},
- editChama:{roles:['VPBN'],label:'Edit Chama details, group rules and the VSLA books'},
- waive:{roles:['VPBN'],label:'Waive a fine (with a reason)'},
- approve:{roles:['VPBN'],label:'Approve or reject loan applications and flagged welfare payouts'},
- submitContrib:{roles:[],label:'Submit own contribution for confirmation (off: only VPBN changes data)'},
- applyLoan:{roles:['VPBN'],label:'Submit a loan application for a member'},
+ recordFinance:{roles:['VBBM'],label:'Record contributions, savings, internal loans and repayments'},
+ correct:{roles:['VBBM'],label:'Correct or reverse a financial record (with a reason)'},
+ manageMembers:{roles:['VBBM'],label:'Add members and edit member details'},
+ manageMeetings:{roles:['VBBM'],label:'Schedule meetings, take attendance, record minutes'},
+ viewAll:{roles:['Platform Owner/Admin','VBBM','Chairperson','Treasurer'],label:'See authorized Chama financial records'},
+ reports:{roles:['Platform Owner/Admin','VBBM','Chairperson','Treasurer'],label:'Generate authorized Chama reports and member statements'},
+ viewAudit:{roles:['Platform Owner/Admin','VBBM','Chairperson','Treasurer','Secretary'],label:'See the authorized activity trail'},
+ manageRoles:{roles:['VBBM'],label:'Change member roles'},
+ editChama:{roles:['VBBM'],label:'Edit Chama details, group rules and the VSLA books'},
+ waive:{roles:['VBBM'],label:'Waive a fine (with a reason)'},
+ approve:{roles:['VBBM'],label:'Approve or reject loan applications and flagged welfare payouts'},
+ submitContrib:{roles:[],label:'Submit own contribution for confirmation (off: only VBBM changes data)'},
+ applyLoan:{roles:['VBBM'],label:'Submit a loan application for a member'},
 };
 const can=p=>PERMS[p].roles.includes(UI.role);
 
@@ -983,7 +983,7 @@ const FORMS={}; /* form handlers, keyed by data-form */
 const UI={role:'Treasurer',group:null,tab:{},f:{},report:null,reg:null,focus:null};
 function resetDemo(opts={}){S=seedDemo(opts);ensureV07Data();saveState()}
 const byId=id=>S.members.find(m=>m.id===id);
-const mName=id=>id==='ledger-import'?'Ledger import':id==='vsla-book'?'VSLA book':String(id||'').startsWith('vsla:')?vslaName(String(id).slice(5))+' (VSLA total)':String(id||'').startsWith('fines:')?(vslaById(String(id).slice(6))?vslaName(String(id).slice(6)):groupName(String(id).slice(6)))+' (group savings from fines)':id==='system'?'System (automatic)':id==='hpf-admin'?'HPF program admin':id==='vpbn'?'VPBN':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
+const mName=id=>id==='ledger-import'?'Ledger import':id==='vsla-book'?'VSLA book':String(id||'').startsWith('vsla:')?vslaName(String(id).slice(5))+' (VSLA total)':String(id||'').startsWith('fines:')?(vslaById(String(id).slice(6))?vslaName(String(id).slice(6)):groupName(String(id).slice(6)))+' (group savings from fines)':id==='system'?'System (automatic)':id==='hpf-admin'?'HPF program admin':id==='vpbn'?'VBBM':String(id||'').startsWith('unassigned-')?String(id).slice(11)+' (not assigned)':byId(id)?.name||'Unknown member';
 function me(){
   const a=byId(S.actors[UI.role]);
   if(a&&(a.role===UI.role||UI.role==='Member'||UI.role==='Platform Owner/Admin'&&a.role!=='Member'))return a;
@@ -1466,7 +1466,7 @@ function dashMember(){
   return `${pageHeader({title:`Hello, ${firstName(m.name)}`,desc:`Your records in ${esc(vslaName(m.vslaId))}, ${esc(curGroup().groupName)} community group, ${esc(S.chama.name)}. You are viewing as a Member: you can see only your own records plus the group's shared summary.`,actions:`${can('submitContrib')?btn('submit-contrib','Contribute',{ic:'heart'}):''}<a class="btn btn-secondary" href="#/reports">${icon('file')}My statement</a>`})}
   <div class="stats">
    ${statCard({label:'My contributions',value:ksh(ms.contribTotal),sub:`${ms.paid} of ${ms.periods} periods paid`,ic:'deposit'})}
-   ${statCard({label:'My savings',value:ksh(ms.savingsTotal),sub:'Recorded by VPBN',ic:'coins'})}
+   ${statCard({label:'My savings',value:ksh(ms.savingsTotal),sub:'Recorded by VBBM',ic:'coins'})}
    ${statCard({label:'My internal loan balance',value:ksh(ms.loanOutstanding),sub:loan?(loan.next?`Next repayment ${fmtDate(loan.next.due)}`:'Principal repaid, interest rate pending'):'No open internal loan',ic:'loan',tone:'maroon'})}
    ${statCard({label:'Chama Activity Score',value:`${sc.score}<span class="muted small" style="font-size:.9rem"> / 100</span>`,sub:`${sc.band} · record-based`,ic:'chart'})}
    ${memberExtraStats(m.id)}
@@ -1510,7 +1510,7 @@ function membersList(){
 function membersView(){
   const f=memberFilters();
   return `${pageHeader({title:can('viewAll')?'Members':'Member directory',desc:can('viewAll')?'Everyone in the Chama, their role and whether they have paid this month. Open a member to see their full record.':'Who is in the Chama and whether each member has paid this month.',actions:(canImport()?btn('ledger-import','Import VSLA ledger',{ic:'book',cls:'btn-secondary'})+btn('import-members','Import from Excel',{ic:'download',cls:'btn-secondary'}):'')+(can('manageMembers')?btn('add-member','Add member',{ic:'userplus'}):'')})}
-  ${!can('manageMembers')&&can('viewAll')?notice('Adding and editing members is done by VPBN.',{ic:'lock'}):''}
+  ${!can('manageMembers')&&can('viewAll')?notice('Adding and editing members is done by VBBM.',{ic:'lock'}):''}
   ${GM().some(m=>m.placeholder)?notice('These are <b>sample members</b> used to demonstrate the workflow. They will be replaced with the confirmed member lists (use Import from Excel or Import VSLA ledger).',{ic:'info',tone:'warn',title:'Sample data.'}):''}
   ${notice('Members without a smartphone are full members. Officials record their contributions, savings, attendance and repayments, and can print receipts and statements for them. SMS / USSD can become their main digital channel later.',{ic:'phone',tone:'teal',title:'Assisted / Offline members.'})}
   <section class="card"><div class="filters no-print">
@@ -1608,7 +1608,7 @@ function contributionsView(){
   }
   const mystat=memberStats(me().id);
   return `${pageHeader({title:all?'Contributions':'My contributions',desc:all?'Social Fund and School Feeding Programme contributions. Each member\'s rate comes from the group\'s tier table, based on the member\'s savings or contributions.':'Every contribution recorded against your name, with the period and payment reference.',actions:can('recordFinance')?btn('rec-contrib','Record contribution',{ic:'plus'}):''})}
-  ${all&&!can('recordFinance')?notice('Recording contributions is done by VPBN. You can view every record here.',{ic:'lock'}):''}
+  ${all&&!can('recordFinance')?notice('Recording contributions is done by VBBM. You can view every record here.',{ic:'lock'}):''}
   <div class="stats">${all?`${statCard({label:`Collected, ${keyLabel(key)}`,value:ksh(ms.collected),sub:ms.pending?'Expected: rates pending confirmation':`of ${ksh(ms.expected)} expected`,ic:'deposit'})}${statCard({label:'Members fully paid',value:`${ms.paid} of ${ms.members}`,sub:`${ms.onTime} on time`,ic:'users'})}${statCard({label:'Still to pay',value:ms.pending?PEND:ksh(Math.max(0,ms.expected-ms.collected)),sub:plural(ms.members-ms.paid,'member'),ic:'clock',tone:'amber'})}${statCard({label:'Total recorded to date',value:ksh(T.contrib),sub:`${rec('contribution').length} records`,ic:'coins'})}`:`${statCard({label:'My total contributions',value:ksh(mystat.contribTotal),sub:`${mystat.paid} of ${mystat.periods} periods paid`,ic:'deposit'})}${statCard({label:`My status, ${keyLabel(curKey())}`,value:payPill(periodStatus(me().id,curKey()).state),sub:`Due by ${fmtDate(dueDate(curKey()))}`,ic:'clock'})}`}</div>
   ${tabs('contrib',items,tab)}<div role="tabpanel" aria-labelledby="tab-contrib-${tab}">${body}</div>`;
 }
@@ -1684,7 +1684,7 @@ function loansView(){
   const items=[['all','All',L.length],['active','Active',cnt('Active')],['overdue','Overdue',cnt('Overdue')],['repaid','Repaid',cnt('Repaid')]];
   return `${pageHeader({title:all?'Loan repayments':'My loan repayments',desc:'Repayment deadlines, what has been paid and what remains. Paying every instalment on time raises the member\'s loan limit for the next loan.',actions:can('recordFinance')?btn('rec-repay','Record repayment',{ic:'plus'})+btn('rec-loan','Record internal loan',{ic:'loan',cls:'btn-maroon'}):''})}
   ${notice(LOAN_NOTE,{ic:'info',tone:'maroon',title:'Internal Chama records.'})}
-  ${all&&!can('recordFinance')?notice('Recording loans and repayments is done by VPBN.',{ic:'lock'}):''}
+  ${all&&!can('recordFinance')?notice('Recording loans and repayments is done by VBBM.',{ic:'lock'}):''}
   ${repayBenefitsCard()}
   <div class="stats">${statCard({label:'Lent by the Chama',value:ksh(sum(L,l=>l.amount)),sub:plural(L.length,'loan')+' recorded',ic:'loan',tone:'maroon'})}${statCard({label:'Repaid so far',value:ksh(sum(L,l=>l.repaid)),sub:'Including the Chama\'s own interest',ic:'check'})}${statCard({label:'Outstanding',value:ksh(sum(L,l=>l.outstanding)),sub:`${cnt('Active')+cnt('Overdue')} open`,ic:'clock',tone:'amber'})}${statCard({label:'Overdue',value:ksh(sum(L,l=>l.overdueAmt)),sub:plural(cnt('Overdue'),'loan'),ic:'alert',tone:'maroon'})}</div>
   <section class="card"><div class="filters no-print" style="align-items:flex-end"><div class="chips" role="group" aria-label="Filter by status">${items.map(([id,l,n])=>`<button type="button" class="chip" aria-pressed="${f.status===id}" data-act="loan-filter" data-status="${id}">${l} (${n})</button>`).join('')}</div>${all?`<div class="fld grow"><label for="lq" class="sr-only">Search loans</label><input id="lq" type="search" placeholder="Search member or loan number" value="${esc(f.q)}" data-input="filter" data-scope="loans" data-key="q" autocomplete="off"></div>`:''}</div><div data-list="loans">${loansList()}</div></section>
@@ -1904,7 +1904,7 @@ function chamaView(){
   const c=S.chama,ed=can('editChama'),lr=c.loanRules;
   const off=r=>{const p=S.members.find(m=>m.role===r);return p?`${esc(p.name)}<div class="muted tiny">${esc(p.id)}</div>`:'Not assigned'};
   return `${pageHeader({title:'Chama profile',desc:'Basic details and the rules your Chama has set. Chama Digital uses these to calculate schedules and flag late records. It does not enforce them.',actions:ed?btn('edit-chama','Edit details',{ic:'edit',cls:'btn-secondary'})+btn('edit-rules','Edit rules',{ic:'sliders'}):''})}
-  ${!ed?notice('Changes to the Chama\'s details and rules are made by VPBN.',{ic:'lock'}):''}
+  ${!ed?notice('Changes to the Chama\'s details and rules are made by VBBM.',{ic:'lock'}):''}
   <div class="grid-eq">${card({title:'About the Chama',body:`<dl class="kv"><dt>Name</dt><dd>${esc(c.name)}</dd><dt>Type</dt><dd>${esc(c.type)}</dd><dt>Location</dt><dd>${esc(c.location||'Not recorded')}</dd><dt>Started</dt><dd>${fmtDate(c.formed)}</dd><dt>Meets at</dt><dd>${esc(c.meetingPlace||'Not recorded')}</dd><dt>Meeting schedule</dt><dd>${esc(c.meetingRule||'Not recorded')}</dd><dt>Registration number</dt><dd>${esc(c.registration||'Not recorded')}</dd></dl>`})}
   ${card({title:'Officials',body:`<dl class="kv"><dt>Chairperson</dt><dd>${off('Chairperson')}</dd><dt>Treasurer</dt><dd>${off('Treasurer')}</dd><dt>Secretary</dt><dd>${off('Secretary')}</dd></dl>`})}
   ${card({title:'Contribution rules',body:`<dl class="kv"><dt>Amount per member</dt><dd class="num">${ksh(c.contribution.amount)}</dd><dt>Frequency</dt><dd>Monthly</dd><dt>Due by</dt><dd>Day ${c.contribution.dueDay} of each month</dd></dl>`})}
@@ -1917,10 +1917,10 @@ function rolesView(){
   const cap=[['See their own records and statements','all'],...Object.values(PERMS).map(p=>[p.label,p.roles])];
   return `${pageHeader({title:'Users & roles',desc:'Who can do what. Roles keep the Chama\'s records in the right hands.'})}
   ${notice('The Demo Role / Prototype Role Switcher in the top bar is a simulated lens for this pilot build, not a login. Real access to this page (who can open it at all) is controlled by who your organization has shared it with, in the share menu.',{ic:'info',tone:'teal'})}
-  ${!mg?notice('Roles are changed by VPBN.',{ic:'lock'}):''}
+  ${!mg?notice('Roles are changed by VBBM.',{ic:'lock'}):''}
   ${card({flush:true,title:'Members and their roles',body:table({caption:'Members and roles',cols:[{label:'Member',render:m=>who(m.id,esc(m.id))},{label:'Role',render:m=>mg?`<div class="fld" style="min-width:160px"><label class="sr-only" for="role-${m.id}">Role for ${esc(m.name)}</label><select id="role-${m.id}" data-change="set-role" data-id="${m.id}">${selectOpts(ROLES,m.role)}</select></div>`:rolePill(m.role)},{label:'Group access',render:m=>m.role==='Member'?'Own records only':mg?`<div class="fld" style="min-width:160px"><label class="sr-only" for="ga-${m.id}">Group access for ${esc(m.name)}</label><select id="ga-${m.id}" data-change="set-access" data-id="${m.id}">${selectOpts([['ALL','All groups'],...S.groups.map(g=>[g.groupId,g.groupName+' only'])],m.groupAccess==='ALL'?'ALL':(m.groupAccess||[])[0])}</select></div>`:esc(m.groupAccess==='ALL'?'All groups':(m.groupAccess||[]).map(groupName).join(', '))},{label:'Can do',render:m=>`<span class="small muted">${esc(ROLE_INFO[m.role].split('.')[0])}.</span>`}],rows:GM()})})}
   <div style="height:16px"></div>
-  ${card({flush:true,title:'What each role can do',sub:'A tick means the role can do this. Only VPBN can add or change data; every other role views only.',body:table({caption:'Role permissions',cols:[{label:'Action',render:c=>esc(c[0])},...['VPBN',...ROLES].map(r=>({label:r,cls:'c',render:c=>c[1]==='all'||c[1].includes(r)?`<span class="perm-yes">${icon('check')}<span class="sr-only">Yes</span></span>`:`<span class="perm-no" aria-label="No">–</span>`}))],rows:cap})})}`;
+  ${card({flush:true,title:'What each role can do',sub:'A tick means the role can do this. Only VBBM can add or change data; every other role views only.',body:table({caption:'Role permissions',cols:[{label:'Action',render:c=>esc(c[0])},...['VBBM',...ROLES].map(r=>({label:r,cls:'c',render:c=>c[1]==='all'||c[1].includes(r)?`<span class="perm-yes">${icon('check')}<span class="sr-only">Yes</span></span>`:`<span class="perm-no" aria-label="No">–</span>`}))],rows:cap})})}`;
 }
 const rolesViewObj={title:'Users & roles',render:rolesView};
 
@@ -2318,7 +2318,7 @@ function meetingsView(){
       +(own?'':`<div style="height:16px"></div>${registerGrid(past.slice(0,6).reverse())}`);
   }
   return `${pageHeader({title:own?'Meetings & my attendance':'Meetings & attendance register',desc:'Who attended each meeting of this group. Absence without apology creates an absenteeism fine automatically, using the group\'s own fine rule.',actions:can('manageMeetings')?btn('sched-meeting','Schedule meeting',{ic:'plus'})+btn('record-past','Record a past meeting',{ic:'clock',cls:'btn-secondary'}):''})}
-  ${!can('manageMeetings')&&!own?notice('Taking attendance and recording fine payments is done by VPBN.',{ic:'lock'}):''}
+  ${!can('manageMeetings')&&!own?notice('Taking attendance and recording fine payments is done by VBBM.',{ic:'lock'}):''}
   ${photoBanner('Where the records begin','Attendance, contributions and fines are recorded at every meeting.',[PHOTOS[0],PHOTOS[1]],'small')}
   <div class="card" style="padding:12px 16px;margin-bottom:16px">${attLegend()}</div>
   <div class="stats">${statCard({label:'Last meeting',value:ls?ls.pct+'%':'-',sub:ls?`${fmtDate(last.date)} · ✓ ${ls.present} Ⓔ ${ls.apology} X ${ls.absent} of ${ls.total}`:'No meeting held yet',ic:'calendar'})}${statCard({label:own?'My fines generated':'Absenteeism fines generated',value:ksh(ft.generated),sub:`${plural(ft.count,'fine')}${ft.pending?` · ${ft.pending} fine amount not set yet`:''}`,ic:'flag',tone:'amber'})}${statCard({label:'Fines collected',value:ksh(ft.collected),sub:'Recorded payments',ic:'check'})}${statCard({label:'Fines outstanding',value:ksh(ft.outstanding),sub:'Carried forward until paid or waived',ic:'alert',tone:'maroon'})}</div>
@@ -2683,7 +2683,7 @@ function openWelfarePayout(){
    ${field({label:'Reason for holding for review',name:'reviewReason',type:'textarea',rows:2,cls:'full',opt:true,hint:'Required if the payout does not meet the group\'s rules.',err:'Explain why this payout should still be considered (at least 8 characters).'})}</div></form>`,footer:modalFooter('Save payout','frm-wp')});
   wpLive($('#frm-wp'));
 }
-function wpLive(form){const box=$('#wp-note',form);if(!box)return;const d=formData(form),f=welfareFlags(d,Number(d.amount)||0);box.innerHTML=f.length?`<div class="inline-note warn"><b>Will be held for review by VPBN:</b> ${f.map(esc).join(' ')}</div>`:`<div class="inline-note ok">Meets this group's payout rules. It will be recorded as paid.</div>`}
+function wpLive(form){const box=$('#wp-note',form);if(!box)return;const d=formData(form),f=welfareFlags(d,Number(d.amount)||0);box.innerHTML=f.length?`<div class="inline-note warn"><b>Will be held for review by VBBM:</b> ${f.map(esc).join(' ')}</div>`:`<div class="inline-note ok">Meets this group's payout rules. It will be recorded as paid.</div>`}
 FORMS['welfare-payout']=(form,d)=>{
   if(!needPerm('recordFinance'))return;const err={},amt=Number(d.amount),m=byId(d.memberId);
   if(!m||m.groupId!==UI.group)err.memberId='Choose a member of this group.';
@@ -2705,7 +2705,7 @@ FORMS['welfare-review']=(form,d)=>{
   if(!needPerm('approve'))return;const w=S.welfare.find(x=>x.id===form.dataset.id);if(!inAllowedGroup(w)||w.status!=='Pending Review')return;
   if(String(d.reason).trim().length<8){applyErrors(form,{reason:'x'});return}
   if(d.decision==='approve'){
-    if(w.recordedBy===me().id&&UI.role!=='VPBN'){applyErrors(form,{reason:'The person who recorded this payout cannot also approve it.'});return}
+    if(w.recordedBy===me().id&&UI.role!=='VBBM'){applyErrors(form,{reason:'The person who recorded this payout cannot also approve it.'});return}
     const bal=welfareSummary(w.groupId).balance;if(w.amount>bal){applyErrors(form,{reason:`The fund balance is now ${ksh(bal)}, less than this payout.`});return}
   }
   const prev=w.status;w.status=d.decision==='approve'?'Paid':'Rejected';w.decisionReason=String(d.reason).trim();w.approvedBy=me().id;w.updatedAt=nowStamp();
@@ -2737,7 +2737,7 @@ function loanAppsView(){
     {label:'Guarantors',render:a=>(a.guarantors||[]).map(g=>esc(g.name)).join(', ')||'-'},
     {label:'Qualification now',render:a=>['Disbursed','Rejected'].includes(a.status)?'<span class="muted small">Closed</span>':outcomePill(loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months).outcome)},
     {label:'Status',render:a=>appPill(a.status)},
-    ...(can('approve')?[{label:'',nolabel:true,cls:'r',render:a=>['Submitted','Needs Review'].includes(a.status)?((a.submittedBy===me().id&&UI.role!=='VPBN')?'<span class="muted tiny">Another official decides</span>':btn('app-decision','Approve / reject',{ic:'check',cls:'btn-primary btn-sm',data:`data-id="${a.id}"`})):''}]:[]),
+    ...(can('approve')?[{label:'',nolabel:true,cls:'r',render:a=>['Submitted','Needs Review'].includes(a.status)?((a.submittedBy===me().id&&UI.role!=='VBBM')?'<span class="muted tiny">Another official decides</span>':btn('app-decision','Approve / reject',{ic:'check',cls:'btn-primary btn-sm',data:`data-id="${a.id}"`})):''}]:[]),
   ];
   const selfE=own?loanEligibility(me().id):null;
   return `${pageHeader({title:own?'Apply for a loan':'Loan applications',desc:'A member must qualify before receiving a loan. Every qualification result shows its reasons, and officials record the reason for every decision.',actions:(can('applyLoan')?btn('apply-loan',own?'Apply for a loan':'New application (assisted)',{ic:'clipboard'}):'')+(!own&&can('viewAll')?btn('check-elig','Check a member\'s qualification',{ic:'check',cls:'btn-secondary'}):'')})}
@@ -2802,13 +2802,13 @@ function openApp(id){
 }
 function openAppDecision(id){
   if(!needPerm('approve'))return;const a=S.loanApps.find(x=>x.id===id);if(!a)return;
-  if((a.submittedBy===me().id&&UI.role!=='VPBN')){toast('You submitted this application, so another official must decide on it.','error');return}
+  if((a.submittedBy===me().id&&UI.role!=='VBBM')){toast('You submitted this application, so another official must decide on it.','error');return}
   const E=loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months);
   openModal({title:`Decision on ${a.id}`,desc:`${esc(mName(a.memberId))} · ${ksh(a.amount)} · qualification: ${E.outcome}`,wide:true,body:`<div class="card" style="padding:14px;margin-bottom:12px">${eligibilityPanel(E)}</div><form id="frm-ad" data-form="app-decision" data-id="${a.id}" novalidate>${field({label:'Decision',name:'decision',opts:[['approve','Approve'],['reject','Reject']],value:E.outcome==='Not Eligible'?'reject':'approve'})}${field({label:'Reason (recorded with the decision)',name:'reason',type:'textarea',required:true,rows:2,err:'Give a reason of at least 8 characters.',hint:E.outcome!=='Eligible'?'The member does not fully qualify on current rules. Explain why the group decided this way.':'For example: "Qualified; agreed at the meeting of 12 October".'})}</form>`,footer:modalFooter('Save decision','frm-ad')});
 }
 FORMS['app-decision']=(form,d)=>{
   if(!needPerm('approve'))return;const a=S.loanApps.find(x=>x.id===form.dataset.id);if(!inAllowedGroup(a)||!['Submitted','Needs Review'].includes(a.status))return;
-  if((a.submittedBy===me().id&&UI.role!=='VPBN')){toast('You submitted this application, so another official must decide on it.','error');return}
+  if((a.submittedBy===me().id&&UI.role!=='VBBM')){toast('You submitted this application, so another official must decide on it.','error');return}
   if(String(d.reason).trim().length<8){applyErrors(form,{reason:'x'});return}
   const prev=a.status;a.status=d.decision==='approve'?'Approved':'Rejected';a.decision={by:me().id,role:UI.role,at:nowStamp(),reason:String(d.reason).trim(),qualification:loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months).outcome};a.updatedAt=nowStamp();
   logAudit({action:a.status==='Approved'?'Loan application approved':'Loan application rejected',target:a.id,detail:`${ksh(a.amount)} · ${mName(a.memberId)} · qualification at decision: ${a.decision.qualification}`,kind:'loan',memberId:a.memberId,prev,next:a.status,reason:a.decision.reason});
@@ -2984,8 +2984,8 @@ const SMS_TEMPLATES={
   'Chama announcement':m=>`Chama Digital: `,
 };
 function communicationsView(){
-  const own=UI.role==='Member',fin=can('viewAll'),tab0=UI.tab.comms||(own?'ussd':'sms'),tab=(own||UI.role!=='VPBN')&&tab0==='compose'?'sms':tab0;
-  const items=[{id:'sms',label:own?'My SMS messages':'SMS outbox'},{id:'ussd',label:'USSD simulator'},...(own||UI.role!=='VPBN'?[]:[{id:'compose',label:'Send SMS (simulated)'}]),{id:'notices',label:'In-app notices'},{id:'reminders',label:own||!canRemind()?'My reminder language':'Reminders'}];
+  const own=UI.role==='Member',fin=can('viewAll'),tab0=UI.tab.comms||(own?'ussd':'sms'),tab=(own||UI.role!=='VBBM')&&tab0==='compose'?'sms':tab0;
+  const items=[{id:'sms',label:own?'My SMS messages':'SMS outbox'},{id:'ussd',label:'USSD simulator'},...(own||UI.role!=='VBBM'?[]:[{id:'compose',label:'Send SMS (simulated)'}]),{id:'notices',label:'In-app notices'},{id:'reminders',label:own||!canRemind()?'My reminder language':'Reminders'}];
   let body='';
   if(tab==='sms'){
     const list=(S.sms||[]).filter(x=>x.chamaId===S.chama.chamaId&&(own?x.memberId===me().id:x.groupId===UI.group&&(fin||['Meeting reminder','Meeting change','Chama announcement'].includes(x.event)))).sort((a,b)=>a.at<b.at?1:-1);
@@ -3081,7 +3081,7 @@ function ussdRefresh(){const U=UI.ussd;const sc=$('#ussd-screen');if(sc)sc.textC
 FORMS['ussd']=(form,d)=>{ussdHandle(d.input);ussdRefresh()};
 
 /* ---------- SETTINGS: group rules, groups, roles, database ---------- */
-const canDb=()=>UI.role==='VPBN';
+const canDb=()=>UI.role==='VBBM';
 function settingsTabs(active){
   const items=[{id:'rules',label:'Group rules'},{id:'groups',label:'Chama & groups'},...(UI.role!=='Member'?[{id:'roles',label:'Users & roles'}]:[]),...(canDb()?[{id:'database',label:'Database (Supabase)'}]:[]),{id:'system',label:'System & privacy'}];
   return pageHeader({title:UI.role==='Member'?'Group rules & settings':'Settings',desc:'Each group\'s own rules, the group structure, roles, the database connection and privacy controls.'})+tabs('settings',items,active);
@@ -4008,7 +4008,7 @@ FORMS['import-members']=(form,d)=>{
   if(!canImport())return;
   const newGroup=!!form.dataset.newgroup;
   if(newGroup){
-    if(!can('editChama')){toast('Only VPBN can add a community group.','error');return}
+    if(!can('editChama')){toast('Only VBBM can add a community group.','error');return}
     const nm=String(d.gname||'').trim();if(!nm){applyErrors(form,{gname:'x'});return}
     if(S.groups.some(g=>g.groupName.toLowerCase()===nm.toLowerCase())){applyErrors(form,{gname:'A community group with this name already exists.'});return}
     let res={added:0,updated:0,vslas:0};
@@ -4310,7 +4310,7 @@ function limitExplainer(){
   return `<ol class="small stack" style="padding-left:18px"><li>Starting limit: savings × <b>${L.limitMultiple}</b>${testTag()}.</li><li>Every loan repaid with <b>all instalments on or before the deadline</b> adds ${isNum(L.onTimeBonusPct)?`<b>${L.onTimeBonusPct}%</b>`:ruleCell('loans.onTimeBonusPct')} to the limit.</li><li>The limit never goes above ${isNum(L.maxLimitMultiple)?`savings × <b>${L.maxLimitMultiple}</b>`:ruleCell('loans.maxLimitMultiple')}.</li></ol>`;
 }
 function openSetRule(path){
-  if(!canSetLoanRule()){toast('Only VPBN can set loan rules.','error');return}
+  if(!canSetLoanRule()){toast('Only VBBM can set loan rules.','error');return}
   const f=LOAN_RULE_FIELDS[path];if(!f)return;const v=getPath(rules(),path);
   openModal({title:`${f[0]} · ${curGroup().groupName}`,desc:isNum(v)?`Currently ${f[3](+v)}`:'Currently pending confirmation',body:`<form id="frm-sr" data-form="set-rule" data-key="${path}" novalidate>
     ${field({label:`${f[0]} (${f[1]})`,name:'value',type:'number',value:isNum(v)?v:'',required:true,attrs:f[2],err:'Enter a number in the allowed range.'})}
@@ -4331,7 +4331,7 @@ FORMS['set-rule']=(form,d)=>{
 
 /* fines recorded directly (from the meeting register or the fines tab) */
 function openAddFine(opts={}){
-  if(!canFine()){toast('Only VPBN can record fines.','error');return}
+  if(!canFine()){toast('Only VBBM can record fines.','error');return}
   const r=rules(),mt=opts.meetingId?S.meetings.find(x=>x.id===opts.meetingId):null;
   if(mt&&mt.date>todayISO()){toast('This meeting has not taken place yet, so no fine can be recorded for it.','error');return}
   const m=opts.memberId?byId(opts.memberId):null;
@@ -4446,7 +4446,7 @@ function loanAppsView(){
     {label:'Qualification now',render:a=>['Disbursed','Rejected'].includes(a.status)?'<span class="muted small">Closed</span>':outcomePill(loanEligibility(a.memberId,a.amount,guarantorCounts(a),a.months).outcome)},
     {label:'Progress',render:a=>appTracker(a,true)},
     {label:'Status',render:a=>appPill(a.status)},
-    ...(can('approve')?[{label:'',nolabel:true,cls:'r',render:a=>appOpen(a)?((a.submittedBy===me().id&&UI.role!=='VPBN')?'<span class="muted tiny">Another official decides</span>':btn('app-decision','Approve / reject',{ic:'check',cls:'btn-primary btn-sm',data:`data-id="${a.id}"`})):''}]:[]),
+    ...(can('approve')?[{label:'',nolabel:true,cls:'r',render:a=>appOpen(a)?((a.submittedBy===me().id&&UI.role!=='VBBM')?'<span class="muted tiny">Another official decides</span>':btn('app-decision','Approve / reject',{ic:'check',cls:'btn-primary btn-sm',data:`data-id="${a.id}"`})):''}]:[]),
   ];
   const selfE=own?loanEligibility(me().id):null;
   const asks=own?guarantorAsks(me().id):[];
@@ -4632,7 +4632,7 @@ function remindersPanel(){
   const own=UI.role==='Member';
   if(own||!canRemind()){
     const m=me();
-    return card({title:'My reminder language',sub:'Reminders about loans, fines, meetings and guarantor requests are sent in the language you choose.',body:`<div class="fgrid">${field({label:'Send my reminders in',name:'mylang',opts:REM_LANGS,value:memberLang(m),attrs:'data-change="my-lang"'+(UI.role!=='VPBN'?' disabled':''),hint:UI.role!=='VPBN'?'Ask VPBN to change the reminder language.':''})}<div></div></div>
+    return card({title:'My reminder language',sub:'Reminders about loans, fines, meetings and guarantor requests are sent in the language you choose.',body:`<div class="fgrid">${field({label:'Send my reminders in',name:'mylang',opts:REM_LANGS,value:memberLang(m),attrs:'data-change="my-lang"'+(UI.role!=='VBBM'?' disabled':''),hint:UI.role!=='VBBM'?'Ask VBBM to change the reminder language.':''})}<div></div></div>
       <div class="inline-note" style="margin-top:12px"><b>Example (meeting reminder):</b> ${esc(fillTpl(remTpl('meeting',memberLang(m)),{name:firstName(m.name),group:groupName(m.groupId),date:fmtDate(addDays(todayISO(),3)),time:'14:00',venue:S.chama.meetingPlace||'the usual place',agenda:'Savings; loans; any other business'}))}</div>`});
   }
   const gid=UI.group,cfg=remCfg(gid);UI.rem=UI.rem||{lang:'member',onlyFresh:true};
@@ -4682,7 +4682,7 @@ function setMyLang(l){
   commit(`Your reminders will be sent in ${langName(l)}.`);
 }
 function openRemTpl(ev){
-  if(!canEditTpl()){toast('Only VPBN can change message wording.','error');return}
+  if(!canEditTpl()){toast('Only VBBM can change message wording.','error');return}
   const E=REM_EVENTS[ev];if(!E)return;
   openModal({title:`Wording: ${E.label}`,desc:`Placeholders: ${E.vars.map(v=>'{'+v+'}').join(' ')}`,wide:true,body:`<form id="frm-rt" data-form="rem-tpl" data-ev="${ev}" novalidate>
     ${REM_LANGS.map(([l,n])=>field({label:n,name:'t-'+l,type:'textarea',rows:3,value:remTpl(ev,l),attrs:'maxlength="320"',hint:l==='mas'?'Draft wording: check with a Maa speaker.':'',err:'Enter the message (keep the placeholders you need).'})).join('')}
@@ -4771,7 +4771,7 @@ const readAsDataURL=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload
 async function uploadMeetingDoc(input){
   const m=S.meetings.find(x=>x.id===input.dataset.id),file=input.files&&input.files[0],note=$('#md-note-'+input.dataset.id);
   const say=(t,k='')=>{if(note)note.innerHTML=`<div class="inline-note ${k}">${esc(t)}</div>`};
-  if(!m||!file)return;if(!can('manageMeetings')){say('Only VPBN can upload meeting documents.','bad');return}
+  if(!m||!file)return;if(!can('manageMeetings')){say('Only VBBM can upload meeting documents.','bad');return}
   if((m.documents||[]).length>=DOC_MAX_PER_MEETING){say(`This meeting already has ${DOC_MAX_PER_MEETING} documents. Remove one first.`,'bad');return}
   const isPdf=file.type==='application/pdf'||/\.pdf$/i.test(file.name),isImg=/^image\//.test(file.type);
   if(!isPdf&&!isImg){say('Only photos (JPG, PNG) and PDF files can be uploaded.','bad');input.value='';return}
@@ -5012,7 +5012,7 @@ function ensureChat(){
 
 /* ---------- officials add answers (for HPF details, local facts, Maa wording) ---------- */
 function openChatFaq(){
-  if(!canEditChat()){toast('Only VPBN can manage answers.','error');return}
+  if(!canEditChat()){toast('Only VBBM can manage answers.','error');return}
   const F=chatStore();
   openModal({title:'Assistant answers',desc:'Add answers the assistant should give, for example about the foundation\'s work, local contacts or events. Added answers are used before the built-in ones.',wide:true,body:`${F.length?`<ul class="rows" style="margin-bottom:14px">${F.map(f=>`<li style="align-items:flex-start"><div class="grow"><b>${esc(f.q)}</b><div class="muted small">${esc(f.en)}</div>${f.sw?`<div class="muted small"><span class="pill pill-info">Kiswahili</span> ${esc(f.sw)}</div>`:''}<div class="muted tiny">Keywords: ${esc(f.keys||'-')} · ${esc(firstName(mName(f.by)))}, ${fmtDate(String(f.at).slice(0,10))}</div></div><button type="button" class="btn btn-ghost btn-sm" data-act="chat-faq-del" data-id="${f.id}">${icon('x')}Remove</button></li>`).join('')}</ul>`:'<p class="muted">No answers added yet.</p>'}
     <form id="frm-cf" data-form="chat-faq" novalidate><div class="fgrid">
@@ -5166,13 +5166,13 @@ function groupChooser(){
    v0.9.6 · Olemoncho Community Group: its five VSLAs from the VSLA books
    (Olchoro, Olosuae, Olemoncho B, Osero, Olemoncho A) with members,
    businesses, loans taken and each meeting's savings, Social Fund and
-   School Feeding totals. VPBN is the only role that changes data; the
+   School Feeding totals. VBBM is the only role that changes data; the
    Chairperson, Treasurer, Secretary, members and HPF admin view only.
    ===================================================================== */
-const VPBN='VPBN',VPBN_ID='vpbn';
-const isVPBN=()=>UI.role===VPBN;
-const vpbnUser=()=>({id:VPBN_ID,name:'VPBN',role:VPBN,groupAccess:[UI.group],groupId:UI.group||((S&&S.groups[0])||{}).groupId,status:'Active',accessMode:'',phone:''});
-{const f=me;me=function(){if(S&&UI.role===VPBN)return vpbnUser();return f.apply(this,arguments)}}
+const VBBM='VBBM',VBBM_ID='vpbn';
+const isVBBM=()=>UI.role===VBBM;
+const vpbnUser=()=>({id:VBBM_ID,name:'VBBM',role:VBBM,groupAccess:[UI.group],groupId:UI.group||((S&&S.groups[0])||{}).groupId,status:'Active',accessMode:'',phone:''});
+{const f=me;me=function(){if(S&&UI.role===VBBM)return vpbnUser();return f.apply(this,arguments)}}
 
 /* ---------- the five Olemoncho VSLAs, as written in their books ----------
    book rows: l label, d date (ISO, '' when not legible), dt date as written,
@@ -5181,7 +5181,7 @@ const vpbnUser=()=>({id:VPBN_ID,name:'VPBN',role:VPBN,groupAccess:[UI.group],gro
    photos are left out (null) and listed under "To confirm". */
 const OLM_VSLAS=[
  {key:'O1',name:'Olchoro VSLA',started:'2026-07-20',startedText:'20th July 2026 (written "VSLA taken on 20/07/2026")',book:[
-   {l:'Start of the VSLA (initial)',d:'2026-07-20',dt:'20/07/2026',cin:95400,cout:95400,n:'Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". No separate savings, Social Fund or School Feeding figures are written for Olchoro.'}]},
+   {l:'Start of the VSLA (initial)',d:'2026-07-20',dt:'20/07/2026',cin:95400,cout:95400,n:'Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". Cash in was deposited in the bank; cash out is the 7 loans given that day (95,400), counted once as the loans. No separate savings, Social Fund or School Feeding figures are written for Olchoro.'}]},
  {key:'O2',name:'Oloisuai VSLA',started:'2026-09-01',startedText:'1st September 2026',book:[
    {l:'1st meeting (initial savings)',d:'2026-09-01',dt:'1st Sep 2026',sav:52200,sfp:1600,sf:3200},
    {l:'2nd meeting',d:'2026-09-30',dt:'30th Sep 2026',sav:19000,sf:3400,sfp:2300,loan:2000}]},
@@ -5196,38 +5196,38 @@ const OLM_VSLAS=[
    {l:'2nd meeting',d:'2026-10-07',dt:'7/10/2026',sav:8400,sf:1000,sfp:1000,loan:12030}]},
 ];
 /* members: [name, VSLA, phone shown as prefix-last 3 digits ('' = not given yet), role, business, loan taken, loan date (YYYY-MM-DD: the date of the meeting written in the book margin; '' = not readable), check note, why the loan amount is not recorded, phone note].
-   Full phone numbers are NOT kept here (the site is public): VPBN imports them privately (Members → Import from Excel, matched by member number). */
+   Full phone numbers are NOT kept here (the site is public): VBBM imports them privately (Members → Import from Excel, matched by member number). */
 const OLM_ROSTER=[
- ['Edna Kimurmur','O1','','Secretary','Sheep',10000],
- ['Noomelin Nkoitoi','O1','','Treasurer','Potatoes & sugar',15000],
- ['Purity Nkoitoi','O1','','','Poultry',15000],
- ['Nalotuesha Nkoitoi','O1','','Chairperson','Beads & beadwork',3700],
- ['Doreen Nkoitoi','O1','','','Sheep',20000],
+ ['Edna Kimurmur','O1','','Secretary','Sheep',10000,'2026-07-20'],
+ ['Noomelin Nkoitoi','O1','','Treasurer','Potatoes & sugar',15000,'2026-07-20'],
+ ['Purity Nkoitoi','O1','','','Poultry',15000,'2026-07-20'],
+ ['Nalotuesha Nkoitoi','O1','','Chairperson','Beads & beadwork',3700,'2026-08-17'],
+ ['Doreen Nkoitoi','O1','','','Sheep',20000,'2026-07-20'],
  ['Mum Sampeyian','O1'],
- ['Kisunyunye Nkoitoi','O1','','','Ushanga (beads)',10000,'','Business word hard to read (Ushanga?).'],
+ ['Kisunyunye Nkoitoi','O1','','','Ushanga (beads)',10000,'2026-07-20','Business word hard to read (Ushanga?).'],
  ['Rebecca Nkoitoi','O1'],
  ['Eliza Nkoitoi','O1'],
- ['Kisaru Nkoitoi','O1','','','Sheep',15400],
+ ['Kisaru Nkoitoi','O1','','','Sheep',15400,'2026-07-20'],
  ['Nadutari Musukut','O1'],
  ['Kinampet Nkoitoi','O1'],
- ['Silal Nkoitoi','O1','','','Beads & beadwork',12000],
- ['Mariamu Nkoitoi','O1','','','Sheep',10000],
+ ['Silal Nkoitoi','O1','','','Beads & beadwork',12000,'2026-08-17'],
+ ['Mariamu Nkoitoi','O1','','','Sheep',10000,'2026-07-20'],
  ['Manati Nkoitoi','O1'],
  ['Naserian Nkoitoi','O1'],
  ['Hellen Nkoitoi','O1'],
- ['Naisuaku Nkoitoi','O1','','','Rams',12900,'','First name hard to read.'],
+ ['Naisuaku Nkoitoi','O1','','','Rams',12900,'2026-08-17','First name hard to read.'],
  ['Kiramaticho Nkoitoi','O1'],
  ['Kashumpa Nkoitoi','O1'],
  ['Naanyu Nkoitoi','O1','','','',null,'','First name hard to read.'],
  ['Naitayuang Liaram','O2','','Chairperson'],
- ['Noomali Maleto','O2','','Treasurer','Mtumba (second-hand clothes)',15000,'2026-09-01'],
+ ['Noomali Maleto','O2','','Treasurer','Mtumba (second-hand clothes)',15000,'2026-09-30'],
  ['Naisae Lekakeng','O2','','Secretary','Buying lambs',18000,'2026-09-01'],
  ['Naibartuni Sairowua','O2'],
- ['Ndari Dorop','O2','','','Petrol',3000],
+ ['Ndari Dorop','O2','','','Petrol',3000,'2026-09-30'],
  ['Konga Maleto','O2','','','',null,'','Written over a crossed-out name ("Napolos Nkoitoi") and marked *.'],
- ['Nemanyara Nkoitoi','O2','','','Potatoes',8000],
+ ['Nemanyara Nkoitoi','O2','','','Potatoes',8000,'2026-09-01'],
  ['Esther Nkoitoi','O2'],
- ['Noonkipa Gilisho','O2','','','Beads & beadwork',3000],
+ ['Noonkipa Gilisho','O2','','','Beads & beadwork',3000,'2026-09-30'],
  ['Loice Karia','O2'],
  ['Kiasunye Koitoi','O2'],
  ['Nalangu Nkoitoi','O2'],
@@ -5248,7 +5248,7 @@ const OLM_ROSTER=[
  ['Noorkiyanyu Sairowua','O3','01-088','','Groceries & shop',15000,'2026-09-02'],
  ['Noonkipa Nkoitoi','O3','07-156','','Beads & beadwork',4800,'2026-09-02'],
  ['Nataana Karia','O3','01-080'],
- ['Noorkisaruni Nkoitoi','O3','01-577'],
+ ['Noorkisaruni Nkoitoi','O3','07-140'],
  ['Nanyikae Nkoitoi','O3','07-046','','Petrol',10000,'2026-09-02'],
  ['Noosokon Nkoitoi','O3','07-440'],
  ['Nosim Mpoe','O3','07-213'],
@@ -5259,7 +5259,7 @@ const OLM_ROSTER=[
  ['Noosianai Pesi','O3','07-275'],
  ['Tori Nkoitoi','O3','07-289','','Petrol',5000,'2026-09-02','A word in brackets after the name is not clear.'],
  ['Nawuai Pesi','O3','07-079'],
- ['Noorkisaruni Naimodu','O3','','','',null,'','Phone number still to be sent (the number on the list is Noorkisaruni Nkoitoi\'s).'],
+ ['Noorkisaruni Naimodu','O3','07-395'],
  ['Macline Yiale','O4','','Secretary','Mtumba (second-hand clothes)',20000,'2026-09-02'],
  ['Ann Sairowua','O4'],
  ['Nolarami Sairowua','O4','','Treasurer'],
@@ -5281,25 +5281,25 @@ const OLM_ROSTER=[
  ['Kajija Pesi','O4'],
  ['Kunai Karia','O4'],
  ['Lilian Sairowua','O5','07-407','Secretary'],
- ['Nalamae Sairowua','O5','07-627','','Shop',10000],
- ['Arami Karia','O5','07-104','','Shuka',10000],
- ['Josphine Sairowua','O5','07-950','','Shop',22300],
+ ['Nalamae Sairowua','O5','07-627','','Shop',10000,'2026-09-04'],
+ ['Arami Karia','O5','07-104','','Shuka',10000,'2026-09-04'],
+ ['Josphine Sairowua','O5','07-950','','Shop',22300,'2026-09-04'],
  ['Noorkimpi Karia','O5','07-285'],
  ['Kiteleki Naimodu','O5','07-330','','',null,'','','','Shares this phone with Noonkiseyia Naimodu.'],
- ['Norkiteto Lenjir','O5','07-987','','Nguo (clothes)',14000],
+ ['Norkiteto Lenjir','O5','07-987','','Nguo (clothes)',14000,'2026-09-04'],
  ['Esther Karia','O5','07-230'],
  ['Faith Karia','O5','07-896'],
  ['Kitiringa Nkoitoi','O5','07-027','Treasurer'],
  ['Parakuo Tongoyo','O5','07-219'],
  ['Jane Sairowua','O5','07-556'],
- ['Kimererio Sairowua','O5','07-596','','Shuka',15000],
+ ['Kimererio Sairowua','O5','07-596','','Shuka',15000,'2026-09-04'],
  ['Hellen Karia','O5','07-145'],
  ['Noonkiseyia Naimodu','O5','07-330','','',null,'','','','Shares this phone with Kiteleki Naimodu.'],
  ['Ntina Naimodu','O5','07-057','','',null,'','First letter hard to read (Ntina or Mtina?).'],
  ['Kijoolu Nkoitoi','O5','07-113'],
- ['Magdaline Sairowua','O5','07-312','Chairperson','Sheep / ram',10000],
+ ['Magdaline Sairowua','O5','07-312','Chairperson','Sheep / ram',10000,'2026-10-07'],
  ['Grace Lenjir','O5','07-272'],
- ['Everline Lentir','O5','07-567','','Selling honey',10430],
+ ['Everline Lentir','O5','07-567','','Selling honey',10430,'2026-10-07'],
 ];
 const OLM_GID='GRP-01',OLM_LISTED='2026-10-15';
 const BOOK_FIELDS=[['savings','Savings'],['socialFund','Social Fund'],['schoolFeeding','School Feeding'],['loan','Loan repaid at the meeting'],['cashIn','Cash in (to the bank)'],['cashOut','Cash out (from the bank)']];
@@ -5362,7 +5362,9 @@ function applyOlemonchoRoster(st){
 const BOOK_POST={savings:{type:'saving',suf:'SV'},socialFund:{type:'contribution',cat:'CAT-SOCIAL',suf:'SF'},schoolFeeding:{type:'contribution',cat:'CAT-SFP',suf:'SFP'}};
 const BOOK_CASH={loan:{dir:'in',suf:'RP',cat:'Loan repayments (VSLA total)',desc:'loan repayments received at the meeting (members not named)',fund:'Loans'},cashIn:{dir:'in',suf:'IN',cat:'Bank: cash in (VSLA book)',desc:'cash in, deposited in the bank (not savings)',fund:'Bank'},cashOut:{dir:'out',suf:'OUT',cat:'Bank: cash out (VSLA book)',desc:'cash out, withdrawn from the bank (not savings)',fund:'Bank'}};
 const isGroupRec=e=>!!(e&&e.type!=='loan'&&(e.bookRef||e.fineRef)); /* a VSLA book loan belongs to its member */
-const OLM_BOOK_REV=3;
+const OLM_BOOK_REV=4;
+const OLM_PHONE_FIX={'OLM-051':['01xx xxx 577','07xx xxx 140'],'OLM-062':['Not added','07xx xxx 395']};
+const OLM_OLD_NOTE='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". No separate savings, Social Fund or School Feeding figures are written for Olchoro.',OLM_NEW_NOTE='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". Cash in was deposited in the bank; cash out is the 7 loans given that day (95,400), counted once as the loans. No separate savings, Social Fund or School Feeding figures are written for Olchoro.';
 const OLM_RENAMES={'OLM-063':['Madline Yiale','Macline Yiale']},OLM_VSLA_RENAMES={'Olosuae VSLA':'Oloisuai VSLA'};
 function postVslaBooks(st,{audit=false}={}){
   st.ledger=(st.ledger||[]).filter(e=>!e.bookRef&&!e.fineRef);st.cashbook=(st.cashbook||[]).filter(c=>!c.bookRef);
@@ -5374,6 +5376,8 @@ function postVslaBooks(st,{audit=false}={}){
     Object.entries(BOOK_POST).forEach(([k,p])=>{if(b[k]==null)return;if(p.cat&&!cats.some(c=>c.id===p.cat))return;
       st.ledger.push({...base,id:`${b.id}-${p.suf}`,type:p.type,amount:+b[k],...(p.type==='contribution'?{category:p.cat,period:monthKey(b.date),expected:null}:{})});add(v.groupId)});
     Object.entries(BOOK_CASH).forEach(([k,p])=>{if(b[k]==null)return;
+      /* a cash out on a day members' loans were given is those loans: count it once, as the loans */
+      if(k==='cashOut'&&(st.members||[]).some(m=>m.vslaId===v.vslaId&&m.vslaBook&&m.vslaBook.loan!=null&&m.vslaBook.loanDate===b.date))return;
       st.cashbook.push({id:`${b.id}-${p.suf}`,chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,direction:p.dir,date:b.date,ref,description:`${v.name}: ${p.desc}`,category:p.cat,bookFund:p.fund||'',amount:+b[k],approvedBy:'',reason:'From the VSLA book',status:'Recorded',by:'vsla-book',bookRef:b.id,source:'vsla-book',at});add(v.groupId)});
   }));
   /* members' loans from the VSLA books, given at the meeting written in the margin: tracked as internal loans
@@ -5397,11 +5401,14 @@ function syncOlemonchoBook(st){
   const g=(st.groups||[]).find(x=>x.groupId===OLM_GID);if(!g)return st;let n=0;
   (st.vslas||[]).forEach(v=>{if(v.groupId===OLM_GID&&OLM_VSLA_RENAMES[v.name]){v.name=OLM_VSLA_RENAMES[v.name];n++}});
   Object.entries(OLM_RENAMES).forEach(([id,[from,to]])=>{const m=st.members.find(x=>x.id===id);if(m&&m.name===from){m.name=to;n++}});
+  Object.entries(OLM_PHONE_FIX).forEach(([id,[from,to]])=>{const m=st.members.find(x=>x.id===id);if(m&&m.phone===from){m.phone=to;m.phoneMasked=true;n++}});
+  (st.vslas||[]).forEach(v=>(v.book||[]).forEach(b=>{if(b.note===OLM_OLD_NOTE){b.note=OLM_NEW_NOTE;n++}}));
+  (st.audit||[]).forEach(a=>{if(a.role==='VP'+'BN')a.role='VBBM'});
   OLM_ROSTER.forEach(([name,key,ph='',role=''],i)=>{const m=st.members.find(x=>x.id===`${g.code||'OLM'}-${String(i+1).padStart(3,'0')}`);
     if(m&&m.name===name&&role&&m.role==='Member'){m.role=role;m.groupAccess=[m.groupId];n++}});
   OLM_ROSTER.forEach(([name,key,ph='',role='',business='',loan=null,loanDate='',note='',loanUnclear=''],i)=>{
     const id=`${g.code||'OLM'}-${String(i+1).padStart(3,'0')}`,m=st.members.find(x=>x.id===id);
-    if(!m||m.source!=='VSLA book'||m.name!==name||m.updatedAt!==OLM_LISTED+'T10:00')return; /* changed by VPBN, or not the same person: leave it */
+    if(!m||m.source!=='VSLA book'||m.name!==name||m.updatedAt!==OLM_LISTED+'T10:00')return; /* changed by VBBM, or not the same person: leave it */
     const b=m.vslaBook||{};if(b.business===business&&b.loan===loan&&(b.loanDate||'')===loanDate&&(b.loanUnclear||'')===loanUnclear&&(m.note||'')===note)return;
     m.vslaBook={business,loan,loanDate,loanUnclear};m.note=note;n++;
   });
@@ -5425,7 +5432,7 @@ function setOlemonchoLoanRules(st){
   const rev=!!S.olemonchoRoster&&S.olemonchoBookRev!==OLM_BOOK_REV;if(rev)syncOlemonchoBook(S);
   const lr=!!S.olemonchoRoster&&S.olemonchoLoanRulesRev!==OLM_LOAN_RULES_REV;if(lr)setOlemonchoLoanRules(S);
   if(rev||lr||!S.vslaBooksPosted)postVslaBooks(S,{audit:true})}}
-/* every save rebuilds them, so new fine payments and VPBN edits are always reflected */
+/* every save rebuilds them, so new fine payments and VBBM edits are always reflected */
 {const f=saveState;saveState=function(){if(S&&S.chama&&Array.isArray(S.ledger))postVslaBooks(S);return f.apply(this,arguments)}}
 
 /* a VSLA total or a fine in the group's savings opens as what it is */
@@ -5435,7 +5442,7 @@ function setOlemonchoLoanRules(st){
   if(e.fineRef){const fn=S.fines.find(x=>x.id===e.fineRef);
     openDrawer({title:`Savings ${e.id}`,desc:'A paid fine, added to the group\'s savings',body:`${notice('Fines paid go to the group\'s savings. The member\'s own savings do not change.',{ic:'info',tone:'teal'})}
       <div class="card" style="padding:18px"><dl class="kv"><dt>Fine</dt><dd>${esc(e.fineRef)}${fn?' · '+esc(fn.type):''}</dd><dt>Paid by</dt><dd>${esc(mName(e.fineMemberId))}</dd><dt>Goes to</dt><dd>${esc(e.vslaId?vslaName(e.vslaId)+' savings':groupName(e.groupId)+' savings')}</dd><dt>Date paid</dt><dd>${fmtDate(e.date)}</dd><dt>Amount</dt><dd class="num"><b>${ksh(e.amount)}</b></dd></dl></div>`});return}
-  openDrawer({title:`${TYPE_LABEL[e.type]} ${e.id}`,desc:'VSLA total from the VSLA book',body:`${notice(`This is the total written in the VSLA book for one meeting; members are not itemised. ${can('editChama')?'To change it, edit the meeting on the VSLA groups page; Savings, Contributions and the Cash Book follow automatically.':'VPBN changes it on the VSLA groups page.'}`,{ic:'book',tone:'teal'})}
+  openDrawer({title:`${TYPE_LABEL[e.type]} ${e.id}`,desc:'VSLA total from the VSLA book',body:`${notice(`This is the total written in the VSLA book for one meeting; members are not itemised. ${can('editChama')?'To change it, edit the meeting on the VSLA groups page; Savings, Contributions and the Cash Book follow automatically.':'VBBM changes it on the VSLA groups page.'}`,{ic:'book',tone:'teal'})}
     <div class="card" style="padding:18px"><dl class="kv"><dt>VSLA</dt><dd>${esc(vslaName(e.vslaId))}</dd><dt>Meeting</dt><dd>${esc(e.bookLabel||'')}</dd><dt>Date</dt><dd>${fmtDate(e.date)}</dd>${e.type==='contribution'?`<dt>Fund</dt><dd>${esc(catName(e.category,e.groupId))}</dd>`:''}<dt>Amount</dt><dd class="num"><b>${ksh(e.amount)}</b></dd></dl></div>
     <div style="margin-top:14px"><a class="btn btn-secondary btn-sm" href="#/vslas">${icon('book')}Open VSLA groups</a></div>`});
 }}
@@ -5495,7 +5502,9 @@ const sameVslaGuarantor=(applicantId,gId)=>{const a=byId(applicantId),g=byId(gId
    Records are linked to a VSLA directly (vslaId) or through their member; records with no VSLA link
    (for example a community-group meeting) are shared and show under every VSLA. */
 const VSLA_KEY='chama.subgroup';
-function curVsla(){if(!UI.vsla||!S)return null;const v=vslaById(UI.vsla);return v&&v.groupId===UI.group?v:null}
+function hasSubgroups(gid){return !!S&&vslasOf(gid).some(v=>v.source==='VSLA book')}
+function curVsla(){if(!UI.vsla||!S)return null;const v=vslaById(UI.vsla);return v&&v.groupId===UI.group&&v.source==='VSLA book'?v:null}
+const subName=v=>v.name.replace(/ VSLA$/,'');
 function recVsla(x){if(!x)return '';if(x.vslaId)return x.vslaId;const mid=x.memberId;if(mid&&!String(mid).includes(':')){const m=byId(mid);return m&&m.vslaId||''}return ''}
 function inSubgroup(x){const v=curVsla();if(!v)return true;const vid=x&&x.vslaId!==undefined&&x.groupId!==undefined&&x.name!==undefined&&x.book!==undefined?x.vslaId:recVsla(x);return !vid||vid===v.vslaId}
 function subOk(x,gid){return gid!==UI.group||inSubgroup(x)}
@@ -5507,19 +5516,48 @@ function setSubgroup(id){UI.vsla=id&&id!=='all'?id:'';saveVslaPref();UI.f={};UI.
 {const f=withGroup;withGroup=function(gid,fn){const v=UI.vsla;UI.vsla='';try{return f(gid,fn)}finally{UI.vsla=v}}}
 /* the role switcher acts as the officials of the selected VSLA */
 {const f=roleHolder;roleHolder=function(role,gid){const v=curVsla();if(v&&S&&gid===UI.group&&role!=='Platform Owner/Admin'){return S.members.find(m=>m.vslaId===v.vslaId&&m.status==='Active'&&m.role===role)||null}return f.apply(this,arguments)}}
-/* sidebar: Subgroup (VSLA) under Community group */
+/* no separate subgroup list in the sidebar: the sidebar picks the community group only (Mbitin, Nterere, Olemoncho).
+   Picking a community group opens it in detail; Olemoncho then shows its groups to choose from. */
 {const f=renderNav;renderNav=function(){
   f.apply(this,arguments);if(!S)return;
-  const gp=document.querySelector('.chama-chip .group-pick');if(!gp)return;
-  let box=document.getElementById('vsla-pick');
-  if(!box){box=document.createElement('div');box.id='vsla-pick';box.className='group-pick';box.style.marginTop='8px';box.innerHTML='<label for="vsla-select">Subgroup (VSLA)</label><select id="vsla-select" aria-label="Select subgroup"></select>';gp.after(box)}
-  const V=vslasOf(UI.group);box.hidden=!V.length;
   if(UI.vsla&&!curVsla())UI.vsla='';
-  document.getElementById('vsla-select').innerHTML=`<option value="">All ${V.length} VSLAs</option>`+V.map(v=>`<option value="${v.vslaId}" ${v.vslaId===UI.vsla?'selected':''}>${esc(v.name.replace(/ VSLA$/,''))}</option>`).join('');
+  const old=document.getElementById('vsla-pick');if(old)old.remove();
+  const link=document.querySelector('#nav a[href="#/vslas"]');
+  if(link){if(!hasSubgroups(UI.group))link.remove();else{const sp=link.querySelector('span');if(sp&&UI.role!=='Member')sp.textContent=`Groups in ${curGroup().groupName}`}}
 }}
-document.addEventListener('change',e=>{const t=e.target;if(t.id==='vsla-select'){e.stopImmediatePropagation();setSubgroup(t.value)}else if(t.id==='group-select'){UI.vsla='';saveVslaPref()}},true);
-/* every page says which subgroup it shows, with a way back to the whole community group */
-{const f=pageHeader;pageHeader=function(o){const v=inApp()&&UI.groupPicked&&curVsla();if(v&&o&&o.title!=='Choose your community group')o={...o,actions:(o.actions||'')+`<span class="pill pill-teal">${icon('users')}${esc(v.name)} only</span><button type="button" class="btn btn-ghost btn-sm" data-act="set-vsla" data-v="">Show all ${esc(curGroup().groupName)}</button>`};return f.call(this,o)}}
+document.addEventListener('change',e=>{const t=e.target;if(t.id==='group-select'){UI.vsla='';saveVslaPref();UI.tab=UI.tab||{};UI.tab.dash='group'}},true);
+/* every page in one group says so, with the way back to all of the community group's groups */
+{const f=pageHeader;pageHeader=function(o){const v=inApp()&&UI.groupPicked&&curVsla();
+  if(v&&o&&o.title!=='Choose your community group'){const g=curGroup();
+    o={...o,title:o.title===g.groupName?v.name:o.title,crumbs:o.title===g.groupName?esc(g.groupName):o.crumbs,actions:(o.actions||'')+`<span class="pill pill-teal">${icon('users')}${esc(v.name)} only</span><button type="button" class="btn btn-ghost btn-sm" data-act="set-vsla" data-v="">Back to all ${vslasOf(g.groupId).length} groups</button>`}}
+  return f.call(this,o)}}
+/* the community group's groups, to choose one */
+function subgroupPicker(){
+  if(!hasSubgroups(UI.group)||UI.role==='Member')return '';
+  const g=curGroup(),V=vslasOf(UI.group),cur=curVsla();
+  if(cur)return `<div class="chips no-print" style="margin:-4px 0 18px;align-items:center"><span class="muted small">Groups in ${esc(g.groupName)}:</span>${V.map(v=>`<button type="button" class="chip" aria-pressed="${v.vslaId===cur.vslaId}" data-act="set-vsla" data-v="${v.vslaId}">${esc(subName(v))}</button>`).join('')}<button type="button" class="chip" aria-pressed="false" data-act="set-vsla" data-v="">All ${V.length} groups</button></div>`;
+  const off=(v,r)=>{const m=vbMembers(v).find(x=>x.role===r);return m?esc(m.name):'<span class="muted">-</span>'};
+  return card({title:`The ${V.length} groups in ${esc(g.groupName)}`,sub:'Choose a group to see only its own records: members, savings, contributions, loans and cash book.',body:`<div class="grid-3">${V.map(v=>`<button type="button" class="card" data-act="set-vsla" data-v="${v.vslaId}" style="text-align:left;padding:16px;cursor:pointer;font:inherit;color:inherit;width:100%">
+      <b style="font:600 1.05rem 'Sora',sans-serif">${esc(subName(v))}</b><div class="muted small" style="margin:2px 0 10px">${plural(vbMembers(v).length,'member')}</div>
+      <dl class="kv small" style="margin:0"><dt>Savings</dt><dd>${vbAmt(vbSum([v],'savings'))}</dd><dt>Loans taken</dt><dd>${vbAmt(vbLoans([v]))}</dd><dt>Chairlady</dt><dd>${off(v,'Chairperson')}</dd></dl>
+      <div style="margin-top:10px;color:var(--teal-700);font-weight:600" class="small">Open ${esc(subName(v))} →</div></button>`).join('')}</div>`})+'<div style="height:16px"></div>';
+}
+{const f=dashOfficial;dashOfficial=function(){const h=f.apply(this,arguments),p=subgroupPicker();return p?afterHeader(h,p):h}}
+{const f=dashSecretary;dashSecretary=function(){const h=f.apply(this,arguments),p=subgroupPicker();return p?afterHeader(h,p):h}}
+
+/* Cash Book: cash in and cash out of the 3 community groups, Olemoncho split into its groups (VBBM and HPF admin) */
+function allGroupsCashCard(){
+  if(!(isPlatformOwner()||isVBBM()))return '';
+  const sumFor=(gid,vid)=>{const og=UI.group,ov=UI.vsla;UI.group=gid;UI.vsla=vid;try{const c=cashSummary(gid);return{tin:c.totalIn,tout:c.totalOut,bal:c.balance}}finally{UI.group=og;UI.vsla=ov}};
+  const rows=[];
+  S.groups.forEach(g=>{rows.push({name:g.groupName,lvl:0,...sumFor(g.groupId,'')});if(hasSubgroups(g.groupId))vslasOf(g.groupId).forEach(v=>rows.push({name:subName(v),lvl:1,...sumFor(g.groupId,v.vslaId)}))});
+  const top=rows.filter(r=>!r.lvl),T={tin:sum(top,r=>r.tin),tout:sum(top,r=>r.tout),bal:sum(top,r=>r.bal)};
+  return card({flush:true,title:'Cash in and cash out: all community groups',sub:'Mbitin, Nterere and Olemoncho, with Olemoncho\'s groups shown under it. Each group\'s own cash book is below when you open it.',body:table({caption:'Cash by community group',cols:[
+    {label:'Community group / group',render:r=>r.lvl?`<span style="padding-left:18px" class="small">↳ ${esc(r.name)}</span>`:`<b>${esc(r.name)}</b>`},
+    {label:'Cash in',cls:'r',render:r=>`<span class="num">${ksh(r.tin)}</span>`},{label:'Cash out',cls:'r',render:r=>`<span class="num">${ksh(r.tout)}</span>`},{label:'Balance',cls:'r',render:r=>`<span class="num">${r.lvl?ksh(r.bal):'<b>'+ksh(r.bal)+'</b>'}</span>`}],rows,
+    foot:`<tfoot><tr><td class="cell-main">All ${top.length} community groups</td><td class="r" data-label="Cash in">${ksh(T.tin)}</td><td class="r" data-label="Cash out">${ksh(T.tout)}</td><td class="r" data-label="Balance">${ksh(T.bal)}</td></tr></tfoot>`})})+'<div style="height:16px"></div>';
+}
+{const f=cashbookView;cashbookView=function(){const h=f.apply(this,arguments),c=allGroupsCashCard();return c?afterHeader(h,c):h}}
 
 /* say plainly on each page where the figures come from */
 const afterHeader=(h,extra)=>{const m=h.match(/^\s*<div class="ph">[\s\S]*?<\/div><\/div>/);return m?m[0]+extra+h.slice(m[0].length):extra+h};
@@ -5541,38 +5579,38 @@ savingsViewObj.render=savingsView;contributionsViewObj.render=contributionsView;
   if(u.n)h=h.replace(/(Cash balance \(cash book\)<\/div><div class="val">[^<]*<\/div><div class="sub">)/,`$1${plural(u.n,'loan')} without a date not included yet · `);
   return h}}
 
-/* ---------- only VPBN changes data: a safety net under every form, button and selector ---------- */
-const VPBN_ACTS=new Set(['rec-contrib','rec-saving','rec-loan','rec-repay','add-member','edit-member','sched-meeting','correct-record','reverse-record','edit-chama','reset-demo','erase-data','fine-pay','ledger-import','resolve-issue','import-members','add-group','add-vsla','rename-vsla','sfp-spend','submit-contrib','confirm-sub','reject-sub','set-loan-rate','fine-waive','add-fine','meeting-fine','set-rule','rec-welfare','welfare-review','apply-loan','app-decision','disburse','cash-in','cash-out','cash-reverse','sms-queue','edit-group-rules','load-illus','edit-group','sb-push','sb-pull','sb-disconnect','guar-respond','rem-send','rem-tpl','sched-mode','record-past','mtg-doc-del','chat-faq-del','att-set','att-all','vb-total','vb-member']);
-const VPBN_FREE_FORMS=new Set(['ussd']);
-const VPBN_CHANGES=['set-role','set-access','mtg-doc','my-lang'];
-const viewOnlyToast=()=>toast('View only: only VPBN can add or change data. Switch to VPBN in the top bar to make changes.','error');
+/* ---------- only VBBM changes data: a safety net under every form, button and selector ---------- */
+const VBBM_ACTS=new Set(['rec-contrib','rec-saving','rec-loan','rec-repay','add-member','edit-member','sched-meeting','correct-record','reverse-record','edit-chama','reset-demo','erase-data','fine-pay','ledger-import','resolve-issue','import-members','add-group','add-vsla','rename-vsla','sfp-spend','submit-contrib','confirm-sub','reject-sub','set-loan-rate','fine-waive','add-fine','meeting-fine','set-rule','rec-welfare','welfare-review','apply-loan','app-decision','disburse','cash-in','cash-out','cash-reverse','sms-queue','edit-group-rules','load-illus','edit-group','sb-push','sb-pull','sb-disconnect','guar-respond','rem-send','rem-tpl','sched-mode','record-past','mtg-doc-del','chat-faq-del','att-set','att-all','vb-total','vb-member']);
+const VBBM_FREE_FORMS=new Set(['ussd']);
+const VBBM_CHANGES=['set-role','set-access','mtg-doc','my-lang'];
+const viewOnlyToast=()=>toast('View only: only VBBM can add or change data. Switch to VBBM in the top bar to make changes.','error');
 const inApp=()=>!!S&&document.body.dataset.mode==='app';
-document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||!inApp()||isVPBN()||!VPBN_ACTS.has(t.dataset.act))return;e.preventDefault();e.stopImmediatePropagation();viewOnlyToast()},true);
-document.addEventListener('submit',e=>{const f=e.target.closest('form[data-form]');if(!f||!inApp()||isVPBN()||VPBN_FREE_FORMS.has(f.dataset.form))return;e.preventDefault();e.stopImmediatePropagation();viewOnlyToast()},true);
-document.addEventListener('change',e=>{const t=e.target;if(!inApp()||isVPBN()||!t.matches||!VPBN_CHANGES.some(c=>t.matches(`[data-change="${c}"]`)))return;e.preventDefault();e.stopImmediatePropagation();if(t.type==='file')t.value='';viewOnlyToast();route()},true);
+document.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||!inApp()||isVBBM()||!VBBM_ACTS.has(t.dataset.act))return;e.preventDefault();e.stopImmediatePropagation();viewOnlyToast()},true);
+document.addEventListener('submit',e=>{const f=e.target.closest('form[data-form]');if(!f||!inApp()||isVBBM()||VBBM_FREE_FORMS.has(f.dataset.form))return;e.preventDefault();e.stopImmediatePropagation();viewOnlyToast()},true);
+document.addEventListener('change',e=>{const t=e.target;if(!inApp()||isVBBM()||!t.matches||!VBBM_CHANGES.some(c=>t.matches(`[data-change="${c}"]`)))return;e.preventDefault();e.stopImmediatePropagation();if(t.type==='file')t.value='';viewOnlyToast();route()},true);
 
 /* every page tells a view-only role so, next to the page title */
-{const f=pageHeader;pageHeader=function(o){if(inApp()&&UI.groupPicked&&!isVPBN()&&o&&o.title!=='Choose your community group')o={...o,actions:(o.actions||'')+pill('neutral','View only · VPBN changes data','lock')};return f.call(this,o)}}
+{const f=pageHeader;pageHeader=function(o){if(inApp()&&UI.groupPicked&&!isVBBM()&&o&&o.title!=='Choose your community group')o={...o,actions:(o.actions||'')+pill('neutral','View only · VBBM changes data','lock')};return f.call(this,o)}}
 
-/* top bar: VPBN sits with the HPF program view; the group's officials and members are view only */
+/* top bar: VBBM sits with the HPF program view; the group's officials and members are view only */
 {const f=renderNav;renderNav=function(){
   f.apply(this,arguments);if(!S)return;
   const sel=$('#role-select');
   if(sel){const g=curGroup();
-    sel.innerHTML=`<optgroup label="HPF program"><option value="${VPBN}" ${isVPBN()?'selected':''}>VPBN · can change data</option><option value="Platform Owner/Admin" ${UI.role==='Platform Owner/Admin'?'selected':''}>HPF program admin · all groups (view only)</option></optgroup><optgroup label="${esc(g.groupName)} · view only">${ROLES.filter(r=>r!=='Platform Owner/Admin').map(r=>{const p=roleHolder(r,g.groupId);return `<option value="${r}" ${r===UI.role?'selected':''}>${r} · ${p?esc(firstName(p.name)):'not assigned'}</option>`}).join('')}</optgroup>`}
-  const vl=$('#viewer-line');if(vl)vl.textContent=`DEMO ONLY · ${UI.role}${isVPBN()?' (can change data)':' (view only)'} · ${S.chama.chamaId} · ${UI.group}`;
+    sel.innerHTML=`<optgroup label="HPF program"><option value="${VBBM}" ${isVBBM()?'selected':''}>VBBM · can change data</option><option value="Platform Owner/Admin" ${UI.role==='Platform Owner/Admin'?'selected':''}>HPF program admin · all groups (view only)</option></optgroup><optgroup label="${esc(g.groupName)} · view only">${ROLES.filter(r=>r!=='Platform Owner/Admin').map(r=>{const p=roleHolder(r,g.groupId);return `<option value="${r}" ${r===UI.role?'selected':''}>${r} · ${p?esc(firstName(p.name)):'not assigned'}</option>`}).join('')}</optgroup>`}
+  const vl=$('#viewer-line');if(vl)vl.textContent=`DEMO ONLY · ${UI.role}${isVBBM()?' (can change data)':' (view only)'} · ${S.chama.chamaId} · ${UI.group}`;
 }}
 
-/* choose a community group: enter as VPBN (changes data) or view as an official or member */
+/* choose a community group: enter as VBBM (changes data) or view as an official or member */
 groupChooser=function(){
   const holders=(r,gid)=>S.members.filter(m=>m.groupId===gid&&m.status==='Active'&&m.role===r);
   const card1=g=>{const vs=vslasOf(g.groupId),ms=S.members.filter(m=>m.groupId===g.groupId&&m.status==='Active');
-    const offs=['Chairperson','Treasurer','Secretary'].map(r=>{const P=holders(r,g.groupId);return `<li><span class="muted">${r}:</span> ${P.length?P.map(p=>esc(p.name)+(vs.length>1&&p.vslaId?` <span class="muted tiny">(${esc(vslaName(p.vslaId))})</span>`:'')).join(', '):'<i class="muted">not assigned yet</i>'}</li>`}).join('');
-    return `<section class="card choose-g"><div class="card-b"><h2 style="margin:0">${esc(g.groupName)}</h2><p class="muted small" style="margin:2px 0 6px">${g.school?esc(g.school)+' school · ':''}${plural(vs.length,'VSLA')} · ${plural(ms.length,'member')}</p>
-      ${vs.length&&!vs.every(v=>v.namePending)?`<p class="small" style="margin:0 0 8px"><span class="muted">VSLAs:</span> ${vs.map(v=>esc(v.name.replace(/ VSLA$/,''))).join(', ')}</p>`:''}
+    const offs=['Chairperson','Treasurer','Secretary'].map(r=>{const P=holders(r,g.groupId);return `<li><span class="muted">${r}:</span> ${P.length?P.map(p=>esc(p.name)+(hasSubgroups(g.groupId)&&p.vslaId?` <span class="muted tiny">(${esc(subName(vslaById(p.vslaId)||{name:''}))})</span>`:'')).join(', '):'<i class="muted">not assigned yet</i>'}</li>`}).join('');
+    return `<section class="card choose-g"><div class="card-b"><h2 style="margin:0">${esc(g.groupName)}</h2><p class="muted small" style="margin:2px 0 6px">${g.school?esc(g.school)+' school · ':''}${hasSubgroups(g.groupId)?plural(vs.length,'group')+' · ':''}${plural(ms.length,'member')}</p>
+      ${hasSubgroups(g.groupId)?`<p class="small" style="margin:0 0 8px"><span class="muted">Groups:</span> ${vs.map(v=>esc(subName(v))).join(', ')}</p>`:''}
       <ul class="small" style="list-style:none;padding:0;margin:0 0 12px">${offs}</ul>
-      <div class="chips">${btn('choose-group','Enter as VPBN',{ic:'edit',cls:'btn-primary btn-sm',data:`data-g="${g.groupId}" data-role="${VPBN}"`})}${['Chairperson','Treasurer','Secretary','Member'].map(r=>`<button type="button" class="btn btn-secondary btn-sm" data-act="choose-group" data-g="${g.groupId}" data-role="${r}">${r==='Member'?'View as a member':'View as '+r}</button>`).join('')}</div></div></section>`};
-  return `${pageHeader({title:'Choose your community group',desc:'Each community group has its own VSLAs, officials and members. <b>Only VPBN can add or change data</b>; the Chairperson, Treasurer, Secretary and members can view but not change anything. You can switch group or role at any time in the top bar.'})}
+      <div class="chips">${btn('choose-group','Enter as VBBM',{ic:'edit',cls:'btn-primary btn-sm',data:`data-g="${g.groupId}" data-role="${VBBM}"`})}${['Chairperson','Treasurer','Secretary','Member'].map(r=>`<button type="button" class="btn btn-secondary btn-sm" data-act="choose-group" data-g="${g.groupId}" data-role="${r}">${r==='Member'?'View as a member':'View as '+r}</button>`).join('')}</div></div></section>`};
+  return `${pageHeader({title:'Choose your community group',desc:'Each community group has its own VSLAs, officials and members. <b>Only VBBM can add or change data</b>; the Chairperson, Treasurer, Secretary and members can view but not change anything. You can switch group or role at any time in the top bar.'})}
     <div class="grid-3">${S.groups.map(card1).join('')}</div><div style="height:14px"></div>
     ${card({title:'HPF program view',sub:'For Human Practice Foundation staff: all community groups and VSLAs on one page (view only).',body:btn('choose-group','Enter as HPF program admin',{ic:'chart',cls:'btn-secondary',data:'data-g="" data-role="Platform Owner/Admin"'})})}`;
 };
@@ -5621,7 +5659,7 @@ function vbConfirmCard(vs){
   const nd=vs.flatMap(vbMembers).filter(m=>{const b=m.vslaBook||{};return(b.loan!=null||b.loanUnclear)&&!b.loanDate});
   if(nd.length)items.push([vs.length>1?'All VSLAs':vs[0].name,'Loan dates',`${plural(nd.length,'loan')} without a readable meeting date in the book margin: ${nd.map(m=>m.name).join(', ')}.`]);
   if(!items.length)return '';
-  return card({flush:true,title:'To confirm against the paper books',sub:`${plural(items.length,'entry','entries')} not clear on the photos. Amounts that could not be read are not counted in any total.${can('editChama')?' Use Edit on the row to correct it.':' VPBN corrects them.'}`,body:table({caption:'Entries to confirm',cols:[{label:'VSLA',render:x=>esc(x[0])},{label:'Entry',render:x=>`<b>${esc(x[1])}</b>`},{label:'What to check',render:x=>`<span style="white-space:normal;display:block;max-width:420px">${esc(x[2])}</span>`}],rows:items})});
+  return card({flush:true,title:'To confirm against the paper books',sub:`${plural(items.length,'entry','entries')} not clear on the photos. Amounts that could not be read are not counted in any total.${can('editChama')?' Use Edit on the row to correct it.':' VBBM corrects them.'}`,body:table({caption:'Entries to confirm',cols:[{label:'VSLA',render:x=>esc(x[0])},{label:'Entry',render:x=>`<b>${esc(x[1])}</b>`},{label:'What to check',render:x=>`<span style="white-space:normal;display:block;max-width:420px">${esc(x[2])}</span>`}],rows:items})});
 }
 function vbByDateCards(V){
   const rows=V.flatMap(v=>(v.book||[]).map(b=>({v,b}))).sort((x,y)=>(x.b.date||'9')<(y.b.date||'9')?-1:(x.b.date||'9')>(y.b.date||'9')?1:V.indexOf(x.v)-V.indexOf(y.v));
@@ -5642,7 +5680,8 @@ function vbByDateCards(V){
 }
 function vslaPage(){
   const g=curGroup(),V=vslasOf(UI.group),own=UI.role==='Member';
-  if(!V.length)return `${pageHeader({title:'VSLA groups',desc:`${esc(g.groupName)} has no VSLAs yet.`})}${emptyState({ic:'users',title:'No VSLAs yet',text:'VPBN adds VSLAs in Settings → Chama & groups.'})}`;
+  if(!hasSubgroups(UI.group))return `${pageHeader({title:g.groupName,desc:`${esc(g.groupName)} has no groups inside it.`})}${emptyState({ic:'users',title:'No groups inside this community group',text:'Only Olemoncho is made up of groups. Use the Dashboard and the other pages for this community group.'})}`;
+  if(!V.length)return `${pageHeader({title:'VSLA groups',desc:`${esc(g.groupName)} has no VSLAs yet.`})}${emptyState({ic:'users',title:'No VSLAs yet',text:'VBBM adds VSLAs in Settings → Chama & groups.'})}`;
   if(own){
     const m=me(),v=vslaById(m.vslaId);
     if(!v)return `${pageHeader({title:'My VSLA',desc:'You are not in a VSLA yet.'})}`;
@@ -5654,9 +5693,9 @@ function vslaPage(){
   }
   const tab=curVsla()?curVsla().vslaId:'all',SV=tab==='all'?V:V.filter(v=>v.vslaId===tab);
   const M=V.flatMap(vbMembers),L=vbLoans(V),SM=SV.flatMap(vbMembers),SL=vbLoans(SV);
-  const head=pageHeader({title:`VSLA groups in ${g.groupName}`,crumbs:orgCrumb(),desc:`${plural(V.length,'VSLA')} and ${plural(M.length,'member')}${g.school?` (${esc(g.school)} school)`:''}. Names, businesses, loans and meeting totals are as written in each VSLA's book; amounts that could not be read are left out and listed under "To confirm".`,actions:can('editChama')?btn('vb-total','Add meeting totals',{ic:'plus'}):''});
+  const head=pageHeader({title:`Groups in ${g.groupName}`,crumbs:orgCrumb(),desc:`${plural(V.length,'VSLA')} and ${plural(M.length,'member')}${g.school?` (${esc(g.school)} school)`:''}. Names, businesses, loans and meeting totals are as written in each VSLA's book; amounts that could not be read are left out and listed under "To confirm".`,actions:can('editChama')?btn('vb-total','Add meeting totals',{ic:'plus'}):''});
   const stats=`<div class="stats">${statCard({label:'Members',value:num(SM.length),sub:tab==='all'?plural(V.length,'VSLA'):esc(SV[0].name),ic:'users'})}${statCard({label:'Total savings written',value:vbAmt(vbSum(SV,'savings')),sub:'All VSLA meetings',ic:'coins'})}${statCard({label:'Social Fund written',value:vbAmt(vbSum(SV,'socialFund')),sub:'All VSLA meetings',ic:'heart'})}${statCard({label:'School Feeding written',value:vbAmt(vbSum(SV,'schoolFeeding')),sub:'All VSLA meetings',ic:'building'})}${statCard({label:'Loans taken (members)',value:vbAmt(SL),sub:`${plural(SL.n,'member')} with a loan written`,ic:'loan',tone:'maroon'})}</div>`;
-  const items=[{id:'all',label:'All VSLAs',count:V.length},...V.map(v=>({id:v.vslaId,label:v.name.replace(/ VSLA$/,''),count:vbMembers(v).length}))];
+  const items=[{id:'all',label:`All ${V.length} groups`,count:V.length},...V.map(v=>({id:v.vslaId,label:v.name.replace(/ VSLA$/,''),count:vbMembers(v).length}))];
   let body='';
   if(tab==='all'){
     body=card({flush:true,title:'VSLAs compared',sub:'Open a VSLA to see its members, businesses, loans and meeting totals',body:table({caption:'VSLAs',cols:[
@@ -5675,7 +5714,7 @@ function vslaPage(){
     body=`${v.nameCheck?notice(esc(v.nameCheck),{ic:'flag',tone:'warn'}):''}
     ${card({flush:true,title:`${esc(v.name)}: meeting totals`,sub:`Started ${esc(v.startedText||(v.started?fmtDate(v.started):'-'))} · savings, Social Fund and School Feeding as written in the book`,actions:can('editChama')?btn('vb-total','Add meeting totals',{ic:'plus',cls:'btn-secondary btn-sm',data:`data-v="${v.vslaId}"`}):'',body:vbBookTable(v)})}
     <div style="height:16px"></div>
-    ${card({flush:true,title:`${esc(v.name)}: members`,sub:`${plural(ms.length,'member')}${(()=>{const o=['Chairperson','Secretary','Treasurer'].map(r=>{const p=ms.find(m=>m.role===r);return p?`${r==='Chairperson'?'Chairlady':r}: ${esc(p.name)}`:''}).filter(Boolean);return o.length?' · '+o.join(' · '):''})()} · business and loan taken as written. Individual savings are not on the book pages yet; they show here once VPBN records them.`,body:ms.length?vbMemberTable(v,ms):emptyState({ic:'users',title:'No members in this VSLA yet',text:''})})}
+    ${card({flush:true,title:`${esc(v.name)}: members`,sub:`${plural(ms.length,'member')}${(()=>{const o=['Chairperson','Secretary','Treasurer'].map(r=>{const p=ms.find(m=>m.role===r);return p?`${r==='Chairperson'?'Chairlady':r}: ${esc(p.name)}`:''}).filter(Boolean);return o.length?' · '+o.join(' · '):''})()} · business and loan taken as written. Individual savings are not on the book pages yet; they show here once VBBM records them.`,body:ms.length?vbMemberTable(v,ms):emptyState({ic:'users',title:'No members in this VSLA yet',text:''})})}
     <div style="height:16px"></div>${vbConfirmCard([v])}`;
   }
   return `${head}${stats}${tabs('vslas',items,tab)}<div role="tabpanel" aria-labelledby="tab-vslas-${tab}">${body}</div>`.replace(/data-act="tab" data-tabs="vslas"/g,'data-act="set-vsla" data-tabs="vslas"');
@@ -5701,7 +5740,7 @@ function vslaBookDashCard(){
   return h+'<div style="height:16px"></div>'+card({title:'From the VSLA book',sub:esc(vslaName(m.vslaId)),actions:can('editChama')?btn('vb-member','Edit',{ic:'edit',cls:'btn-secondary btn-sm',data:`data-id="${m.id}"`}):'',body:`<dl class="kv"><dt>Business (loan purpose)</dt><dd>${esc(b.business||'Not written')}</dd><dt>Loan taken</dt><dd class="num">${b.loan!=null?ksh(+b.loan):b.loanUnclear?'Not clear on the book page (to confirm)':'None written'}</dd>${b.loanDate?`<dt>Loan date</dt><dd>${vbLoanDate(b)}</dd>`:''}${m.note||b.loanUnclear?`<dt>To check</dt><dd>${esc([m.note,b.loanUnclear].filter(Boolean).join(' '))}</dd>`:''}</dl>`});
 }}
 
-/* ---------- VPBN edits the VSLA books ---------- */
+/* ---------- VBBM edits the VSLA books ---------- */
 const vbNum=v=>{const s=String(v??'').replace(/[,\s]/g,'');return s===''?null:Number(s)};
 function openVbTotal(vslaId,id){
   if(!needPerm('editChama'))return;
@@ -5726,7 +5765,7 @@ FORMS['vb-total']=(form,d)=>{
   v.book=v.book||[];
   const all=(S.vslas||[]).flatMap(x=>x.book||[]);
   let b=form.dataset.id?v.book.find(x=>x.id===form.dataset.id):null;const prev=b?BOOK_FIELDS.filter(([k])=>b[k]!=null).map(([k,l])=>`${l} ${num(b[k])}`).join(', '):'';
-  if(!b){b={id:nextSeq(all,'VB',3),unclear:{},source:'VPBN',at:nowStamp()};v.book.push(b)}
+  if(!b){b={id:nextSeq(all,'VB',3),unclear:{},source:'VBBM',at:nowStamp()};v.book.push(b)}
   b.label=String(d.label).trim();b.date=d.date||'';b.dateText=String(d.dateText||'').trim();b.note=String(d.note||'').trim();
   BOOK_FIELDS.forEach(([k])=>{b[k]=vals[k];if(vals[k]!=null&&b.unclear)delete b.unclear[k]});
   b.updatedAt=nowStamp();b.updatedBy=me().id;v.updatedAt=nowStamp();
@@ -5920,7 +5959,7 @@ function memberForm(m){
    ${field({label:'VSLA',name:'vslaId',opts:[['','Not assigned yet'],...vslasOf(m?m.groupId:UI.group).map(v=>[v.vslaId,v.name])],value:m?.vslaId||'',hint:'The Village Savings and Loans Association this member belongs to.'})}
    ${field({label:'Date joined',name:'joined',type:'date',value:m?.joined||todayISO(),required:true,attrs:`max="${todayISO()}"`})}
    ${field({label:'Access type',name:'accessMode',opts:['Smartphone / Digital','Assisted / Offline'],value:m?.accessMode||'Smartphone / Digital',hint:'Assisted / Offline members are full members; officials keep their records for them.'})}
-   ${m?field({label:'Status',name:'status',opts:['Active','Inactive'],value:m.status}):field({label:'Role',name:'role',opts:ROLES.filter(r=>r!=='Platform Owner/Admin'),value:'Member',hint:'Roles can be changed later by VPBN.'})}</div></form>`;
+   ${m?field({label:'Status',name:'status',opts:['Active','Inactive'],value:m.status}):field({label:'Role',name:'role',opts:ROLES.filter(r=>r!=='Platform Owner/Admin'),value:'Member',hint:'Roles can be changed later by VBBM.'})}</div></form>`;
 }
 function openAddMember(){if(!needPerm('manageMembers'))return;openModal({title:'Add member',desc:'Adds the person to the Chama\'s member list.',body:memberForm(null),footer:modalFooter('Add member','frm-m')})}
 function openEditMember(id){if(!needPerm('manageMembers'))return;const m=byId(id);openModal({title:`Edit ${m.name}`,body:memberForm(m),footer:modalFooter('Save changes','frm-m')})}
@@ -6157,8 +6196,8 @@ async function bootData(){
     if(!readLocalCache())S=null;
     PERSIST.mode='local';
   }
-  const savedRole=readRolePref();
-  if(S&&savedRole&&(savedRole==='VPBN'||S.members.some(m=>m.role===savedRole||ROLES.includes(savedRole))))UI.role=savedRole;
+  const savedRole=(r=>r==='VP'+'BN'?'VBBM':r)(readRolePref()); /* the role was called VPBN before v0.9.12 */
+  if(S&&savedRole&&(savedRole==='VBBM'||S.members.some(m=>m.role===savedRole||ROLES.includes(savedRole))))UI.role=savedRole;
 }
 function hasRealData(){return !!(S&&(S.ledger.length||S.members.length>1||!S.demo))}
 
@@ -6219,10 +6258,10 @@ function act(name,el,ev){
     case 'statement-for':UI.report={type:'member',range:'this-month',memberId:id,from:'',to:'',result:null,loading:false};location.hash='#/reports';break;
     case 'clear-filters':clearFilters(scope);break;
     case 'more':{const f=UI.f[scope];f.limit+=25;renderListOnly(scope);break}
-    case 'reset-demo':if(!can('editChama')){toast('Only VPBN can restore sample data.','error');break}confirmDialog({title:'Restore sample data?',text:`This replaces every record currently saved${PERSIST.mode==='synced'?' to your account':' in this browser'} with fresh sample data. Consider downloading a backup from Settings first. This cannot be undone.`,confirmLabel:'Restore sample data',tone:'btn-maroon',onConfirm:()=>{resetDemo({illustrative:S&&Object.values(S.rules||{}).some(r=>r.source==='illustrative')});UI.role='Treasurer';UI.group=null;syncGroup();saveRolePref();renderNav();location.hash='#/dashboard';route();toast('Sample data restored.')}});break;
+    case 'reset-demo':if(!can('editChama')){toast('Only VBBM can restore sample data.','error');break}confirmDialog({title:'Restore sample data?',text:`This replaces every record currently saved${PERSIST.mode==='synced'?' to your account':' in this browser'} with fresh sample data. Consider downloading a backup from Settings first. This cannot be undone.`,confirmLabel:'Restore sample data',tone:'btn-maroon',onConfirm:()=>{resetDemo({illustrative:S&&Object.values(S.rules||{}).some(r=>r.source==='illustrative')});UI.role='Treasurer';UI.group=null;syncGroup();saveRolePref();renderNav();location.hash='#/dashboard';route();toast('Sample data restored.')}});break;
     case 'toggle-lock':openLockSettings();break;
     case 'backup-json':if(!can('viewAll')){toast('Your role can\'t download the full backup.','error');break}logAudit({action:'Full backup downloaded',target:'Backup (JSON)',detail:'All records of this Chama',kind:'statement',groupId:''});saveState();downloadJSON(`${(S.chama.name||'chama').replace(/[^a-z0-9]+/gi,'-').toLowerCase()}-backup-${todayISO()}.json`,S);toast('Backup downloaded.');break;
-    case 'erase-data':if(!can('editChama')){toast('Only VPBN can erase data.','error');break}confirmDialog({title:'Erase all Chama data',text:`This permanently deletes every member, contribution, saving, internal loan and audit record${PERSIST.mode==='synced'?' from your account':' from this browser'}. Consider downloading a backup first. This cannot be undone.`,confirmLabel:'Erase everything',tone:'btn-maroon',onConfirm:eraseAllData});break;
+    case 'erase-data':if(!can('editChama')){toast('Only VBBM can erase data.','error');break}confirmDialog({title:'Erase all Chama data',text:`This permanently deletes every member, contribution, saving, internal loan and audit record${PERSIST.mode==='synced'?' from your account':' from this browser'}. Consider downloading a backup first. This cannot be undone.`,confirmLabel:'Erase everything',tone:'btn-maroon',onConfirm:eraseAllData});break;
     case 'apply-remote':applyPendingRemote();break;
     case 'lock-now':try{sessionStorage.removeItem(UNLOCK_FLAG)}catch(e){};if(lockInfo()){lockScreen()}break;
     case 'loan-filter':{lf().status=el.dataset.status;lf().limit=25;renderNav();renderView('x','x',()=>loansView());break}

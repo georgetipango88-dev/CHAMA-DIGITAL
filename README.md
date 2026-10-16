@@ -16,6 +16,21 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.14
+- **Simpler:** no separate "Groups in Olemoncho" menu item. Dashboard shows all 3 community groups; choosing
+  Olemoncho shows only its 5 groups; clicking a group shows that group's own dashboard and records.
+- **Cash Book = the bank.** It records only cash in (money deposited in the bank) and cash out (money withdrawn from the
+  bank), entered by VBBM with a reference and reason. Savings are given out as loans, so savings, contributions, loans,
+  repayments and fines stay on their own pages. Olchoro's 20 July line: 95,400 deposited, 95,400 withdrawn.
+- **Contribution limits:** each group sets a minimum for Social Fund and School Feeding; the maximum is 5 times the
+  minimum, and a payment outside the limits is rejected (Contributions page; VBBM sets them).
+
+## New in v0.9.13
+- **Dashboard opens all community groups.** For VBBM and the HPF admin, clicking Dashboard always opens "All groups
+  (one pane)": all members and figures of Mbitin, Nterere and Olemoncho. Choosing a community group (e.g. Olemoncho)
+  opens it in detail; Olemoncho then shows its 5 groups. VBBM can now work in every community group. Group officials
+  and members still see only their own group.
+
 ## New in v0.9.12
 - The role that changes data is called **VBBM** (it was spelled VPBN). Saved role choices and audit entries switch over.
 - **Every Olemoncho loan now has its date** (the date in the book margin is the date the member took the loan), so all

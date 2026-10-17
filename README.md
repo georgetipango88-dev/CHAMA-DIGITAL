@@ -16,6 +16,18 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.15
+- **Cash Book = savings in, loans out.** Cash in is the savings collected at meetings (with loan repayments received and
+  fines paid into savings); cash out is the money given out as loans; the balance is what is left to lend. Every line
+  comes from a recorded saving, loan or repayment. Olchoro's 20 July line: cash in 95,400 = savings collected, cash out
+  95,400 = the 7 loans of that day. A group that lent more than the savings written is flagged (a figure is missing).
+- **Contributions are kept in the bank.** Social Fund and School Feeding are never mixed with savings or the cash book
+  and cannot be lent: a loan can only come from the savings. Social Fund payouts and School Feeding spending come from
+  the bank, not the cash book. The Contributions page shows each member's Social Fund and School Feeding (By member),
+  each group's totals and the total across all community groups (Olemoncho's 5 groups under it).
+- **Olemoncho B:** Noonkipa Kupai took 5,000 on 2 Sep (what the loan is for: still to be sent), so the 2 Sep loans
+  equal the 55,000 saved that day. Tori Nkoitoi's 5,000 (petrol) is kept with its date to confirm.
+
 ## New in v0.9.14
 - **Simpler:** no separate "Groups in Olemoncho" menu item. Dashboard shows all 3 community groups; choosing
   Olemoncho shows only its 5 groups; clicking a group shows that group's own dashboard and records.

@@ -516,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.14 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.15 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -1602,8 +1602,8 @@ function contributionsView(){
       {label:'Members paid',render:r=>`${r.paid} of ${r.members}`},{label:'On time',render:r=>r.onTime},{label:'Progress',render:r=>`<div style="min-width:120px">${bar(pct(r.collected,r.expected))}</div>`}],rows})});
   }else{
     const rows=GM().map(m=>({m,s:memberStats(m.id)}));
-    body=card({flush:true,title:'By member',sub:'Total contributions and how consistently each member has paid',body:table({caption:'Contributions by member',cols:[
-      {label:'Member',render:r=>`<a href="#/members/${r.m.id}" style="text-decoration:none;color:inherit">${who(r.m.id,esc(r.m.id))}</a>`},{label:'Total contributed',cls:'r',render:r=>`<span class="num"><b>${ksh(r.s.contribTotal)}</b></span>`},
+    body=card({flush:true,title:'By member',sub:'Each member\'s Social Fund and School Feeding contributions, and how consistently each member has paid',body:table({caption:'Contributions by member',cols:[
+      {label:'Member',render:r=>`<a href="#/members/${r.m.id}" style="text-decoration:none;color:inherit">${who(r.m.id,esc(r.m.id))}</a>`},...catsOf(UI.group).map(c=>({label:esc(c.name),cls:'r',render:r=>`<span class="num">${ksh(sum(rec('contribution').filter(e=>e.memberId===r.m.id&&e.category===c.id)))}</span>`})),{label:'Total contributed',cls:'r',render:r=>`<span class="num"><b>${ksh(r.s.contribTotal)}</b></span>`},
       {label:'Periods paid',render:r=>`${r.s.paid} of ${r.s.periods}`},{label:'On time',render:r=>r.s.paid?pct(r.s.onTime,r.s.paid)+'%':'-'},{label:'Last payment',render:r=>r.s.lastContrib?fmtDate(r.s.lastContrib):'-'}],rows})});
   }
   const mystat=memberStats(me().id);
@@ -1666,7 +1666,7 @@ function loansList(){
   const shown=rows.slice(0,f.limit);
   const t=rows.length?table({caption:'Internal Chama loans',cols:[
     {label:'Member',render:l=>who(l.memberId,`<button type="button" class="link-btn tiny" data-act="open-loan" data-id="${l.id}">${l.id}</button>`)},
-    {label:'Reason',render:l=>`<span class="tiny" style="white-space:normal;display:block;max-width:180px">${esc(l.purpose||l.enterprise||'Not recorded')}</span>`},
+    {label:'Reason',render:l=>`<span class="tiny" style="white-space:normal;display:block;max-width:180px">${esc(l.purpose||l.enterprise||(l.bookRef?'Still to be sent':'Not recorded'))}</span>`},
     {label:'Original loan',cls:'r',render:l=>`<span class="num"><b>${ksh(l.amount)}</b></span>`},
     {label:'Issued',render:l=>fmtDate(l.date)},
     {label:'Repayment schedule',render:l=>`${l.flexible?`Any time, in full by ${fmtDate(l.sched[0].due)}`:`${l.months} × ${ksh(l.inst)}`}<div class="muted tiny">${l.ratePending?'Interest rate pending confirmation':'Interest '+l.rate+'% flat'}</div>`},
@@ -1779,7 +1779,7 @@ const REPORT_TYPES=[
   {id:'attendance',label:'Attendance report',d:'Present, absent with apology and absent without apology per meeting',perm:true},
   {id:'fines',label:'Absenteeism fines report',d:'Date, member, reason, amount, paid and outstanding',perm:true},
   {id:'welfare',label:'Social Fund / Welfare report',d:'Contributions to the fund, payouts and balance',perm:true},
-  {id:'cashbook',label:'Cash book report',d:'Money in, money out and running balance',perm:true},
+  {id:'cashbook',label:'Cash book report',d:'Cash in (savings and repayments), cash out (loans) and running balance',perm:true},
   {id:'groups',label:'Group comparison',d:'Key figures side by side for the groups you are authorized to see',perm:true},
 ];
 const RANGES=[['this-month','This month'],['last-month','Last month'],['quarter','This quarter'],['year','This year'],['12m','Last 12 months'],['5y','Last 5 years'],['10y','Last 10 years'],['custom','Custom range']];
@@ -2255,7 +2255,7 @@ function dashKPIs(){
   const savM=sum(rec('saving').filter(e=>monthKey(e.date)===k)),lastM=heldMeetings()[0],la=lastM?meetingStats(lastM):null;
   const openApps=GLA().filter(a=>['Submitted','Needs Review','Approved'].includes(a.status)).length;
   return [
-    statCard({label:'Cash balance (cash book)',value:ksh(cs.balance),sub:`${ksh(cs.totalIn)} in, ${ksh(cs.totalOut)} out${cs.openingPending?' (opening balance pending)':''}`,ic:'cash',cls:'span-2'}),
+    statCard({label:'Cash balance (left to lend)',value:ksh(cs.balance),sub:`${ksh(cs.totalIn)} savings and repayments in, ${ksh(cs.totalOut)} lent out${cs.openingPending?' (opening balance pending)':''}`,ic:'cash',cls:'span-2'}),
     statCard({label:`Contributions, ${keyLabel(k)}`,value:ksh(ms.collected),sub:ms.pending?'Expected: rates pending confirmation':`of ${ksh(ms.expected)} expected (${pct(ms.collected,ms.expected)}%)`,ic:'deposit'}),
     statCard({label:`Savings, ${keyLabel(k)}`,value:ksh(savM),sub:`${ksh(T.savings)} total savings`,ic:'coins'}),
     statCard({label:'Attendance, last meeting',value:la?la.pct+'%':'-',sub:la?`✓ ${la.present} · Ⓔ ${la.apology} · X ${la.absent} · ${fmtDate(lastM.date)}`:'No meeting held yet',ic:'calendar'}),
@@ -2664,7 +2664,6 @@ function welfareFlags(d,amount){
   else if(!r.welfare.categories.includes(d.category))f.push(`"${d.category}" is not one of the group's permitted reasons.`);
   if(isNum(r.welfare.maxPayout)&&amount>r.welfare.maxPayout)f.push(`Amount is above the group maximum of ${ksh(r.welfare.maxPayout)}.`);
   if(amount>ws.balance)f.push(`Amount is more than the fund balance of ${ksh(ws.balance)}.`);
-  if(amount>cashSummary().balance)f.push(`Amount is more than the cash book balance of ${ksh(cashSummary().balance)}.`);
   return f;
 }
 function openWelfarePayout(){
@@ -2853,7 +2852,7 @@ FORMS['rec-loan']=(form,d)=>{
   if(!(Number.isInteger(mo)&&mo>=1&&mo<=36))err.months='Enter a whole number from 1 to 36.';
   if(!d.date||d.date>todayISO())err.date='Enter a date that is not in the future.';
   if(!d.confirm)err.confirm='x';
-  if(amt>0&&amt>cashSummary().balance)err.amount=`This is more than the cash book balance of ${ksh(cashSummary().balance)}. Record the money in first.`;
+  if(amt>0&&amt>cashSummary().balance)err.amount=`This is more than the savings left to lend (${ksh(cashSummary().balance)} on the cash book). Contributions cannot be lent.`;
   if(!applyErrors(form,err))return;
   const app=form.dataset.app?S.loanApps.find(x=>x.id===form.dataset.app):null;
   const e={id:nextId('loan'),type:'loan',chamaId:S.chama.chamaId,groupId:m.groupId,memberId:m.id,date:d.date,amount:Math.round(amt),interestPct:rate,months:mo,purpose:d.purpose||'',enterprise:d.enterprise||'',guarantors:app?app.guarantors:[],loanAppId:app?app.id:'',eligibility:app?app.eligibility:(()=>{const E=loanEligibility(m.id,Math.round(amt),0,mo);return{outcome:E.outcome,checks:E.checks,at:E.at,note:'Recorded without an application'}})(),approval:d.approval||'',approvedBy:app&&app.decision?app.decision.by:'',status:'Recorded',by:me().id,at:nowStamp(),note:'',ref:'Loan book',method:'Cash'};
@@ -2907,19 +2906,19 @@ function cashbookView(){
   const mx=Math.max(1,...mdat.map(d=>Math.max(d.i,d.o))),W=520,H=180,pb=26,bw=W/mdat.length;
   const chart=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Money in and out by month: ${esc(mdat.map(d=>`${keyLabel(d.k)} in ${ksh(d.i)}, out ${ksh(d.o)}`).join('; '))}" style="display:block;font-family:Inter,sans-serif"><line x1="0" x2="${W}" y1="${H-pb}" y2="${H-pb}" stroke="#DAE4E5"/>${mdat.map((d,i)=>{const x=i*bw+bw*.15,w=bw*.33,hi=d.i/mx*(H-pb-14),ho=d.o/mx*(H-pb-14);return `<rect x="${x}" y="${H-pb-hi}" width="${w}" height="${hi}" rx="3" fill="#08898D"/><rect x="${x+w+2}" y="${H-pb-ho}" width="${w}" height="${ho}" rx="3" fill="#910F3D"/><text x="${x+w}" y="${H-8}" text-anchor="middle" font-size="11" fill="#546D72">${MON[+d.k.slice(5)-1]}</text>`}).join('')}</svg><div class="legend"><span><i style="background:#08898D;border-color:#08898D"></i>Money in</span><span><i style="background:#910F3D;border-color:#910F3D"></i>Money out</span></div>`;
   const tIn=sum(rows,r=>r.in),tOut=sum(rows,r=>r.out);
-  return `${pageHeader({title:'Cash book',desc:`Cash in (deposited in the bank), cash out (withdrawn from the bank) and the bank balance for ${esc(curGroup().groupName)}.`,actions:(can('recordFinance')?btn('cash-in','Cash in (to the bank)',{ic:'plus',cls:'btn-secondary'})+btn('cash-out','Cash out (from the bank)',{ic:'cash',cls:'btn-maroon'}):'')+`<button type="button" class="btn btn-secondary" data-act="cash-csv">${icon('download')}CSV</button>`})}
-  ${notice('Each entry needs a reference and a reason. Nothing is deleted: an entry can be reversed with a reason. Chama Digital does not hold the money.',{ic:'shield',tone:'teal'})}
-  <div class="stats">${statCard({label:'Opening balance',value:cs.openingPending?PEND:ksh(cs.opening),sub:cs.openingPending?'Counted as KSh 0 until confirmed':'Set in group rules',ic:'book'})}${statCard({label:'Total money in',value:ksh(cs.totalIn),sub:'All recorded receipts',ic:'deposit'})}${statCard({label:'Total money out',value:ksh(cs.totalOut),sub:'All recorded payments out',ic:'cash',tone:'maroon'})}${statCard({label:'Current balance',value:ksh(cs.balance),sub:'Opening + in − out',ic:'building'})}</div>
-  <div class="grid-eq">${card({flush:true,title:'Balances by fund',body:table({caption:'Fund balances',cols:[{label:'Fund',render:x=>`<b>${esc(x.fund)}</b>`},{label:'In',cls:'r',render:x=>`<span class="num">${ksh(x.in)}</span>`},{label:'Out',cls:'r',render:x=>`<span class="num">${ksh(x.out)}</span>`},{label:'Net',cls:'r',render:x=>`<span class="num"><b>${ksh(x.net)}</b></span>`}],rows:fb})})}${card({title:'Money in vs money out',sub:'Last 6 months',body:chart})}</div>
+  return `${pageHeader({title:'Cash book',desc:`Cash in (savings collected at meetings and loan repayments), cash out (money given out as loans) and what is left to lend for ${esc(curGroup().groupName)}.`,actions:(can('recordFinance')?btn('rec-saving','Record savings (cash in)',{ic:'plus',cls:'btn-secondary'})+btn('rec-loan','Record a loan (cash out)',{ic:'cash',cls:'btn-maroon'}):'')+`<button type="button" class="btn btn-secondary" data-act="cash-csv">${icon('download')}CSV</button>`})}
+  ${notice('Every line comes from a recorded saving, loan or repayment, so nothing is entered twice: record savings on the Savings page and loans on the Loan Repayments page. Nothing is deleted: a record can be reversed with a reason. Chama Digital does not hold the money.',{ic:'shield',tone:'teal'})}
+  <div class="stats">${statCard({label:'Opening balance',value:cs.openingPending?PEND:ksh(cs.opening),sub:cs.openingPending?'Counted as KSh 0 until confirmed':'Set in group rules',ic:'book'})}${statCard({label:'Cash in',value:ksh(cs.totalIn),sub:'Savings collected and loan repayments',ic:'deposit'})}${statCard({label:'Cash out',value:ksh(cs.totalOut),sub:'Money given out as loans',ic:'cash',tone:'maroon'})}${statCard({label:'Left to lend',value:ksh(cs.balance),sub:'Opening + cash in − cash out',ic:'building'})}</div>
+  <div class="grid-eq">${card({flush:true,title:'Balances by fund',body:table({caption:'Fund balances',cols:[{label:'Fund',render:x=>`<b>${esc(x.fund)}</b>`},{label:'In',cls:'r',render:x=>`<span class="num">${ksh(x.in)}</span>`},{label:'Out',cls:'r',render:x=>`<span class="num">${ksh(x.out)}</span>`},{label:'Net',cls:'r',render:x=>`<span class="num"><b>${ksh(x.net)}</b></span>`}],rows:fb})})}${card({title:'Cash in vs cash out',sub:'Last 6 months',body:chart})}</div>
   <section class="card"><div class="filters no-print">
    <div class="fld"><label for="cb-m">Month</label><select id="cb-m" data-change="cashf" data-key="month">${selectOpts([['','All months'],...monthOpts(12)],f.month)}</select></div>
-   <div class="fld"><label for="cb-d">Direction</label><select id="cb-d" data-change="cashf" data-key="dir">${selectOpts([['','In and out'],['in','Money in'],['out','Money out']],f.dir)}</select></div>
+   <div class="fld"><label for="cb-d">Direction</label><select id="cb-d" data-change="cashf" data-key="dir">${selectOpts([['','In and out'],['in','Cash in'],['out','Cash out']],f.dir)}</select></div>
    <div class="fld"><label for="cb-f">Fund</label><select id="cb-f" data-change="cashf" data-key="fund">${selectOpts([['','All funds'],...funds],f.fund)}</select></div></div>
-   <div class="tbl-wrap"><table class="rt"><caption class="sr-only">Cash book</caption><thead><tr><th scope="col">Date</th><th scope="col">Reference</th><th scope="col">Description</th><th scope="col" class="r">Money in</th><th scope="col" class="r">Money out</th><th scope="col">Category / fund</th><th scope="col">Recorded by</th><th scope="col" class="r">Running balance</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>
-   ${f.month&&!f.dir&&!f.fund?`<tr><td data-label="Date" class="cell-main">${fmtDate(f.month+'-01')}</td><td data-label="Reference">-</td><td data-label="Description"><b>Balance brought forward</b></td><td data-label="Money in"></td><td data-label="Money out"></td><td data-label="Category / fund"></td><td data-label="Recorded by"></td><td class="r num" data-label="Running balance"><b>${ksh(bf)}</b></td><td class="nolabel"></td></tr>`:''}
-   ${rows.map(r=>`<tr><td data-label="Date" class="cell-main">${fmtDate(r.date)}</td><td data-label="Reference"><span class="num tiny">${esc(r.ref)}</span><div class="muted tiny">${esc(r.src)}</div></td><td data-label="Description">${esc(r.desc)}</td><td class="r num plus" data-label="Money in">${r.in?ksh(r.in):''}</td><td class="r num minus" data-label="Money out">${r.out?ksh(r.out):''}</td><td data-label="Category / fund">${esc(r.cat)}<div class="muted tiny">${esc(r.fund)}</div></td><td data-label="Recorded by" class="small">${esc(mName(r.by))}</td><td class="r num" data-label="Running balance"><b>${ksh(r.balance)}</b></td><td class="nolabel">${r.manual&&can('correct')?`<button type="button" class="btn btn-ghost btn-sm" data-act="cash-reverse" data-id="${r.src}">Reverse</button>`:''}</td></tr>`).join('')||`<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">No cash book lines match these filters.</td></tr>`}
-   </tbody><tfoot><tr><td>Totals</td><td></td><td data-label="Lines">${rows.length} lines</td><td class="r num" data-label="Money in">${ksh(tIn)}</td><td class="r num" data-label="Money out">${ksh(tOut)}</td><td></td><td></td><td class="r num" data-label="Closing balance">${rows.length?ksh(rows[rows.length-1].balance):ksh(bf)}</td><td></td></tr></tfoot></table></div></section>
-  ${S.cashbook.some(c=>c.groupId===UI.group&&c.status==='Reversed')?`<div style="height:16px"></div>${card({flush:true,title:'Reversed manual entries',sub:'Kept for the audit trail; not counted',body:`<ul class="rows">${S.cashbook.filter(c=>c.groupId===UI.group&&c.status==='Reversed').map(c=>`<li><div class="grow"><b class="strike">${esc(c.description)} · ${ksh(c.amount)}</b><div class="muted small">${esc(c.id)} · ${fmtDate(c.date)} · reversed: ${esc(c.reverseReason||'')}</div></div></li>`).join('')}</ul>`})}`:''}`;
+   <div class="tbl-wrap"><table class="rt"><caption class="sr-only">Cash book</caption><thead><tr><th scope="col">Date</th><th scope="col">Reference</th><th scope="col">Description</th><th scope="col" class="r">Cash in</th><th scope="col" class="r">Cash out</th><th scope="col">Category / fund</th><th scope="col">Recorded by</th><th scope="col" class="r">Running balance</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead><tbody>
+   ${f.month&&!f.dir&&!f.fund?`<tr><td data-label="Date" class="cell-main">${fmtDate(f.month+'-01')}</td><td data-label="Reference">-</td><td data-label="Description"><b>Balance brought forward</b></td><td data-label="Cash in"></td><td data-label="Cash out"></td><td data-label="Category / fund"></td><td data-label="Recorded by"></td><td class="r num" data-label="Running balance"><b>${ksh(bf)}</b></td><td class="nolabel"></td></tr>`:''}
+   ${rows.map(r=>`<tr><td data-label="Date" class="cell-main">${fmtDate(r.date)}</td><td data-label="Reference"><span class="num tiny">${esc(r.ref)}</span><div class="muted tiny">${esc(r.src)}</div></td><td data-label="Description">${esc(r.desc)}</td><td class="r num plus" data-label="Cash in">${r.in?ksh(r.in):''}</td><td class="r num minus" data-label="Cash out">${r.out?ksh(r.out):''}</td><td data-label="Category / fund">${esc(r.cat)}<div class="muted tiny">${esc(r.fund)}</div></td><td data-label="Recorded by" class="small">${esc(mName(r.by))}</td><td class="r num" data-label="Running balance"><b>${ksh(r.balance)}</b></td><td class="nolabel">${r.manual&&can('correct')?`<button type="button" class="btn btn-ghost btn-sm" data-act="cash-reverse" data-id="${r.src}">Reverse</button>`:''}</td></tr>`).join('')||`<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">No cash book lines match these filters.</td></tr>`}
+   </tbody><tfoot><tr><td>Totals</td><td></td><td data-label="Lines">${rows.length} lines</td><td class="r num" data-label="Cash in">${ksh(tIn)}</td><td class="r num" data-label="Cash out">${ksh(tOut)}</td><td></td><td></td><td class="r num" data-label="Closing balance">${rows.length?ksh(rows[rows.length-1].balance):ksh(bf)}</td><td></td></tr></tfoot></table></div></section>
+  ${S.cashbook.some(c=>c.groupId===UI.group&&c.status==='Reversed')?`<div style="height:16px"></div>${card({flush:true,title:'Reversed entries',sub:'Kept for the audit trail; not counted',body:`<ul class="rows">${S.cashbook.filter(c=>c.groupId===UI.group&&c.status==='Reversed').map(c=>`<li><div class="grow"><b class="strike">${esc(c.description)} · ${ksh(c.amount)}</b><div class="muted small">${esc(c.id)} · ${fmtDate(c.date)} · reversed: ${esc(c.reverseReason||'')}</div></div></li>`).join('')}</ul>`})}`:''}`;
 }
 function openCashEntry(dir){
   if(!needPerm('recordFinance'))return;
@@ -2969,7 +2968,7 @@ FORMS['set-loan-rate']=(form,d)=>{
 };
 function exportCashbook(){
   const cs=cashSummary();
-  downloadCSV(`cash-book-${UI.group}-${todayISO()}.csv`,[['Date','Reference','Source record','Description','Money in (KSh)','Money out (KSh)','Category','Fund','Group','Recorded by','Running balance (KSh)'],['','','','Opening balance','','','','','','',cs.opening],...cs.rows.map(r=>[r.date,r.ref,r.src,r.desc,r.in||'',r.out||'',r.cat,r.fund,groupName(r.groupId),mName(r.by),r.balance])]);
+  downloadCSV(`cash-book-${UI.group}-${todayISO()}.csv`,[['Date','Reference','Source record','Description','Cash in (KSh)','Cash out (KSh)','Category','Fund','Group','Recorded by','Running balance (KSh)'],['','','','Opening balance','','','','','','',cs.opening],...cs.rows.map(r=>[r.date,r.ref,r.src,r.desc,r.in||'',r.out||'',r.cat,r.fund,groupName(r.groupId),mName(r.by),r.balance])]);
   logAudit({action:'Cash book exported',target:'Cash book',detail:`${cs.rows.length} lines, CSV`,kind:'statement'});saveState();toast('Cash book downloaded as CSV.');
 }
 
@@ -3363,7 +3362,7 @@ function buildReportV7(r,R,{from,to,sumGrid,tbl}){
   }else if(r.type==='cashbook'){
     const cs=cashSummary(),rows=cs.rows.filter(x=>x.date>=from&&x.date<=to),before=cs.rows.filter(x=>x.date<from),bf=before.length?before[before.length-1].balance:cs.opening;
     R.title='Cash book report';
-    R.sections=sumGrid([['Balance brought forward',ksh(bf)],['Money in',ksh(sum(rows,x=>x.in))],['Money out',ksh(sum(rows,x=>x.out))],['Closing balance',ksh(rows.length?rows[rows.length-1].balance:bf)]])+(rows.length?tbl('Cash book',[{label:'Date',render:x=>fmtDate(x.date)},{label:'Ref',render:x=>esc(x.ref)},{label:'Description',render:x=>esc(x.desc)},{label:'In',cls:'r',render:x=>x.in?ksh(x.in):''},{label:'Out',cls:'r',render:x=>x.out?ksh(x.out):''},{label:'Balance',cls:'r',render:x=>ksh(x.balance)}],rows):'<p class="muted">No cash book lines in this period.</p>');
+    R.sections=sumGrid([['Balance brought forward',ksh(bf)],['Cash in',ksh(sum(rows,x=>x.in))],['Cash out',ksh(sum(rows,x=>x.out))],['Closing balance',ksh(rows.length?rows[rows.length-1].balance:bf)]])+(rows.length?tbl('Cash book',[{label:'Date',render:x=>fmtDate(x.date)},{label:'Ref',render:x=>esc(x.ref)},{label:'Description',render:x=>esc(x.desc)},{label:'In',cls:'r',render:x=>x.in?ksh(x.in):''},{label:'Out',cls:'r',render:x=>x.out?ksh(x.out):''},{label:'Balance',cls:'r',render:x=>ksh(x.balance)}],rows):'<p class="muted">No cash book lines in this period.</p>');
     R.csv=[['Date','Reference','Description','Money in','Money out','Fund','Balance'],['','','Balance brought forward','','','',bf],...rows.map(x=>[x.date,x.ref,x.desc,x.in||'',x.out||'',x.fund,x.balance])];
   }else{
     const gs=allowedGroups().map(g=>withGroup(g.groupId,()=>{const T=totals(),lm=heldMeetings()[0];return{g,members:GM().length,contrib:sum(rec('contribution').filter(e=>e.date>=from&&e.date<=to)),savings:T.savings,att:lm?meetingStats(lm).pct:null,fines:fineTotals(GF()).outstanding,loans:T.outstanding,overdue:T.overdueLoans,welfare:welfareSummary().balance,cash:cashSummary().balance}}));
@@ -3693,7 +3692,7 @@ function openSfpSpend(){
 FORMS['sfp-spend']=(form,d)=>{
   if(!needPerm('recordFinance'))return;const err={},amt=Number(d.amount),sf=sfpSummary();
   if(!d.date||d.date>todayISO())err.date='x';if(!String(d.school).trim())err.school='x';if(!String(d.description).trim())err.description='x';if(!String(d.ref).trim())err.ref='x';
-  if(!(amt>0))err.amount='x';else if(amt>sf.balance)err.amount=`This is more than the programme balance of ${ksh(sf.balance)}.`;else if(amt>cashSummary().balance)err.amount=`This is more than the cash book balance of ${ksh(cashSummary().balance)}.`;
+  if(!(amt>0))err.amount='x';else if(amt>sf.balance)err.amount=`This is more than the programme balance of ${ksh(sf.balance)}.`;
   if(!applyErrors(form,err))return;
   S.sfpSpend=S.sfpSpend||[];
   const x={id:nextSeq(S.sfpSpend,'SF'),chamaId:S.chama.chamaId,groupId:UI.group,date:d.date,school:String(d.school).trim(),description:String(d.description).trim(),meals:numOrNull(d.meals)||0,children:numOrNull(d.children)||0,amount:Math.round(amt),ref:String(d.ref).trim(),status:'Recorded',by:me().id,at:nowStamp()};
@@ -3788,7 +3787,7 @@ function orgDashboard(){
   return `${pageHeader({title:S.chama.name,crumbs:esc(progLabel()?progFull():orgSub()),desc:`All ${G.length} community groups and their ${V.length} VSLAs on one page. <span id="live-stamp">${liveLabel()}</span>. Each community group keeps the same colour on every chart.`})}
   ${dashTabs('org')}
   ${photoBanner('Our community groups at work',`${G.map(g=>g.groupName).join(', ')} · ${progLabel()||'Micro Enterprise Program'}`)}
-  <div class="stats">${statCard({label:'Members',value:num(sum(per,p=>p.members)),sub:`${G.length} community groups · ${V.length} VSLAs${unassigned?` · ${unassigned} not in a VSLA yet`:''}`,ic:'users',cls:'span-2'})}${statCard({label:'Total savings',value:ksh(sum(per,p=>p.savings)),sub:'All groups',ic:'coins'})}${statCard({label:'Cash balance',value:ksh(sum(per,p=>p.cash)),sub:'Sum of the groups\' cash books',ic:'cash'})}${statCard({label:'Loans outstanding',value:ksh(sum(per,p=>p.loans)),sub:`${sum(per,p=>p.overdue)} overdue${sum(G,g=>loanRoundsTotal(g.groupId))?` · ${ksh(sum(G,g=>loanRoundsTotal(g.groupId)))} issued in ledger loan rounds`:''}`,ic:'loan',tone:'maroon'})}${statCard({label:'Social Fund / Welfare',value:ksh(sum(per,p=>p.welfare)),sub:'All groups',ic:'heart'})}${statCard({label:'School Feeding Programme',value:ksh(sum(per,p=>p.sfp.balance)),sub:`${num(sum(per,p=>p.sfp.meals))} meals recorded`,ic:'building'})}</div>
+  <div class="stats">${statCard({label:'Members',value:num(sum(per,p=>p.members)),sub:`${G.length} community groups · ${V.length} VSLAs${unassigned?` · ${unassigned} not in a VSLA yet`:''}`,ic:'users',cls:'span-2'})}${statCard({label:'Total savings',value:ksh(sum(per,p=>p.savings)),sub:'All groups',ic:'coins'})}${statCard({label:'Cash balance',value:ksh(sum(per,p=>p.cash)),sub:'Savings not yet lent, all groups',ic:'cash'})}${statCard({label:'Loans outstanding',value:ksh(sum(per,p=>p.loans)),sub:`${sum(per,p=>p.overdue)} overdue${sum(G,g=>loanRoundsTotal(g.groupId))?` · ${ksh(sum(G,g=>loanRoundsTotal(g.groupId)))} issued in ledger loan rounds`:''}`,ic:'loan',tone:'maroon'})}${statCard({label:'Social Fund / Welfare',value:ksh(sum(per,p=>p.welfare)),sub:'All groups',ic:'heart'})}${statCard({label:'School Feeding Programme',value:ksh(sum(per,p=>p.sfp.balance)),sub:`${num(sum(per,p=>p.sfp.meals))} meals recorded`,ic:'building'})}</div>
   <div class="dash-sec"><h2 class="sec-h">Community groups compared</h2>${dashFilterRow()}</div>
   <div class="card" style="padding:12px 16px;margin-bottom:16px">${legend}<p class="muted small" style="margin:0">${gs.map(x=>`<b>${esc(x.name)}</b>${x.g.school?` (${esc(x.g.school)} school)`:''}`).join(' · ')}</p></div>
   <div class="grid-eq">
@@ -5181,7 +5180,7 @@ const vpbnUser=()=>({id:VBBM_ID,name:'VBBM',role:VBBM,groupAccess:[UI.group],gro
    photos are left out (null) and listed under "To confirm". */
 const OLM_VSLAS=[
  {key:'O1',name:'Olchoro VSLA',started:'2026-07-20',startedText:'20th July 2026 (written "VSLA taken on 20/07/2026")',book:[
-   {l:'Start of the VSLA (initial)',d:'2026-07-20',dt:'20/07/2026',cin:95400,cout:95400,n:'Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": 95,400 deposited in the bank and 95,400 withdrawn from the bank (both on the Cash Book). The 7 loans of 20 July (95,400) were given from it. No separate savings, Social Fund or School Feeding figures are written for Olchoro.'}]},
+   {l:'Start of the VSLA (initial)',d:'2026-07-20',dt:'20/07/2026',cin:95400,cout:95400,n:'Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": cash in is the savings collected (95,400) and cash out is the 7 loans given that day (95,400, recorded under each member). No Social Fund or School Feeding figures are written for Olchoro.'}]},
  {key:'O2',name:'Oloisuai VSLA',started:'2026-09-01',startedText:'1st September 2026',book:[
    {l:'1st meeting (initial savings)',d:'2026-09-01',dt:'1st Sep 2026',sav:52200,sfp:1600,sf:3200},
    {l:'2nd meeting',d:'2026-09-30',dt:'30th Sep 2026',sav:19000,sf:3400,sfp:2300,loan:2000}]},
@@ -5242,7 +5241,7 @@ const OLM_ROSTER=[
  ['Nairishu Naimodu','O3','07-702','Chairperson','Shop',5000,'2026-10-02'],
  ['Jenifer Nkoitoi','O3','07-769','Secretary','Kinyozi (barber)',8000,'2026-10-02'],
  ['Kibarisho Nkoitoi','O3','07-104','Treasurer','Mtumba (second-hand clothes)',5000,'2026-10-02','Spelled "Kibarirho" on the phone list.'],
- ['Noonkipa Kupai','O3','07-189'],
+ ['Noonkipa Kupai','O3','07-189','','',5000,'2026-09-02','What the loan is for (business) is still to be sent.'],
  ['Raposh Nkoitoi','O3','01-054','','Groceries',10000,'2026-09-02'],
  ['Naomi Nkoitoi','O3','01-322','','Hotel',1200,'2026-09-02'],
  ['Noorkiyanyu Sairowua','O3','01-088','','Groceries & shop',15000,'2026-09-02'],
@@ -5257,7 +5256,7 @@ const OLM_ROSTER=[
  ['Noolaitete Sairowua','O3','07-824'],
  ['Emmah Sairowua','O3','07-163'],
  ['Noosianai Pesi','O3','07-275'],
- ['Tori Nkoitoi','O3','07-289','','Petrol',5000,'2026-09-02','A word in brackets after the name is not clear.'],
+ ['Tori Nkoitoi','O3','07-289','','Petrol',5000,'','A word in brackets after the name is not clear. The date of this loan is still to confirm (the 2 Sep loans add up to the 55,000 saved that day with the 5,000 of Noonkipa Kupai).'],
  ['Nawuai Pesi','O3','07-079'],
  ['Noorkisaruni Naimodu','O3','07-395'],
  ['Macline Yiale','O4','','Secretary','Mtumba (second-hand clothes)',20000,'2026-09-02'],
@@ -5302,7 +5301,7 @@ const OLM_ROSTER=[
  ['Everline Lentir','O5','07-567','','Selling honey',10430,'2026-10-07'],
 ];
 const OLM_GID='GRP-01',OLM_LISTED='2026-10-15';
-const BOOK_FIELDS=[['savings','Savings'],['socialFund','Social Fund'],['schoolFeeding','School Feeding'],['loan','Loan repaid at the meeting'],['cashIn','Cash in (to the bank)'],['cashOut','Cash out (from the bank)']];
+const BOOK_FIELDS=[['savings','Savings'],['socialFund','Social Fund'],['schoolFeeding','School Feeding'],['loan','Loan repaid at the meeting'],['cashIn','Cash in (savings collected)'],['cashOut','Cash out (loans given)']];
 const BOOK_SHORT={sav:'savings',sf:'socialFund',sfp:'schoolFeeding',loan:'loan',cin:'cashIn',cout:'cashOut'};
 
 function applyOlemonchoRoster(st){
@@ -5360,9 +5359,13 @@ function applyOlemonchoRoster(st){
    • each member's loan in the book that has a meeting date → money out in the cash book on that date.
    • each fine payment → the group's savings (the member's VSLA), never the member's own savings. */
 const BOOK_POST={savings:{type:'saving',suf:'SV'},socialFund:{type:'contribution',cat:'CAT-SOCIAL',suf:'SF'},schoolFeeding:{type:'contribution',cat:'CAT-SFP',suf:'SFP'}};
-const BOOK_CASH={cashIn:{dir:'in',suf:'IN',cat:'Cash in (to the bank)',desc:'cash in: deposited in the bank',fund:'Bank'},cashOut:{dir:'out',suf:'OUT',cat:'Cash out (from the bank)',desc:'cash out: withdrawn from the bank',fund:'Bank'}};
+/* v0.9.15: in a VSLA book, cash in is the savings collected at the meeting and cash out is the money given out as loans.
+   Loan repayments received at a meeting are cash in too: they are lent out again. Contributions go to the bank. */
+const BOOK_CASH={loan:{dir:'in',suf:'RP',cat:'Loan repayment',desc:'loan repayments received at the meeting (members not named)',fund:'Loans'},cashOut:{dir:'out',suf:'OUT',cat:'Loan disbursement',desc:'loans given at the meeting (members not named)',fund:'Loans'}};
+const bookSavings=b=>b.savings!=null?b.savings:b.cashIn!=null?b.cashIn:null; /* the savings collected: "cash in" when savings is not written separately */
 const isGroupRec=e=>!!(e&&e.type!=='loan'&&(e.bookRef||e.fineRef)); /* a VSLA book loan belongs to its member */
-const OLM_BOOK_REV=5;
+const OLM_BOOK_REV=7;
+const OLM_NOTE4='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": cash in is the savings collected (95,400) and cash out is the 7 loans given that day (95,400, recorded under each member). No Social Fund or School Feeding figures are written for Olchoro.';
 const OLM_NOTE3='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": 95,400 deposited in the bank and 95,400 withdrawn from the bank (both on the Cash Book). The 7 loans of 20 July (95,400) were given from it. No separate savings, Social Fund or School Feeding figures are written for Olchoro.';
 const OLM_PHONE_FIX={'OLM-051':['01xx xxx 577','07xx xxx 140'],'OLM-062':['Not added','07xx xxx 395']};
 const OLM_OLD_NOTE='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". No separate savings, Social Fund or School Feeding figures are written for Olchoro.',OLM_NEW_NOTE='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". Cash in was deposited in the bank; cash out is the 7 loans given that day (95,400), counted once as the loans. No separate savings, Social Fund or School Feeding figures are written for Olchoro.';
@@ -5374,10 +5377,13 @@ function postVslaBooks(st,{audit=false}={}){
     if(!b.date)return; /* a total without a date cannot be placed in a month */
     const at=b.date+'T12:00',ref=`VSLA book · ${b.label}`,cats=((st.rules||{})[v.groupId]||{}).contributionCategories||[];
     const base={chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,memberId:'vsla:'+v.vslaId,date:b.date,status:'Recorded',by:'vsla-book',method:'Cash',ref,bookRef:b.id,bookLabel:b.label,source:'vsla-book',note:'VSLA total for the meeting, as written in the VSLA book (members not itemised).',at};
-    Object.entries(BOOK_POST).forEach(([k,p])=>{if(b[k]==null)return;if(p.cat&&!cats.some(c=>c.id===p.cat))return;
-      st.ledger.push({...base,id:`${b.id}-${p.suf}`,type:p.type,amount:+b[k],...(p.type==='contribution'?{category:p.cat,period:monthKey(b.date),expected:null}:{})});add(v.groupId)});
+    Object.entries(BOOK_POST).forEach(([k,p])=>{const val=k==='savings'?bookSavings(b):b[k];if(val==null)return;if(p.cat&&!cats.some(c=>c.id===p.cat))return;
+      st.ledger.push({...base,id:`${b.id}-${p.suf}`,type:p.type,amount:+val,...(p.type==='contribution'?{category:p.cat,period:monthKey(b.date),expected:null}:{})});add(v.groupId)});
     Object.entries(BOOK_CASH).forEach(([k,p])=>{if(b[k]==null)return;
-      st.cashbook.push({id:`${b.id}-${p.suf}`,chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,direction:p.dir,date:b.date,ref,description:`${v.name}: ${p.desc}`,category:p.cat,bookFund:p.fund||'',amount:+b[k],approvedBy:'',reason:'From the VSLA book',status:'Recorded',by:'vsla-book',bookRef:b.id,source:'vsla-book',at});add(v.groupId)});
+      /* cash out = the loans given that day: members' own loans of that day are already counted, so only the rest is added */
+      const amt=k==='cashOut'?+b[k]-sum((st.members||[]).filter(m=>m.vslaId===v.vslaId&&m.vslaBook&&m.vslaBook.loan!=null&&m.vslaBook.loanDate===b.date),m=>+m.vslaBook.loan):+b[k];
+      if(!(amt>0))return;
+      st.cashbook.push({id:`${b.id}-${p.suf}`,chamaId:st.chama.chamaId,groupId:v.groupId,vslaId:v.vslaId,direction:p.dir,date:b.date,ref,description:`${v.name}: ${p.desc}`,category:p.cat,bookFund:p.fund||'',amount:amt,approvedBy:'',reason:'From the VSLA book',status:'Recorded',by:'vsla-book',bookRef:b.id,source:'vsla-book',at});add(v.groupId)});
   }));
   /* members' loans from the VSLA books, given at the meeting written in the margin: tracked as internal loans
      (deadline, repayments, overdue) under the group's loan rules; the Cash Book counts them as money out */
@@ -5401,7 +5407,7 @@ function syncOlemonchoBook(st){
   (st.vslas||[]).forEach(v=>{if(v.groupId===OLM_GID&&OLM_VSLA_RENAMES[v.name]){v.name=OLM_VSLA_RENAMES[v.name];n++}});
   Object.entries(OLM_RENAMES).forEach(([id,[from,to]])=>{const m=st.members.find(x=>x.id===id);if(m&&m.name===from){m.name=to;n++}});
   Object.entries(OLM_PHONE_FIX).forEach(([id,[from,to]])=>{const m=st.members.find(x=>x.id===id);if(m&&m.phone===from){m.phone=to;m.phoneMasked=true;n++}});
-  (st.vslas||[]).forEach(v=>(v.book||[]).forEach(b=>{if(b.note===OLM_OLD_NOTE||b.note===OLM_NEW_NOTE){b.note=OLM_NOTE3;n++}}));
+  (st.vslas||[]).forEach(v=>(v.book||[]).forEach(b=>{if([OLM_OLD_NOTE,OLM_NEW_NOTE,OLM_NOTE3].includes(b.note)){b.note=OLM_NOTE4;n++}}));
   (st.audit||[]).forEach(a=>{if(a.role==='VP'+'BN')a.role='VBBM'});
   OLM_ROSTER.forEach(([name,key,ph='',role=''],i)=>{const m=st.members.find(x=>x.id===`${g.code||'OLM'}-${String(i+1).padStart(3,'0')}`);
     if(m&&m.name===name&&role&&m.role==='Member'){m.role=role;m.groupAccess=[m.groupId];n++}});
@@ -5538,7 +5544,7 @@ function subgroupPicker(){
   const off=(v,r)=>{const m=vbMembers(v).find(x=>x.role===r);return m?esc(m.name):'<span class="muted">-</span>'};
   return card({title:`The ${V.length} groups in ${esc(g.groupName)}`,sub:'Choose a group to see only its own records: members, savings, contributions, loans and cash book.',body:`<div class="grid-3">${V.map(v=>`<button type="button" class="card" data-act="set-vsla" data-v="${v.vslaId}" style="text-align:left;padding:16px;cursor:pointer;font:inherit;color:inherit;width:100%">
       <b style="font:600 1.05rem 'Sora',sans-serif">${esc(subName(v))}</b><div class="muted small" style="margin:2px 0 10px">${plural(vbMembers(v).length,'member')}</div>
-      <dl class="kv small" style="margin:0"><dt>Savings</dt><dd>${vbAmt(vbSum([v],'savings'))}</dd><dt>Loans taken</dt><dd>${vbAmt(vbLoans([v]))}</dd><dt>Chairlady</dt><dd>${off(v,'Chairperson')}</dd></dl>
+      <dl class="kv small" style="margin:0"><dt>Savings</dt><dd>${vbAmt(vbSav([v]))}</dd><dt>Loans taken</dt><dd>${vbAmt(vbLoans([v]))}</dd><dt>Chairlady</dt><dd>${off(v,'Chairperson')}</dd></dl>
       <div style="margin-top:10px;color:var(--teal-700);font-weight:600" class="small">Open ${esc(subName(v))} →</div></button>`).join('')}</div>`})+'<div style="height:16px"></div>';
 }
 function subgroupHome(){const g=curGroup(),n=vslasOf(UI.group).length;
@@ -5553,10 +5559,10 @@ function allGroupsCashCard(){
   const rows=[];
   S.groups.forEach(g=>{rows.push({name:g.groupName,lvl:0,...sumFor(g.groupId,'')});if(hasSubgroups(g.groupId))vslasOf(g.groupId).forEach(v=>rows.push({name:subName(v),lvl:1,...sumFor(g.groupId,v.vslaId)}))});
   const top=rows.filter(r=>!r.lvl),T={tin:sum(top,r=>r.tin),tout:sum(top,r=>r.tout),bal:sum(top,r=>r.bal)};
-  return card({flush:true,title:'Cash in and cash out: all community groups',sub:'Mbitin, Nterere and Olemoncho, with Olemoncho\'s groups shown under it. Each group\'s own cash book is below when you open it.',body:table({caption:'Cash by community group',cols:[
+  return card({flush:true,title:'Cash in and cash out: all community groups',sub:'Cash in = savings collected and loan repayments; cash out = loans given. Mbitin, Nterere and Olemoncho, with Olemoncho\'s groups under it. Contributions are not here: they are in the bank (see Contributions).',body:table({caption:'Cash by community group',cols:[
     {label:'Community group / group',render:r=>r.lvl?`<span style="padding-left:18px" class="small">↳ ${esc(r.name)}</span>`:`<b>${esc(r.name)}</b>`},
-    {label:'Cash in',cls:'r',render:r=>`<span class="num">${ksh(r.tin)}</span>`},{label:'Cash out',cls:'r',render:r=>`<span class="num">${ksh(r.tout)}</span>`},{label:'Balance',cls:'r',render:r=>`<span class="num">${r.lvl?ksh(r.bal):'<b>'+ksh(r.bal)+'</b>'}</span>`}],rows,
-    foot:`<tfoot><tr><td class="cell-main">All ${top.length} community groups</td><td class="r" data-label="Cash in">${ksh(T.tin)}</td><td class="r" data-label="Cash out">${ksh(T.tout)}</td><td class="r" data-label="Balance">${ksh(T.bal)}</td></tr></tfoot>`})})+'<div style="height:16px"></div>';
+    {label:'Cash in',cls:'r',render:r=>`<span class="num">${ksh(r.tin)}</span>`},{label:'Cash out',cls:'r',render:r=>`<span class="num">${ksh(r.tout)}</span>`},{label:'Left to lend',cls:'r',render:r=>`<span class="num${r.bal<0?' minus':''}">${r.lvl?ksh(r.bal):'<b>'+ksh(r.bal)+'</b>'}</span>`}],rows,
+    foot:`<tfoot><tr><td class="cell-main">All ${top.length} community groups</td><td class="r" data-label="Cash in">${ksh(T.tin)}</td><td class="r" data-label="Cash out">${ksh(T.tout)}</td><td class="r" data-label="Left to lend">${ksh(T.bal)}</td></tr></tfoot>`})})+'<div style="height:16px"></div>';
 }
 {const f=cashbookView;cashbookView=function(){const h=f.apply(this,arguments),c=allGroupsCashCard();return c?afterHeader(h,c):h}}
 
@@ -5601,6 +5607,25 @@ FORMS['contrib-limits']=(form,d)=>{
   if(L&&amt>0&&(amt<L.min||amt>L.max)){applyErrors(form,{amount:`Rejected: ${catName(d.category,m.groupId)} in ${L.scopeName} must be between ${ksh(L.min)} (minimum) and ${ksh(L.max)} (${CONTRIB_MAX_X} × the minimum).`});return}
   return f(form,d);
 }}
+/* contributions (Social Fund, School Feeding) go to the bank: by group and across all community groups */
+function contribBank(gid,vid){const og=UI.group,ov=UI.vsla;UI.group=gid;UI.vsla=vid;try{const w=welfareSummary(gid),p=sfpSummary(gid);
+  return{sf:w.contributions,sfp:p.collected,tot:w.contributions+p.collected,out:w.payouts+p.spent,bank:w.balance+p.balance}}finally{UI.group=og;UI.vsla=ov}}
+function contribBankCard(){
+  if(UI.role==='Member')return '';
+  const all=isPlatformOwner()||isVBBM(),G=all?S.groups:[curGroup()],cv=curVsla(),rows=[];
+  G.forEach(g=>{const sub=hasSubgroups(g.groupId);
+    if(!all&&cv){rows.push({name:subName(cv),lvl:0,...contribBank(g.groupId,cv.vslaId)});return}
+    rows.push({name:g.groupName,lvl:0,...contribBank(g.groupId,'')});
+    if(sub)vslasOf(g.groupId).forEach(v=>rows.push({name:subName(v),lvl:1,...contribBank(g.groupId,v.vslaId)}))});
+  const top=rows.filter(r=>!r.lvl),T=k=>sum(top,r=>r[k]),c=(r,k)=>`<span class="num">${r.lvl?ksh(r[k]):'<b>'+ksh(r[k])+'</b>'}</span>`;
+  return card({flush:true,title:all?'Contributions in the bank: all community groups':`Contributions in the bank: ${esc(cv&&!all?subName(cv):curGroup().groupName)}`,
+    sub:`Social Fund and School Feeding go to the bank. They are kept apart from savings and the cash book, and are never given out as loans.${all?' Mbitin, Nterere and Olemoncho, with Olemoncho\'s groups under it.':''}`,
+    body:table({caption:'Contributions in the bank',cols:[
+      {label:'Community group / group',render:r=>r.lvl?`<span style="padding-left:18px" class="small">↳ ${esc(r.name)}</span>`:`<b>${esc(r.name)}</b>`},
+      {label:'Social Fund',cls:'r',render:r=>c(r,'sf')},{label:'School Feeding',cls:'r',render:r=>c(r,'sfp')},{label:'Total contributions',cls:'r',render:r=>c(r,'tot')},
+      {label:'Paid out',cls:'r',render:r=>c(r,'out')},{label:'In the bank',cls:'r',render:r=>c(r,'bank')}],rows,
+      foot:top.length>1?`<tfoot><tr><td class="cell-main">All ${top.length} community groups</td><td class="r" data-label="Social Fund">${ksh(T('sf'))}</td><td class="r" data-label="School Feeding">${ksh(T('sfp'))}</td><td class="r" data-label="Total contributions">${ksh(T('tot'))}</td><td class="r" data-label="Paid out">${ksh(T('out'))}</td><td class="r" data-label="In the bank">${ksh(T('bank'))}</td></tr></tfoot>`:''})})+'<div style="height:16px"></div>';
+}
 {const f=contributionsView;contributionsView=function(){const h=f.apply(this,arguments),c=UI.role==='Member'?'':contribLimitsCard();return c?afterHeader(h,c):h}}
 contributionsViewObj.render=contributionsView;
 {const f=actV7;actV7=function(name,el,ev){if(name==='contrib-limits'){openContribLimits(el.dataset.id);return}return f(name,el,ev)}}
@@ -5615,13 +5640,22 @@ const undatedLoans=(gid=UI.group)=>{const L=bookLoanRows(gid).filter(x=>!x.m.vsl
   return afterHeader(h,notice(`These figures include ${parts.join(', and ')}. Each member's own savings show here once recorded.`,{ic:'book',tone:'teal',title:'Group savings.'}))}}
 {const f=contributionsView;contributionsView=function(){const h=f.apply(this,arguments),B=bookRecs('contribution');if(!B.length||UI.role==='Member')return h;
   return afterHeader(h,notice(`These figures include <b>${ksh(sum(B))}</b> of Social Fund and School Feeding totals from the VSLA books (members not itemised), so "members paid" stays at 0 until members' own contributions are recorded.`,{ic:'book',tone:'teal',title:'From the VSLA books.'}))}}
+{const f=contributionsView;contributionsView=function(){const h=f.apply(this,arguments);
+  return afterHeader(h,notice('Contributions (Social Fund and School Feeding) go to the bank. They are never mixed with savings or the cash book, and they cannot be given out as loans: loans come only from the savings.',{ic:'building',tone:'teal',title:'Kept in the bank.'})+contribBankCard())}}
 savingsViewObj.render=savingsView;contributionsViewObj.render=contributionsView; /* the router holds these references */
-/* the cash book holds only cash in (money deposited in the bank) and cash out (money withdrawn from the bank);
-   savings are lent out as loans, and contributions, loans, repayments and fines have their own pages */
-{const f=cashEntries;cashEntries=function(g=UI.group){const c=f(g);return memo('cashbank|'+g+'|'+subKey(g),()=>{const ids=new Set((S.cashbook||[]).map(x=>x.id));let bal=c.opening;
-  const rows=c.rows.filter(r=>ids.has(r.src)).map(r=>{bal+=r.in-r.out;return{...r,balance:bal}});return{...c,rows}})}}
-{const f=cashbookView;cashbookView=function(){const h=f.apply(this,arguments);
-  return afterHeader(h,notice('The cash book records only <b>cash in</b> (money deposited in the bank) and <b>cash out</b> (money withdrawn from the bank). Savings are given out as loans, so they are not in the cash book: see Savings, Contributions and Loan Repayments.',{ic:'cash',tone:'teal',title:'Cash in and cash out.'}))}}
+/* v0.9.15: the cash book holds cash in = the savings collected at meetings (members' savings, VSLA savings totals and
+   fines paid into savings) and the loan repayments received; cash out = the money given out as loans. The balance is
+   what is left to lend. Contributions (Social Fund, School Feeding) go to the bank: they are kept apart, are never
+   lent, and neither they nor the payouts made from them are in the cash book. */
+const CASH_CATS=new Set(['Savings','Fine payment','Loan repayment','Loan disbursement',LOAN_ROUND_CAT]);
+{const f=cashEntries;cashEntries=function(g=UI.group){return memo('cashloan|'+g+'|'+subKey(g),()=>{const c=f(g);let bal=c.opening;
+  const rows=c.rows.filter(r=>CASH_CATS.has(r.cat)).map(r=>{bal+=r.in-r.out;return{...r,balance:bal}});return{...c,rows}})}}
+/* a group whose loans are more than its savings and repayments written: a figure is missing from its book */
+function cashShort(gid,vid){const og=UI.group,ov=UI.vsla;UI.group=gid;UI.vsla=vid;try{const c=cashSummary(gid);return c.balance<0?{tin:c.totalIn,tout:c.totalOut,short:-c.balance}:null}finally{UI.group=og;UI.vsla=ov}}
+{const f=cashbookView;cashbookView=function(){const h=f.apply(this,arguments),g=curGroup(),cv=curVsla();
+  const V=hasSubgroups(UI.group)?(cv?[cv]:vslasOf(UI.group)):[],short=V.length?V.map(v=>({n:subName(v),x:cashShort(UI.group,v.vslaId)})).filter(r=>r.x):((x=>x?[{n:g.groupName,x}]:[])(cashShort(UI.group,'')));
+  return afterHeader(h,notice('<b>Cash in</b> is the savings collected at meetings, with the loan repayments received and fines paid into savings. <b>Cash out</b> is the money given out as loans. The balance is what is left to lend. <b>Contributions</b> (Social Fund and School Feeding) go to the bank: they are kept apart on the Contributions page and are never given out as loans.',{ic:'cash',tone:'teal',title:'Cash in and cash out.'})
+    +(short.length?notice(`${short.map(r=>`<b>${esc(r.n)}</b>: loans given (${ksh(r.x.tout)}) are ${ksh(r.x.short)} more than the savings and repayments written (${ksh(r.x.tin)})`).join('; ')}. A savings figure is probably missing from the book: please send it so the balance is right.`,{ic:'alert',tone:'amber',title:'Lent more than collected.'}):''))}}
 {const f=dashKPIs;dashKPIs=function(){let h=f.apply(this,arguments);const L=bookLoanRows();if(!L.length)return h;
   const a=sum(L.filter(x=>x.m.vslaBook.loan!=null),x=>+x.m.vslaBook.loan),u=undatedLoans();
   if(u.n)h=h.replace(/(Loans outstanding<\/div><div class="val">[^<]*<\/div><div class="sub">)/,`$1${plural(u.n,'VSLA book loan')} not tracked yet (date to confirm) · `);
@@ -5666,6 +5700,7 @@ groupChooser=function(){
 /* ---------- VSLA groups page: every VSLA of the selected community group ---------- */
 const vbMembers=v=>S.members.filter(m=>m.vslaId===v.vslaId&&m.status==='Active');
 const vbBook=v=>(v.book||[]).slice().sort((a,b)=>(a.date||'9')<(b.date||'9')?-1:(a.date||'9')>(b.date||'9')?1:0);
+function vbSav(vs){const B=vs.flatMap(v=>v.book||[]),W=B.filter(b=>bookSavings(b)!=null);return{amt:sum(W,b=>+bookSavings(b)),n:W.length,open:B.filter(b=>bookSavings(b)==null&&b.unclear&&(b.unclear.savings||b.unclear.cashIn)).length}}
 function vbSum(vs,k){const B=vs.flatMap(v=>v.book||[]);return{amt:sum(B.filter(b=>b[k]!=null),b=>+b[k]),n:B.filter(b=>b[k]!=null).length,open:B.filter(b=>b[k]==null&&b.unclear&&b.unclear[k]).length}}
 function vbLoans(vs){const M=vs.flatMap(vbMembers),L=M.filter(m=>m.vslaBook&&m.vslaBook.loan!=null);return{amt:sum(L,m=>+m.vslaBook.loan),n:L.length,open:M.filter(m=>m.vslaBook&&m.vslaBook.loan==null&&m.vslaBook.loanUnclear).length}}
 const vbAmt=x=>!x.n&&!x.open?'<span class="muted">Not written</span>':`${x.n?`<span style="white-space:nowrap">${ksh(x.amt)}</span>`:''}${x.open?` <span class="pend" title="Not clear on the photos: to confirm">+ ${plural(x.open,'amount')} to confirm</span>`:''}`;
@@ -5735,14 +5770,14 @@ function vslaPage(){
     if(!v)return `${pageHeader({title:'My VSLA',desc:'You are not in a VSLA yet.'})}`;
     const b=m.vslaBook||{},L=vbLoans([v]);
     return `${pageHeader({title:`My VSLA: ${v.name}`,desc:`${esc(g.groupName)} community group · started ${esc(v.startedText||(v.started?fmtDate(v.started):'-'))} · ${plural(vbMembers(v).length,'member')}. Totals are as written in the VSLA book; other members' details stay private.`})}
-    <div class="stats">${statCard({label:'VSLA savings written',value:vbAmt(vbSum([v],'savings')),sub:'All meetings',ic:'coins'})}${statCard({label:'Social Fund written',value:vbAmt(vbSum([v],'socialFund')),sub:'All meetings',ic:'heart'})}${statCard({label:'School Feeding written',value:vbAmt(vbSum([v],'schoolFeeding')),sub:'All meetings',ic:'building'})}${statCard({label:'Loans taken in the VSLA',value:vbAmt(L),sub:plural(L.n,'member'),ic:'loan',tone:'maroon'})}</div>
+    <div class="stats">${statCard({label:'VSLA savings written',value:vbAmt(vbSav([v])),sub:'All meetings',ic:'coins'})}${statCard({label:'Social Fund written',value:vbAmt(vbSum([v],'socialFund')),sub:'All meetings',ic:'heart'})}${statCard({label:'School Feeding written',value:vbAmt(vbSum([v],'schoolFeeding')),sub:'All meetings',ic:'building'})}${statCard({label:'Loans taken in the VSLA',value:vbAmt(L),sub:plural(L.n,'member'),ic:'loan',tone:'maroon'})}</div>
     <div class="grid-eq">${card({title:'My business and loan',sub:'From the VSLA book',body:`<dl class="kv"><dt>Business (loan purpose)</dt><dd>${esc(b.business||'Not written')}</dd><dt>Loan taken</dt><dd class="num">${b.loan!=null?ksh(+b.loan):b.loanUnclear?'Not clear on the book page (to confirm)':'None written'}</dd>${b.loanDate?`<dt>Loan date</dt><dd>${vbLoanDate(b)}</dd>`:''}<dt>My savings</dt><dd>${vbOwnSavings(m.id)}</dd></dl>`})}
     ${card({flush:true,title:'Meeting totals',sub:'As written in the VSLA book',body:vbBookTable(v)})}</div>`;
   }
   const tab=curVsla()?curVsla().vslaId:'all',SV=tab==='all'?V:V.filter(v=>v.vslaId===tab);
   const M=V.flatMap(vbMembers),L=vbLoans(V),SM=SV.flatMap(vbMembers),SL=vbLoans(SV);
   const head=pageHeader({title:`Groups in ${g.groupName}`,crumbs:orgCrumb(),desc:`${plural(V.length,'VSLA')} and ${plural(M.length,'member')}${g.school?` (${esc(g.school)} school)`:''}. Names, businesses, loans and meeting totals are as written in each VSLA's book; amounts that could not be read are left out and listed under "To confirm".`,actions:can('editChama')?btn('vb-total','Add meeting totals',{ic:'plus'}):''});
-  const stats=`<div class="stats">${statCard({label:'Members',value:num(SM.length),sub:tab==='all'?plural(V.length,'VSLA'):esc(SV[0].name),ic:'users'})}${statCard({label:'Total savings written',value:vbAmt(vbSum(SV,'savings')),sub:'All VSLA meetings',ic:'coins'})}${statCard({label:'Social Fund written',value:vbAmt(vbSum(SV,'socialFund')),sub:'All VSLA meetings',ic:'heart'})}${statCard({label:'School Feeding written',value:vbAmt(vbSum(SV,'schoolFeeding')),sub:'All VSLA meetings',ic:'building'})}${statCard({label:'Loans taken (members)',value:vbAmt(SL),sub:`${plural(SL.n,'member')} with a loan written`,ic:'loan',tone:'maroon'})}</div>`;
+  const stats=`<div class="stats">${statCard({label:'Members',value:num(SM.length),sub:tab==='all'?plural(V.length,'VSLA'):esc(SV[0].name),ic:'users'})}${statCard({label:'Total savings written',value:vbAmt(vbSav(SV)),sub:'All VSLA meetings',ic:'coins'})}${statCard({label:'Social Fund written',value:vbAmt(vbSum(SV,'socialFund')),sub:'All VSLA meetings',ic:'heart'})}${statCard({label:'School Feeding written',value:vbAmt(vbSum(SV,'schoolFeeding')),sub:'All VSLA meetings',ic:'building'})}${statCard({label:'Loans taken (members)',value:vbAmt(SL),sub:`${plural(SL.n,'member')} with a loan written`,ic:'loan',tone:'maroon'})}</div>`;
   const items=[{id:'all',label:`All ${V.length} groups`,count:V.length},...V.map(v=>({id:v.vslaId,label:v.name.replace(/ VSLA$/,''),count:vbMembers(v).length}))];
   let body='';
   if(tab==='all'){
@@ -5750,12 +5785,12 @@ function vslaPage(){
       {label:'VSLA',render:v=>`<span class="who"><i class="gdot" style="background:${groupColor(v.groupId)}"></i><span><b>${esc(v.name)}</b><span title="${esc(v.startedText||'')}">${v.started?'Since '+esc(fmtDate(v.started)):''}</span></span></span>`},
       {label:'Members',cls:'r',render:v=>vbMembers(v).length},
       {label:'Officials',render:v=>{const o=vbMembers(v).filter(m=>m.role!=='Member');return o.length?`<div class="tiny" style="white-space:normal;min-width:170px">${o.map(m=>`${esc(m.name)} <span class="muted">(${esc(m.role==='Chairperson'?'Chair':m.role)})</span>`).join('<br>')}</div>`:'<span class="muted tiny">Not written</span>'}},
-      {label:'Savings written',cls:'r',render:v=>vbAmt(vbSum([v],'savings'))},
+      {label:'Savings written',cls:'r',render:v=>vbAmt(vbSav([v]))},
       {label:'Social Fund',cls:'r',render:v=>vbAmt(vbSum([v],'socialFund'))},
       {label:'School Feeding',cls:'r',render:v=>vbAmt(vbSum([v],'schoolFeeding'))},
       {label:'Loans taken',cls:'r',render:v=>vbAmt(vbLoans([v]))},
       {label:'',nolabel:true,cls:'r',render:v=>`<button type="button" class="btn btn-secondary btn-sm" data-act="tab" data-tabs="vslas" data-tab="${v.vslaId}">Open</button>`}],rows:V,
-      foot:`<tfoot><tr><td class="cell-main">All ${V.length} VSLAs</td><td class="r" data-label="Members">${M.length}</td><td></td><td class="r" data-label="Savings written">${vbAmt(vbSum(V,'savings'))}</td><td class="r" data-label="Social Fund">${vbAmt(vbSum(V,'socialFund'))}</td><td class="r" data-label="School Feeding">${vbAmt(vbSum(V,'schoolFeeding'))}</td><td class="r" data-label="Loans taken">${vbAmt(L)}</td><td></td></tr></tfoot>`})})
+      foot:`<tfoot><tr><td class="cell-main">All ${V.length} VSLAs</td><td class="r" data-label="Members">${M.length}</td><td></td><td class="r" data-label="Savings written">${vbAmt(vbSav(V))}</td><td class="r" data-label="Social Fund">${vbAmt(vbSum(V,'socialFund'))}</td><td class="r" data-label="School Feeding">${vbAmt(vbSum(V,'schoolFeeding'))}</td><td class="r" data-label="Loans taken">${vbAmt(L)}</td><td></td></tr></tfoot>`})})
       +'<div style="height:16px"></div>'+vbByDateCards(V)+vbConfirmCard(V);
   }else{
     const v=vslaById(tab),ms=vbMembers(v);
@@ -5775,8 +5810,8 @@ function vslaBookDashCard(){
   const V=vslasOf(UI.group).filter(v=>subOk(v,UI.group)&&((v.book||[]).length||vbMembers(v).some(m=>m.vslaBook)));if(!V.length)return '';
   return card({flush:true,title:'From the VSLA books',sub:'Savings, Social Fund, School Feeding and loans as written in each VSLA\'s book',actions:`<a class="btn btn-ghost btn-sm" href="#/vslas">Open VSLA groups</a>`,body:table({caption:'VSLA book totals',cols:[
     {label:'VSLA',render:v=>`<b>${esc(v.name)}</b><div class="muted tiny">${plural(vbMembers(v).length,'member')}</div>`},
-    {label:'Savings',cls:'r',render:v=>vbAmt(vbSum([v],'savings'))},{label:'Social Fund',cls:'r',render:v=>vbAmt(vbSum([v],'socialFund'))},{label:'School Feeding',cls:'r',render:v=>vbAmt(vbSum([v],'schoolFeeding'))},{label:'Loans taken',cls:'r',render:v=>vbAmt(vbLoans([v]))}],rows:V,
-    foot:`<tfoot><tr><td class="cell-main">Total</td><td class="r" data-label="Savings">${vbAmt(vbSum(V,'savings'))}</td><td class="r" data-label="Social Fund">${vbAmt(vbSum(V,'socialFund'))}</td><td class="r" data-label="School Feeding">${vbAmt(vbSum(V,'schoolFeeding'))}</td><td class="r" data-label="Loans taken">${vbAmt(vbLoans(V))}</td></tr></tfoot>`})})+'<div style="height:16px"></div>';
+    {label:'Savings',cls:'r',render:v=>vbAmt(vbSav([v]))},{label:'Social Fund',cls:'r',render:v=>vbAmt(vbSum([v],'socialFund'))},{label:'School Feeding',cls:'r',render:v=>vbAmt(vbSum([v],'schoolFeeding'))},{label:'Loans taken',cls:'r',render:v=>vbAmt(vbLoans([v]))}],rows:V,
+    foot:`<tfoot><tr><td class="cell-main">Total</td><td class="r" data-label="Savings">${vbAmt(vbSav(V))}</td><td class="r" data-label="Social Fund">${vbAmt(vbSum(V,'socialFund'))}</td><td class="r" data-label="School Feeding">${vbAmt(vbSum(V,'schoolFeeding'))}</td><td class="r" data-label="Loans taken">${vbAmt(vbLoans(V))}</td></tr></tfoot>`})})+'<div style="height:16px"></div>';
 }
 {const f=groupVslaSection;groupVslaSection=function(){return hasSubgroups(UI.group)?'':f.apply(this,arguments)}}
 

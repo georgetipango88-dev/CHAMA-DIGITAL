@@ -25,8 +25,8 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
   and cannot be lent: a loan can only come from the savings. Social Fund payouts and School Feeding spending come from
   the bank, not the cash book. The Contributions page shows each member's Social Fund and School Feeding (By member),
   each group's totals and the total across all community groups (Olemoncho's 5 groups under it).
-- **Olemoncho B:** Noonkipa Kupai took 5,000 on 2 Sep (what the loan is for: still to be sent), so the 2 Sep loans
-  equal the 55,000 saved that day. Tori Nkoitoi's 5,000 (petrol) is kept with its date to confirm.
+- **Olemoncho B:** Noonkipa Kupai took 5,000 on 2 Sep (what the loan is for: still to be sent) and Tori Nkoitoi
+  took 5,000 (petrol) on 2 Sep. The 2 Sep loans (60,000) are 5,000 more than the 55,000 saved that day: flagged.
 
 ## New in v0.9.14
 - **Simpler:** no separate "Groups in Olemoncho" menu item. Dashboard shows all 3 community groups; choosing

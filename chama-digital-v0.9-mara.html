@@ -5256,7 +5256,7 @@ const OLM_ROSTER=[
  ['Noolaitete Sairowua','O3','07-824'],
  ['Emmah Sairowua','O3','07-163'],
  ['Noosianai Pesi','O3','07-275'],
- ['Tori Nkoitoi','O3','07-289','','Petrol',5000,'','A word in brackets after the name is not clear. The date of this loan is still to confirm (the 2 Sep loans add up to the 55,000 saved that day with the 5,000 of Noonkipa Kupai).'],
+ ['Tori Nkoitoi','O3','07-289','','Petrol',5000,'2026-09-02','A word in brackets after the name is not clear.'],
  ['Nawuai Pesi','O3','07-079'],
  ['Noorkisaruni Naimodu','O3','07-395'],
  ['Macline Yiale','O4','','Secretary','Mtumba (second-hand clothes)',20000,'2026-09-02'],
@@ -5364,7 +5364,7 @@ const BOOK_POST={savings:{type:'saving',suf:'SV'},socialFund:{type:'contribution
 const BOOK_CASH={loan:{dir:'in',suf:'RP',cat:'Loan repayment',desc:'loan repayments received at the meeting (members not named)',fund:'Loans'},cashOut:{dir:'out',suf:'OUT',cat:'Loan disbursement',desc:'loans given at the meeting (members not named)',fund:'Loans'}};
 const bookSavings=b=>b.savings!=null?b.savings:b.cashIn!=null?b.cashIn:null; /* the savings collected: "cash in" when savings is not written separately */
 const isGroupRec=e=>!!(e&&e.type!=='loan'&&(e.bookRef||e.fineRef)); /* a VSLA book loan belongs to its member */
-const OLM_BOOK_REV=7;
+const OLM_BOOK_REV=8;
 const OLM_NOTE4='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": cash in is the savings collected (95,400) and cash out is the 7 loans given that day (95,400, recorded under each member). No Social Fund or School Feeding figures are written for Olchoro.';
 const OLM_NOTE3='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": 95,400 deposited in the bank and 95,400 withdrawn from the bank (both on the Cash Book). The 7 loans of 20 July (95,400) were given from it. No separate savings, Social Fund or School Feeding figures are written for Olchoro.';
 const OLM_PHONE_FIX={'OLM-051':['01xx xxx 577','07xx xxx 140'],'OLM-062':['Not added','07xx xxx 395']};

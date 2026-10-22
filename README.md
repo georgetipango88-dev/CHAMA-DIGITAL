@@ -16,6 +16,25 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.16
+- **Contributions page holds the funds.** Social Fund / Welfare and School Feeding Programme are now tabs on the
+  Contributions page (payouts, programme spending and balances moved there); the separate menu item is gone. The
+  tables show Social Fund and School Feeding Programme as their own amount columns (This round, All records, By month,
+  By member).
+- **Dashboard: general or one group.** Dashboard shows all community groups together, with buttons to open one group.
+  A group's dashboard shows only that group, with "All community groups" to go back.
+- **VBBM and the HPF program admin change data.** Chairperson, Treasurer, Secretary and members view only.
+- **Olchoro from its books.** All 12 loans from the members' loan pages (new: Hellen 9,200 and Nadutari 8,650 on
+  18 Sep; purposes as written; Silal's interest 200 and Naiswaku's 290 as confirmed; Naiswaku's guarantor Mariamu). The
+  Cash Book's meetings of 17 Aug (savings 28,600) and 18 Sep (17,850) are added, so Olchoro's cash book balances to 0.
+  Recorded member by member from the books: savings (20 Jul 93,550; 17 Aug 28,000; 18 Sep 17,700), Social Fund and
+  School Feeding (100 a meeting), attendance of the 3 meetings, and the 15 fines. Everything on the Fines page is a
+  fine (even when written as Social Fund or School Feeding) and goes to the group's savings once paid.
+  Loan due dates as written on each loan page. Mum Sampeyian and Kisunyunye Nkoitoi (Mum Sipilon) are two different
+  members, both named Kisunyunye Nkoitoi. Names: Naiswaku Nkoitoi, Kiramatisho Nkoitoi.
+- **Social Fund payouts** are recorded once paid, with what they were for (for example an event); not a loan.
+- **Olemoncho B:** Noonkipa Kupai did not borrow; the 2 Sep 5,000 is Tori Nkoitoi's.
+
 ## New in v0.9.15
 - **Cash Book = savings in, loans out.** Cash in is the savings collected at meetings (with loan repayments received and
   fines paid into savings); cash out is the money given out as loans; the balance is what is left to lend. Every line

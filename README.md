@@ -16,6 +16,11 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.17
+- **Choose the month on the dashboard.** A "Month shown on the cards" picker sets the month of the Contributions and
+  Savings cards (any month from the group's first record, or All months). It opens on the latest month with records,
+  so Olchoro opens on September 2026 instead of an empty October.
+
 ## New in v0.9.16
 - **Contributions page holds the funds.** Social Fund / Welfare and School Feeding Programme are now tabs on the
   Contributions page (payouts, programme spending and balances moved there); the separate menu item is gone. The

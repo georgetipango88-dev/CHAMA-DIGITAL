@@ -516,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.16 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.17 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -1438,7 +1438,7 @@ function dashOfficial(){
   ${rulesBanner()}
   ${more?`<div class="chips no-print" style="margin:-8px 0 18px">${more}</div>`:''}
   ${empty?getStarted()+'<div style="height:16px"></div>':''}
-  <div class="stats">
+  ${dashMonthPicker()}<div class="stats">
    ${dashKPIs()}
   </div>
   ${dashAttention()}
@@ -2267,14 +2267,20 @@ function queueSMS(memberId,event,message){
 function queueGroupSMS(event,fn){GM().filter(m=>m.status==='Active').forEach(m=>queueSMS(m.id,event,fn(m)))}
 
 /* ---------- dashboard additions ---------- */
+function dashRecMonths(){return [...rec('contribution'),...rec('saving')].map(e=>monthKey(e.date)).filter(k=>k&&k<=curKey()).sort()}
+function dashMonthKeys(){const R=dashRecMonths(),c=curKey(),min=keyAdd(c,-23);let first=R[0]||c;if(first<min)first=min;return keysBetween(first,c).reverse()}
+function dashMonth(){if(UI.dashMonth==='all')return 'all';if(UI.dashMonth&&dashMonthKeys().includes(UI.dashMonth))return UI.dashMonth;const R=dashRecMonths();return R.length?R[R.length-1]:curKey()}
+function dashMonthPicker(){const K=dashMonthKeys(),k=dashMonth(),c=curKey();
+  return `<div class="fld no-print" style="max-width:280px;margin-bottom:12px"><label for="dash-month">Month shown on the cards</label><select id="dash-month">${selectOpts([...K.map(x=>[x,keyLabelLong(x)+(x===c?' (current)':'')]),['all','All months']],k)}</select></div>`}
 function dashKPIs(){
-  const T=totals(),k=curKey(),ms=monthSummary(k),cs=cashSummary(),ws=welfareSummary(),ft=fineTotals(GF());
-  const savM=sum(rec('saving').filter(e=>monthKey(e.date)===k)),lastM=heldMeetings()[0],la=lastM?meetingStats(lastM):null;
+  const T=totals(),k=dashMonth(),all=k==='all',ms=all?null:monthSummary(k),cs=cashSummary(),ws=welfareSummary(),ft=fineTotals(GF());
+  const savM=all?T.savings:sum(rec('saving').filter(e=>monthKey(e.date)===k)),lastM=heldMeetings()[0],la=lastM?meetingStats(lastM):null;
   const openApps=GLA().filter(a=>['Submitted','Needs Review','Approved'].includes(a.status)).length;
   return [
     statCard({label:'Cash balance (left to lend)',value:ksh(cs.balance),sub:`${ksh(cs.totalIn)} savings and repayments in, ${ksh(cs.totalOut)} lent out${cs.openingPending?' (opening balance pending)':''}`,ic:'cash',cls:'span-2'}),
-    statCard({label:`Contributions, ${keyLabel(k)}`,value:ksh(ms.collected),sub:ms.pending?'Expected: rates pending confirmation':`of ${ksh(ms.expected)} expected (${pct(ms.collected,ms.expected)}%)`,ic:'deposit'}),
-    statCard({label:`Savings, ${keyLabel(k)}`,value:ksh(savM),sub:`${ksh(T.savings)} total savings`,ic:'coins'}),
+    all?statCard({label:'Contributions, all months',value:ksh(T.contrib),sub:plural(rec('contribution').length,'record'),ic:'deposit'})
+      :statCard({label:`Contributions, ${keyLabel(k)}`,value:ksh(ms.collected),sub:ms.pending?'Expected: rates pending confirmation':`of ${ksh(ms.expected)} expected (${pct(ms.collected,ms.expected)}%)`,ic:'deposit'}),
+    statCard({label:`Savings, ${all?'all months':keyLabel(k)}`,value:ksh(savM),sub:all?plural(rec('saving').length,'record'):`${ksh(T.savings)} total savings`,ic:'coins'}),
     statCard({label:'Attendance, last meeting',value:la?la.pct+'%':'-',sub:la?`✓ ${la.present} · Ⓔ ${la.apology} · X ${la.absent} · ${fmtDate(lastM.date)}`:'No meeting held yet',ic:'calendar'}),
     statCard({label:'Outstanding fines',value:ksh(ft.outstanding),sub:`${ksh(ft.collected)} collected${ft.pending?` · ${ft.pending} fine amount not set yet`:''}`,ic:'flag',tone:'amber'}),
     statCard({label:'Loans outstanding',value:ksh(T.outstanding),sub:`${plural(T.activeLoans,'active loan')}${T.overdueLoans?` · ${T.overdueLoans} overdue`:' · none overdue'}${loanRoundsTotal(UI.group)?` · ${ksh(loanRoundsTotal(UI.group))} issued in ledger loan rounds (borrowers not named)`:''}`,ic:'loan',tone:'maroon'}),
@@ -6526,6 +6532,7 @@ document.addEventListener('change',e=>{
   const t=e.target;
   if(changeV7(t))return;
   if(t.matches('[data-change="filter"]')){UI.f[t.dataset.scope][t.dataset.key]=t.value;UI.f[t.dataset.scope].limit=25;renderListOnly(t.dataset.scope)}
+  else if(t.id==='dash-month'){UI.dashMonth=t.value;route()}
   else if(t.id==='role-select'){UI.role=t.value;UI.groupPicked=true;UI.chat=null;syncGroup();UI.f={};UI.tab={};UI.smsc=null;UI.ussd=null;UI.report=null;saveRolePref();renderNav();route()}
   else if(t.id==='group-select'){UI.group=t.value;UI.groupPicked=true;UI.chat=null;syncGroup();UI.f={};UI.smsc=null;UI.ussd=null;UI.report=null;saveGroupPref();renderNav();route()}
   else if(t.id==='cp'){UI.f.cperiod=t.value;renderView('x','x',()=>contributionsView())}

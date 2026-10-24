@@ -16,6 +16,18 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.18
+- **Olchoro: Kisunyunye Nkoitoi 1 and 2.** The two members named Kisunyunye Nkoitoi are now "Kisunyunye Nkoitoi 1"
+  (known as Mum Sampeyian, member 6) and "Kisunyunye Nkoitoi 2" (known as Mum Sipilon, member 7: the 10,000 loan and the
+  M-Pesa money fine). Their records are unchanged.
+- **Phone numbers** for all 102 Olemoncho members (last 3 digits on the site; full numbers only in the private file).
+- **Names confirmed by the client:** Elizabeth Nkoitoi, Kashumba Nkoitoi (Olchoro); Naisae Lekakeny (Oloisuai);
+  Noolarami Sairowua, Noilatete Tinka, Noorkitoip Sairowua, Noormeseyieki Mpoe (Osero).
+- **Olchoro fines on the day they were collected** (confirmed by the client): 20 Jul 600 (Kiramatisho 400, Nadutari 100,
+  Doreen 50, Kisaru 50); 17 Aug 900 (Naanyu 500 for not paying her savings, Kiramatisho 400); 18 Sep 150 paid. Mariamu
+  (18 Sep, not paid): 500 for being absent and 100 (50 Social Fund, 50 for not paying School Feeding). "m.p" is M-Pesa:
+  those payments are recorded as mobile money (M-Pesa).
+
 ## New in v0.9.17
 - **Choose the month on the dashboard.** A "Month shown on the cards" picker sets the month of the Contributions and
   Savings cards (any month from the group's first record, or All months). It opens on the latest month with records,
@@ -35,8 +47,8 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
   Recorded member by member from the books: savings (20 Jul 93,550; 17 Aug 28,000; 18 Sep 17,700), Social Fund and
   School Feeding (100 a meeting), attendance of the 3 meetings, and the 15 fines. Everything on the Fines page is a
   fine (even when written as Social Fund or School Feeding) and goes to the group's savings once paid.
-  Loan due dates as written on each loan page. Mum Sampeyian and Kisunyunye Nkoitoi (Mum Sipilon) are two different
-  members, both named Kisunyunye Nkoitoi. Names: Naiswaku Nkoitoi, Kiramatisho Nkoitoi.
+  Loan due dates as written on each loan page. The two members named Kisunyunye Nkoitoi are told apart (v0.9.18: Kisunyunye
+  Nkoitoi 1 and 2). Names: Naiswaku Nkoitoi, Kiramatisho Nkoitoi.
 - **Social Fund payouts** are recorded once paid, with what they were for (for example an event); not a loan.
 - **Olemoncho B:** Noonkipa Kupai did not borrow; the 2 Sep 5,000 is Tori Nkoitoi's.
 

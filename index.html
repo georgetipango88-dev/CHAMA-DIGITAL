@@ -516,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.17 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.18 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -5222,47 +5222,47 @@ const OLM_VSLAS=[
 /* members: [name, VSLA, phone shown as prefix-last 3 digits ('' = not given yet), role, business, loan taken, loan date (YYYY-MM-DD: the date of the meeting written in the book margin; '' = not readable), check note, why the loan amount is not recorded, phone note].
    Full phone numbers are NOT kept here (the site is public): VBBM imports them privately (Members → Import from Excel, matched by member number). */
 const OLM_ROSTER=[
- ['Edna Kimurmur','O1','','Secretary','Sheep',10000,'2026-07-20'],
- ['Noomelin Nkoitoi','O1','','Treasurer','Potatoes & sugar',15000,'2026-07-20'],
- ['Purity Nkoitoi','O1','','','Poultry',15000,'2026-07-20'],
- ['Nalotuesha Nkoitoi','O1','','Chairperson','Buying beads',3700,'2026-08-17'],
- ['Doreen Nkoitoi','O1','','','Sheep',20000,'2026-07-20'],
- ['Mum Sampeyian','O1','','','',null,'','Also named Kisunyunye Nkoitoi. A different member from Kisunyunye Nkoitoi (Mum Sipilon).'],
- ['Kisunyunye Nkoitoi (Mum Sipilon)','O1','','','Shanga (beads)',10000,'2026-07-20','Known as Mum Sipilon. A different member from Mum Sampeyian, who is also named Kisunyunye Nkoitoi.'],
- ['Rebecca Nkoitoi','O1'],
- ['Eliza Nkoitoi','O1'],
- ['Kisaru Nkoitoi','O1','','','Sheep',15400,'2026-07-20'],
- ['Nadutari Musukut','O1','','','Beads',8650,'2026-09-18'],
- ['Kinampet Nkoitoi','O1'],
- ['Silal Nkoitoi','O1','','','Buying beads',12000,'2026-08-17','Interest 200, as written on the loan page and confirmed by the client.'],
- ['Mariamu Nkoitoi','O1','','','Sheep',10000,'2026-07-20'],
- ['Manati Nkoitoi','O1'],
- ['Naserian Nkoitoi','O1'],
- ['Hellen Nkoitoi','O1','','','Rams',9200,'2026-09-18'],
- ['Naiswaku Nkoitoi','O1','','','Buying sheep',12900,'2026-08-17','Interest 290, as written on the loan page and confirmed by the client. Guarantor: Mariamu Nkoitoi.'],
- ['Kiramatisho Nkoitoi','O1'],
- ['Kashumpa Nkoitoi','O1'],
- ['Naanyu Nkoitoi','O1','','','',null,'','First name hard to read.'],
- ['Naitayuang Liaram','O2','','Chairperson'],
- ['Noomali Maleto','O2','','Treasurer','Mtumba (second-hand clothes)',15000,'2026-09-30'],
- ['Naisae Lekakeng','O2','','Secretary','Buying lambs',18000,'2026-09-01'],
- ['Naibartuni Sairowua','O2'],
- ['Ndari Dorop','O2','','','Petrol',3000,'2026-09-30'],
- ['Konga Maleto','O2','','','',null,'','Written over a crossed-out name ("Napolos Nkoitoi") and marked *.'],
- ['Nemanyara Nkoitoi','O2','','','Potatoes',8000,'2026-09-01'],
- ['Esther Nkoitoi','O2'],
- ['Noonkipa Gilisho','O2','','','Beads & beadwork',3000,'2026-09-30'],
- ['Loice Karia','O2'],
- ['Kiasunye Koitoi','O2'],
- ['Nalangu Nkoitoi','O2'],
- ['Nasuju Nkoitoi','O2','','','Buying lambs',26200,'2026-09-01','First name hard to read.'],
- ['Kimanyisho Nkoitoi','O2'],
- ['Joice Karia','O2'],
- ['Melua Gilisho','O2','','','',null,'','First letter hard to read.'],
- ['Naimodu Sairowua','O2'],
- ['Nookishuru Sairowua','O2'],
- ['Naropil Sairowua','O2','','','',null,'','Written over a crossed-out name ("Noomejoli Karia") and marked *.'],
- ['Naoroi Karia','O2','','','',null,'','First name hard to read.'],
+ ['Edna Kimurmur','O1','07-844','Secretary','Sheep',10000,'2026-07-20'],
+ ['Noomelin Nkoitoi','O1','01-872','Treasurer','Potatoes & sugar',15000,'2026-07-20'],
+ ['Purity Nkoitoi','O1','01-121','','Poultry',15000,'2026-07-20'],
+ ['Nalotuesha Nkoitoi','O1','07-976','Chairperson','Buying beads',3700,'2026-08-17'],
+ ['Doreen Nkoitoi','O1','07-090','','Sheep',20000,'2026-07-20'],
+ ['Kisunyunye Nkoitoi 1','O1','01-089','','',null,'','Known as Mum Sampeyian. A different member from Kisunyunye Nkoitoi 2 (Mum Sipilon).'],
+ ['Kisunyunye Nkoitoi 2','O1','07-345','','Shanga (beads)',10000,'2026-07-20','Known as Mum Sipilon (on the Fines page). A different member from Kisunyunye Nkoitoi 1 (Mum Sampeyian).'],
+ ['Rebecca Nkoitoi','O1','07-705'],
+ ['Elizabeth Nkoitoi','O1','07-316'],
+ ['Kisaru Nkoitoi','O1','07-675','','Sheep',15400,'2026-07-20'],
+ ['Nadutari Musukut','O1','07-298','','Beads',8650,'2026-09-18'],
+ ['Kinampet Nkoitoi','O1','07-892'],
+ ['Silal Nkoitoi','O1','07-462','','Buying beads',12000,'2026-08-17','Interest 200, as written on the loan page and confirmed by the client.'],
+ ['Mariamu Nkoitoi','O1','07-111','','Sheep',10000,'2026-07-20'],
+ ['Manati Nkoitoi','O1','07-690'],
+ ['Naserian Nkoitoi','O1','07-843'],
+ ['Hellen Nkoitoi','O1','07-143','','Rams',9200,'2026-09-18'],
+ ['Naiswaku Nkoitoi','O1','07-960','','Buying sheep',12900,'2026-08-17','Interest 290, as written on the loan page and confirmed by the client. Guarantor: Mariamu Nkoitoi.'],
+ ['Kiramatisho Nkoitoi','O1','07-697'],
+ ['Kashumba Nkoitoi','O1','07-961'],
+ ['Naanyu Nkoitoi','O1','07-488','','',null,'','First name hard to read.'],
+ ['Naitayuang Liaram','O2','07-971','Chairperson'],
+ ['Noomali Maleto','O2','07-772','Treasurer','Mtumba (second-hand clothes)',15000,'2026-09-30'],
+ ['Naisae Lekakeny','O2','07-736','Secretary','Buying lambs',18000,'2026-09-01'],
+ ['Naibartuni Sairowua','O2','07-618'],
+ ['Ndari Dorop','O2','07-329','','Petrol',3000,'2026-09-30'],
+ ['Konga Maleto','O2','01-125','','',null,'','Written over a crossed-out name ("Napolos Nkoitoi") and marked *.'],
+ ['Nemanyara Nkoitoi','O2','07-256','','Potatoes',8000,'2026-09-01'],
+ ['Esther Nkoitoi','O2','01-151'],
+ ['Noonkipa Gilisho','O2','07-991','','Beads & beadwork',3000,'2026-09-30'],
+ ['Loice Karia','O2','01-314'],
+ ['Kiasunye Koitoi','O2','01-559'],
+ ['Nalangu Nkoitoi','O2','07-530'],
+ ['Nasuju Nkoitoi','O2','07-486','','Buying lambs',26200,'2026-09-01','First name hard to read.'],
+ ['Kimanyisho Nkoitoi','O2','01-465'],
+ ['Joice Karia','O2','07-667'],
+ ['Melua Gilisho','O2','07-034','','',null,'','First letter hard to read.'],
+ ['Naimodu Sairowua','O2','01-613'],
+ ['Nookishuru Sairowua','O2','07-689'],
+ ['Naropil Sairowua','O2','07-453','','',null,'','Written over a crossed-out name ("Noomejoli Karia") and marked *.'],
+ ['Naoroi Karia','O2','07-745','','',null,'','First name hard to read.'],
  ['Nairishu Naimodu','O3','07-702','Chairperson','Shop',5000,'2026-10-02'],
  ['Jenifer Nkoitoi','O3','07-769','Secretary','Kinyozi (barber)',8000,'2026-10-02'],
  ['Kibarisho Nkoitoi','O3','07-104','Treasurer','Mtumba (second-hand clothes)',5000,'2026-10-02','Spelled "Kibarirho" on the phone list.'],
@@ -5284,26 +5284,26 @@ const OLM_ROSTER=[
  ['Tori Nkoitoi','O3','07-289','','Petrol',5000,'2026-09-02','A word in brackets after the name is not clear.'],
  ['Nawuai Pesi','O3','07-079'],
  ['Noorkisaruni Naimodu','O3','07-395'],
- ['Macline Yiale','O4','','Secretary','Mtumba (second-hand clothes)',20000,'2026-09-02'],
- ['Ann Sairowua','O4'],
- ['Nolarami Sairowua','O4','','Treasurer'],
- ['Leah Sairowua','O4','','','Mtumba (second-hand clothes)',7400,'2026-10-02'],
- ['Lilian Mereru','O4'],
- ['Arami Sairowua','O4','','','Shuka shop',15000,'2026-09-02'],
- ['Noolaitete Tinka','O4','','','Beads',20000,'2026-09-02'],
- ['Ntiwal Mereru','O4','','','Rams',12900,'2026-09-02'],
- ['Norkitoip Sairowua','O4'],
- ['Nashiru Karia','O4','','Chairperson','Shuka',4000,'2026-10-02'],
- ['Ntiwal Naimodu','O4'],
- ['Lilian Pesi','O4'],
- ['Noomereyieki Mpoe','O4'],
- ['Nanyikae Sairowua','O4'],
- ['Stellah Pesi','O4'],
- ['Nemanyara Karia','O4'],
- ['Ntupurdai Sairowua','O4'],
- ['Brecy Potishoi','O4'],
- ['Kajija Pesi','O4'],
- ['Kunai Karia','O4'],
+ ['Macline Yiale','O4','07-322','Secretary','Mtumba (second-hand clothes)',20000,'2026-09-02'],
+ ['Ann Sairowua','O4','07-236'],
+ ['Noolarami Sairowua','O4','07-488','Treasurer'],
+ ['Leah Sairowua','O4','07-278','','Mtumba (second-hand clothes)',7400,'2026-10-02'],
+ ['Lilian Mereru','O4','07-736'],
+ ['Arami Sairowua','O4','07-473','','Shuka shop',15000,'2026-09-02'],
+ ['Noilatete Tinka','O4','07-359','','Beads',20000,'2026-09-02'],
+ ['Ntiwal Mereru','O4','07-046','','Rams',12900,'2026-09-02'],
+ ['Noorkitoip Sairowua','O4','07-878'],
+ ['Nashiru Karia','O4','07-230','Chairperson','Shuka',4000,'2026-10-02'],
+ ['Ntiwal Naimodu','O4','07-537'],
+ ['Lilian Pesi','O4','07-115'],
+ ['Noormeseyieki Mpoe','O4','07-103'],
+ ['Nanyikae Sairowua','O4','07-793'],
+ ['Stellah Pesi','O4','07-523'],
+ ['Nemanyara Karia','O4','01-523'],
+ ['Ntupurdai Sairowua','O4','07-046'],
+ ['Brecy Potishoi','O4','07-997'],
+ ['Kajija Pesi','O4','07-255'],
+ ['Kunai Karia','O4','01-287'],
  ['Lilian Sairowua','O5','07-407','Secretary'],
  ['Nalamae Sairowua','O5','07-627','','Shop',10000,'2026-09-04'],
  ['Arami Karia','O5','07-104','','Shuka',10000,'2026-09-04'],
@@ -5389,7 +5389,7 @@ const BOOK_POST={savings:{type:'saving',suf:'SV'},socialFund:{type:'contribution
 const BOOK_CASH={loan:{dir:'in',suf:'RP',cat:'Loan repayment',desc:'loan repayments received at the meeting (members not named)',fund:'Loans'},cashOut:{dir:'out',suf:'OUT',cat:'Loan disbursement',desc:'loans given at the meeting (members not named)',fund:'Loans'}};
 const bookSavings=b=>b.savings!=null?b.savings:b.cashIn!=null?b.cashIn:null; /* the savings collected: "cash in" when savings is not written separately */
 const isGroupRec=e=>!!(e&&e.type!=='loan'&&(e.bookRef||e.fineRef)); /* a VSLA book loan belongs to its member */
-const OLM_BOOK_REV=11;
+const OLM_BOOK_REV=15;
 const OLM_NOTE5='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": cash in is the savings collected (95,400) and cash out is the 7 loans given that day (95,400, recorded under each member). The Cash Book also shows Social Fund 2,100 (recorded per member from the register) and School Feeding 2,100 that day.';
 const OLM_NOTE4='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": cash in is the savings collected (95,400) and cash out is the 7 loans given that day (95,400, recorded under each member). No Social Fund or School Feeding figures are written for Olchoro.';
 const OLM_NOTE3='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": 95,400 deposited in the bank and 95,400 withdrawn from the bank (both on the Cash Book). The 7 loans of 20 July (95,400) were given from it. No separate savings, Social Fund or School Feeding figures are written for Olchoro.';
@@ -5397,9 +5397,10 @@ const OLM_LOAN_DUE={'OLM-001':'2026-10-17','OLM-002':'2026-10-17','OLM-003':'202
   'OLM-004':'2026-11-17','OLM-013':'2026-11-17','OLM-018':'2026-11-17','OLM-011':'2026-10-17','OLM-017':'2026-10-17'}; /* Olchoro loan pages */
 const OLM_LOAN_INTEREST={'OLM-013':200,'OLM-018':290}; /* Silal, Naisuaku: interest as written, confirmed by the client */
 const OLM_LOAN_GUARANTOR={'OLM-018':'OLM-014'}; /* Naisuaku: guarantor Mariamu Nkoitoi (written on her loan page) */
-const OLM_PHONE_FIX={'OLM-051':['01xx xxx 577','07xx xxx 140'],'OLM-062':['Not added','07xx xxx 395']};
+const OLM_PHONE_FIX={'OLM-051':['01xx xxx 577','07xx xxx 140'],'OLM-010':['Not added','07xx xxx 675'],'OLM-062':['Not added','07xx xxx 395'],'OLM-001':['Not added','07xx xxx 844'],'OLM-002':['Not added','01xx xxx 872'],'OLM-003':['Not added','01xx xxx 121'],'OLM-004':['Not added','07xx xxx 976'],'OLM-005':['Not added','07xx xxx 090'],'OLM-006':['Not added','01xx xxx 089'],'OLM-007':['Not added','07xx xxx 345'],'OLM-008':['Not added','07xx xxx 705'],'OLM-009':['Not added','07xx xxx 316'],'OLM-011':['Not added','07xx xxx 298'],'OLM-012':['Not added','07xx xxx 892'],'OLM-013':['Not added','07xx xxx 462'],'OLM-014':['Not added','07xx xxx 111'],'OLM-015':['Not added','07xx xxx 690'],'OLM-016':['Not added','07xx xxx 843'],'OLM-017':['Not added','07xx xxx 143'],'OLM-018':['Not added','07xx xxx 960'],'OLM-019':['Not added','07xx xxx 697'],'OLM-020':['Not added','07xx xxx 961'],'OLM-021':['Not added','07xx xxx 488'],'OLM-022':['Not added','07xx xxx 971'],'OLM-023':['Not added','07xx xxx 772'],'OLM-024':['Not added','07xx xxx 736'],'OLM-025':['Not added','07xx xxx 618'],'OLM-026':['Not added','07xx xxx 329'],'OLM-027':['Not added','01xx xxx 125'],'OLM-028':['Not added','07xx xxx 256'],'OLM-029':['Not added','01xx xxx 151'],'OLM-030':['Not added','07xx xxx 991'],'OLM-031':['Not added','01xx xxx 314'],'OLM-032':['Not added','01xx xxx 559'],'OLM-033':['Not added','07xx xxx 530'],'OLM-034':['Not added','07xx xxx 486'],'OLM-035':['Not added','01xx xxx 465'],'OLM-036':['Not added','07xx xxx 667'],'OLM-037':['Not added','07xx xxx 034'],'OLM-038':['Not added','01xx xxx 613'],'OLM-039':['Not added','07xx xxx 689'],'OLM-040':['Not added','07xx xxx 453'],'OLM-041':['Not added','07xx xxx 745'],'OLM-063':['Not added','07xx xxx 322'],'OLM-064':['Not added','07xx xxx 236'],'OLM-065':['Not added','07xx xxx 488'],'OLM-066':['Not added','07xx xxx 278'],'OLM-067':['Not added','07xx xxx 736'],'OLM-068':['Not added','07xx xxx 473'],'OLM-069':['Not added','07xx xxx 359'],'OLM-070':['Not added','07xx xxx 046'],'OLM-071':['Not added','07xx xxx 878'],'OLM-072':['Not added','07xx xxx 230'],'OLM-073':['Not added','07xx xxx 537'],'OLM-074':['Not added','07xx xxx 115'],'OLM-075':['Not added','07xx xxx 103'],'OLM-076':['Not added','07xx xxx 793'],'OLM-077':['Not added','07xx xxx 523'],'OLM-078':['Not added','01xx xxx 523'],'OLM-079':['Not added','07xx xxx 046'],'OLM-080':['Not added','07xx xxx 997'],'OLM-081':['Not added','07xx xxx 255'],'OLM-082':['Not added','01xx xxx 287']};
+const OLM_PHONE_NOTE={};
 const OLM_OLD_NOTE='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". No separate savings, Social Fund or School Feeding figures are written for Olchoro.',OLM_NEW_NOTE='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400". Cash in was deposited in the bank; cash out is the 7 loans given that day (95,400), counted once as the loans. No separate savings, Social Fund or School Feeding figures are written for Olchoro.';
-const OLM_RENAMES={'OLM-063':['Madline Yiale','Macline Yiale'],'OLM-007':['Kisunyunye Nkoitoi','Kisunyunye Nkoitoi (Mum Sipilon)'],'OLM-018':['Naisuaku Nkoitoi','Naiswaku Nkoitoi'],'OLM-019':['Kiramaticho Nkoitoi','Kiramatisho Nkoitoi']},OLM_VSLA_RENAMES={'Olosuae VSLA':'Oloisuai VSLA'};
+const OLM_RENAMES={'OLM-063':['Madline Yiale','Macline Yiale'],'OLM-009':['Eliza Nkoitoi','Elizabeth Nkoitoi'],'OLM-020':['Kashumpa Nkoitoi','Kashumba Nkoitoi'],'OLM-024':['Naisae Lekakeng','Naisae Lekakeny'],'OLM-065':['Nolarami Sairowua','Noolarami Sairowua'],'OLM-069':['Noolaitete Tinka','Noilatete Tinka'],'OLM-071':['Norkitoip Sairowua','Noorkitoip Sairowua'],'OLM-075':['Noomereyieki Mpoe','Noormeseyieki Mpoe'],'OLM-006':['Mum Sampeyian','Kisunyunye Nkoitoi 1'],'OLM-007':[['Kisunyunye Nkoitoi','Kisunyunye Nkoitoi (Mum Sipilon)'],'Kisunyunye Nkoitoi 2'],'OLM-018':['Naisuaku Nkoitoi','Naiswaku Nkoitoi'],'OLM-019':['Kiramaticho Nkoitoi','Kiramatisho Nkoitoi']},OLM_VSLA_RENAMES={'Olosuae VSLA':'Oloisuai VSLA'};
 function postVslaBooks(st,{audit=false}={}){
   st.ledger=(st.ledger||[]).filter(e=>!e.bookRef&&!e.fineRef);st.cashbook=(st.cashbook||[]).filter(c=>!c.bookRef);
   const done={},add=gid=>{done[gid]=(done[gid]||0)+1};
@@ -5437,8 +5438,10 @@ function postVslaBooks(st,{audit=false}={}){
 function syncOlemonchoBook(st){
   const g=(st.groups||[]).find(x=>x.groupId===OLM_GID);if(!g)return st;let n=0;
   (st.vslas||[]).forEach(v=>{if(v.groupId===OLM_GID&&OLM_VSLA_RENAMES[v.name]){v.name=OLM_VSLA_RENAMES[v.name];n++}});
-  Object.entries(OLM_RENAMES).forEach(([id,[from,to]])=>{const m=st.members.find(x=>x.id===id);if(m&&m.name===from){m.name=to;n++}});
-  Object.entries(OLM_PHONE_FIX).forEach(([id,[from,to]])=>{const m=st.members.find(x=>x.id===id);if(m&&m.phone===from){m.phone=to;m.phoneMasked=true;n++}});
+  Object.entries(OLM_RENAMES).forEach(([id,[from,to]])=>{const m=st.members.find(x=>x.id===id);if(m&&[].concat(from).includes(m.name)){m.name=to;n++}});
+  Object.entries(OLM_PHONE_FIX).forEach(([id,[from,to,pn]])=>{const m=st.members.find(x=>x.id===id);if(m&&m.phone===from){m.phone=to;m.phoneMasked=true;if(/not clear|starts 014/.test(m.phoneNote||''))m.phoneNote='';if(pn&&!m.phoneNote)m.phoneNote=pn;n++}});
+  ['OLM-027','OLM-029'].forEach(id=>{const m=st.members.find(x=>x.id===id);if(m&&/starts 014/.test(m.phoneNote||'')){m.phoneNote='';n++}}); /* confirmed correct by the client */
+  Object.entries(OLM_PHONE_NOTE).forEach(([id,pn])=>{const m=st.members.find(x=>x.id===id);if(m&&m.phone==='Not added'&&!m.phoneNote){m.phoneNote=pn;n++}});
   (st.vslas||[]).forEach(v=>(v.book||[]).forEach(b=>{if([OLM_OLD_NOTE,OLM_NEW_NOTE,OLM_NOTE3].includes(b.note)){b.note=OLM_NOTE4;n++}if(b.note===OLM_NOTE4&&b.socialFund!=null){b.note=OLM_NOTE5;n++}}));
   (st.audit||[]).forEach(a=>{if(a.role==='VP'+'BN')a.role='VBBM'});
   OLM_ROSTER.forEach(([name,key,ph='',role=''],i)=>{const m=st.members.find(x=>x.id===`${g.code||'OLM'}-${String(i+1).padStart(3,'0')}`);
@@ -5456,7 +5459,7 @@ function syncOlemonchoBook(st){
 /* Olchoro's books, member by member (confirmed by the client): the Savings page, the Social Fund and School Feeding
    registers (100 a member a meeting) and the Fines page; plus the Cash Book's meetings of 17 Aug and 18 Sep.
    Members are matched by member number (OLM-001 … OLM-021, in the order of the VSLA's member list). */
-const OLC_REV=4,OLC_VSLA='Olchoro VSLA',OLC_DATES=['2026-07-20','2026-08-17','2026-09-18'];
+const OLC_REV=6,OLC_VSLA='Olchoro VSLA',OLC_DATES=['2026-07-20','2026-08-17','2026-09-18'];
 const OLC_IDS=Array.from({length:21},(_,i)=>'OLM-'+String(i+1).padStart(3,'0'));
 /* savings on 20 Jul (initial), 17 Aug and 18 Sep; null = nothing written */
 const OLC_SAV={'OLM-001':[4500,1150,500],'OLM-002':[10000,2000,500],'OLM-003':[12000,2500,500],'OLM-004':[3000,500,500],'OLM-005':[10000,2000,500],
@@ -5466,6 +5469,8 @@ const OLC_SAV={'OLM-001':[4500,1150,500],'OLM-002':[10000,2000,500],'OLM-003':[1
 const OLC_SAV_NOTE={'OLM-003':['Written "2000 (10,000 mp)": 12,000 in all.'],'OLM-009':['Written "1000 + (500 mp)": 1,500.',,'Written "2500 − 50": 2,450.'],
   'OLM-011':['Written "1000 − 50": 950.'],'OLM-014':['Written "9800 − 50": 9,750.'],'OLM-015':[,,'Written "1000 − 50": 950.'],
   'OLM-016':['Written "500 mp".'],'OLM-019':['Written "1000 − 50": 950.'],'OLM-007':[,,'Written "800 mp".']};
+const OLC_MP={'2026-07-20':['OLM-001','OLM-003','OLM-004','OLM-009','OLM-015','OLM-016','OLM-019','OLM-021']}; /* Social Fund and School Feeding written "100 m.p" */
+const OLC_SAV_MP={'OLM-003':[10000],'OLM-009':[500],'OLM-016':[500],'OLM-007':[,,800]}; /* the part of the savings paid by M-Pesa */
 const OLC_SF_NONE={'OLM-014':['2026-09-18']},OLC_SFP_NONE={'OLM-014':['2026-09-18']}; /* a dash: no payment written (Mariamu, absent) */
 /* contributions written in a meeting's column but paid at a later meeting (none: the registers' dates are kept) */
 const OLC_PAID_LATER={};
@@ -5474,15 +5479,18 @@ const OLC_ATT={'2026-07-20':'PPPPPPPPPPPPPEEPEEAEP','2026-08-17':'PPPPEPPPEEPPPE
 /* [date, member, type, as written, amount (null = to confirm), date paid or null, note]. Everything on the Fines page is
    a fine, even when it is written as Social Fund or School Feeding; a fine paid goes to the group's savings. */
 const OLC_FINES=[
-  ['2026-07-20','OLM-019','Absenteeism','Absentism',200,'2026-08-17','Paid on 17/8/2026 with her other two fines of 20/7: 400 in all (the Cash Book\'s fines that day).'],
-  ['2026-07-20','OLM-011','No Social Fund','No social fund',200,'2026-07-20','Written "Paid"; the date of payment is not written.'],
+  ['2026-07-20','OLM-019','Absenteeism','Absentism',200,'2026-07-20'],
+  ['2026-07-20','OLM-011','No Social Fund','No social fund',100,'2026-07-20','Written 200, corrected by the client to 100.'],
   ['2026-07-20','OLM-005','Late','Late',50,'2026-07-20'],
   ['2026-07-20','OLM-010','Late','Late',50,'2026-07-20'],
-  ['2026-07-20','OLM-019','No School Feeding','No sch feeding',100,'2026-08-17','Paid on 17/8/2026.'],
-  ['2026-07-20','OLM-019','No Social Fund','No social',100,'2026-08-17','Paid on 17/8/2026.'],
-  ['2026-08-17','OLM-021','No saving','No saving',500,null],
-  ['2026-09-18','OLM-014','Absenteeism','Abse/no feeding',null,null,'Not paid. Amount to confirm (the client thinks 500).'],
-  ['2026-09-18','OLM-014','No Social Fund','No social fund',100,null],
+  ['2026-07-20','OLM-019','No School Feeding','No sch feeding',100,'2026-07-20'],
+  ['2026-07-20','OLM-019','No Social Fund','No social',100,'2026-07-20'],
+  ['2026-08-17','OLM-021','No saving','No saving',500,'2026-08-17','She did not pay her savings that day. Paid on 17/8/2026 (confirmed by the client).'],
+  ['2026-08-17','OLM-019','No Social Fund','Social',100,'2026-08-17'],
+  ['2026-08-17','OLM-019','No School Feeding','School',100,'2026-08-17'],
+  ['2026-08-17','OLM-019','Absence','Abs',200,'2026-08-17'],
+  ['2026-09-18','OLM-014','Absenteeism','Abse/no feeding',500,null,'Not paid. 500 for being absent; she did not save that day.'],
+  ['2026-09-18','OLM-014','No Social Fund / School Feeding','No social fund',100,null,'Not paid: 50 for the Social Fund and 50 fine for not paying School Feeding.'],
   ['2026-09-18','OLM-007','M-Pesa money','mpesa money',50,null],
   ['2026-09-18','OLM-009','Late','Late',50,'2026-09-18'],
   ['2026-09-18','OLM-015','Late','Late',50,'2026-09-18'],
@@ -5491,7 +5499,7 @@ const OLC_FINES=[
   ['2026-09-18','OLM-016','M-Pesa','mpesa',50,null]];
 const OLC_MEETINGS=[
   {date:'2026-08-17',label:'Meeting 17/8/2026',dateText:'17/08/2026',savings:28600,socialFund:2100,schoolFeeding:2100,
-   note:'From the Cash Book: savings 28,600, Social Fund 2,100, School Feeding 2,100 and fines 400 in (Kiramatisho\'s 3 fines of 20/7: absence 200, no Social Fund 100, no School Feeding 100); 28,600 out as the 3 loans of 17 Aug. Social Fund and School Feeding (4,200) went to the bank. Recorded member by member: the members\' savings on the Savings page add up to 28,000.'},
+   note:'From the Cash Book: savings 28,600, Social Fund 2,100 and School Feeding 2,100 in; 28,600 out as the 3 loans of 17 Aug. Fines collected that day (confirmed by the client): Naanyu 500 and Kiramatisho 400. Social Fund and School Feeding (4,200) went to the bank. Recorded member by member: the members\' savings on the Savings page add up to 28,000.'},
   {date:'2026-09-18',label:'Meeting 18/9/2026',dateText:'18/09/2026',savings:17850,socialFund:2000,schoolFeeding:2000,
    note:'From the Cash Book: 17,850 in (members\' savings 17,700 on the Savings page plus 150 of late fines paid that day), Social Fund 2,000 and School Feeding 2,000; 17,850 out as Hellen\'s and Nadutari\'s loans. 4,000 went to the bank. Recorded member by member.'}];
 const OLC_NOTE1=' Recorded member by member: the members\' initial savings on the Savings page add up to 93,550.';
@@ -5517,10 +5525,13 @@ function applyOlchoroRegister(st){
   const add=e=>{if(st.ledger.some(x=>x.id===e.id))return 0;st.ledger.push({chamaId:st.chama.chamaId,groupId:OLM_GID,vslaId:v.vslaId,status:'Recorded',by:'vsla-book',source:'vsla-register',method:'Not written',...e});return 1};
   let cnt=0;
   M.forEach(m=>OLC_DATES.forEach((d,i)=>{const k=d.replace(/-/g,'');
-    const sv=(OLC_SAV[m.id]||[])[i];if(isNum(sv)&&sv>0)cnt+=add({id:`OS-${m.id}-${k}`,type:'saving',memberId:m.id,date:d,amount:sv,ref:'Savings page',at:d+'T12:05',note:['From the Olchoro Savings page.',((OLC_SAV_NOTE[m.id]||[])[i])||''].join(' ').trim()});
+    const sv=(OLC_SAV[m.id]||[])[i],mp=(OLC_SAV_MP[m.id]||[])[i]||0,sn=['From the Olchoro Savings page.',((OLC_SAV_NOTE[m.id]||[])[i])||''].join(' ').trim();
+    if(isNum(sv)&&sv>mp)cnt+=add({id:`OS-${m.id}-${k}`,type:'saving',memberId:m.id,date:d,amount:sv-mp,ref:'Savings page',at:d+'T12:05',note:sn});
+    if(isNum(sv)&&mp>0)cnt+=add({id:`OS-${m.id}-${k}-MP`,type:'saving',memberId:m.id,date:d,amount:mp,ref:'Savings page (M-Pesa)',method:'Mobile money',at:d+'T12:06',note:sn+' Paid by M-Pesa.'});
+    const viaMp=(OLC_MP[d]||[]).includes(m.id),mpx=viaMp?{method:'Mobile money'}:{},mpn=viaMp?' Paid by M-Pesa (written "m.p").':'';
     const pd=(OLC_PAID_LATER[m.id]||{})[d],late=pd?` Written in the ${fmtDate(d)} column; paid on ${fmtDate(pd)}.`:'';
-    if(cats.includes('CAT-SOCIAL')&&!(OLC_SF_NONE[m.id]||[]).includes(d))cnt+=add({id:`SF-${m.id}-${k}`,type:'contribution',memberId:m.id,date:pd||d,amount:100,period:monthKey(d),category:'CAT-SOCIAL',expected:null,ref:'Social Fund register',at:(pd||d)+'T12:00',note:'From the Olchoro Social Fund register.'+late});
-    if(cats.includes('CAT-SFP')&&!(OLC_SFP_NONE[m.id]||[]).includes(d))cnt+=add({id:`SP-${m.id}-${k}`,type:'contribution',memberId:m.id,date:pd||d,amount:100,period:monthKey(d),category:'CAT-SFP',expected:null,ref:'School Feeding register',at:(pd||d)+'T12:01',note:'From the Olchoro School Feeding Programme register.'+late});
+    if(cats.includes('CAT-SOCIAL')&&!(OLC_SF_NONE[m.id]||[]).includes(d))cnt+=add({id:`SF-${m.id}-${k}`,type:'contribution',memberId:m.id,date:pd||d,amount:100,period:monthKey(d),category:'CAT-SOCIAL',expected:null,ref:'Social Fund register',at:(pd||d)+'T12:00',...mpx,note:'From the Olchoro Social Fund register.'+late+mpn});
+    if(cats.includes('CAT-SFP')&&!(OLC_SFP_NONE[m.id]||[]).includes(d))cnt+=add({id:`SP-${m.id}-${k}`,type:'contribution',memberId:m.id,date:pd||d,amount:100,period:monthKey(d),category:'CAT-SFP',expected:null,ref:'School Feeding register',at:(pd||d)+'T12:01',...mpx,note:'From the Olchoro School Feeding Programme register.'+late+mpn});
   }));
   /* the three meetings and who attended, from the register */
   st.meetings=st.meetings||[];const mtg={};let mc=0;
@@ -5532,7 +5543,7 @@ function applyOlchoroRegister(st){
     mtg[d]=mt.id});
   /* fines as written on the Fines page; a fine paid goes to the group's savings */
   st.fines=st.fines||[];let fc=0;
-  OLC_FINES.forEach(([d,mid,type,written,amt,paidOn,extra],i)=>{const key=`olc4-fine-${i+1}`;if(st.fines.some(f=>f.bookKey===key))return;const m=M.find(x=>x.id===mid);if(!m)return;
+  OLC_FINES.forEach(([d,mid,type,written,amt,paidOn,extra],i)=>{const key=`olc6-fine-${i+1}`;if(st.fines.some(f=>f.bookKey===key))return;const m=M.find(x=>x.id===mid);if(!m)return;
     const f={id:nextSeq(st.fines,'FN'),chamaId:st.chama.chamaId,groupId:OLM_GID,vslaId:v.vslaId,memberId:m.id,meetingId:type==='Absenteeism'?(mtg[d]||''):'',date:d,type,reason:`Written "${written}" on the Fines page (${fmtDate(d)}).${extra?' '+extra:''}`,amount:amt,amountPending:amt==null,payments:[],status:'Outstanding',recordedBy:'vsla-book',createdAt:d+'T12:10',updatedAt:ts,source:'olchoro-book',bookKey:key};
     if(paidOn){const allP=st.fines.flatMap(x=>x.payments||[]);f.payments.push({id:nextSeq(allP,'FP'),amount:amt,date:paidOn,method:'Not written',ref:'Fines page',by:'vsla-book',at:paidOn+'T12:15',status:'Recorded'})}
     st.fines.push(f);fc++});

@@ -516,7 +516,7 @@ body[data-mode=bare] .fab,body[data-mode=bare] .bottomnav{display:none!important
     <div class="side-foot">
       <a class="nav-link" href="#/welcome"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg><span>Exit prototype</span></a>
       <p id="viewer-line" style="padding:8px 12px 0;color:#9CCBCD;font-size:.75rem"></p>
-      <p>Pilot build · v0.9.18 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
+      <p>Pilot build · v0.9.19 (HPF Micro Enterprise Program: Olemoncho, Mbitin and Nterere community groups with their VSLAs). The Demo Role / Prototype Role Switcher is for testing only. It is not a login. Production privacy requires authenticated server-side authorization.</p>
     </div>
   </nav>
   <div class="main-col">
@@ -5234,12 +5234,12 @@ const OLM_ROSTER=[
  ['Kisaru Nkoitoi','O1','07-675','','Sheep',15400,'2026-07-20'],
  ['Nadutari Musukut','O1','07-298','','Beads',8650,'2026-09-18'],
  ['Kinampet Nkoitoi','O1','07-892'],
- ['Silal Nkoitoi','O1','07-462','','Buying beads',12000,'2026-08-17','Interest 200, as written on the loan page and confirmed by the client.'],
+ ['Silal Nkoitoi','O1','07-462','','Buying beads',12000,'2026-08-17'],
  ['Mariamu Nkoitoi','O1','07-111','','Sheep',10000,'2026-07-20'],
  ['Manati Nkoitoi','O1','07-690'],
  ['Naserian Nkoitoi','O1','07-843'],
  ['Hellen Nkoitoi','O1','07-143','','Rams',9200,'2026-09-18'],
- ['Naiswaku Nkoitoi','O1','07-960','','Buying sheep',12900,'2026-08-17','Interest 290, as written on the loan page and confirmed by the client. Guarantor: Mariamu Nkoitoi.'],
+ ['Naiswaku Nkoitoi','O1','07-960','','Buying sheep',12900,'2026-08-17','Guarantor: Mariamu Nkoitoi.'],
  ['Kiramatisho Nkoitoi','O1','07-697'],
  ['Kashumba Nkoitoi','O1','07-961'],
  ['Naanyu Nkoitoi','O1','07-488','','',null,'','First name hard to read.'],
@@ -5389,13 +5389,13 @@ const BOOK_POST={savings:{type:'saving',suf:'SV'},socialFund:{type:'contribution
 const BOOK_CASH={loan:{dir:'in',suf:'RP',cat:'Loan repayment',desc:'loan repayments received at the meeting (members not named)',fund:'Loans'},cashOut:{dir:'out',suf:'OUT',cat:'Loan disbursement',desc:'loans given at the meeting (members not named)',fund:'Loans'}};
 const bookSavings=b=>b.savings!=null?b.savings:b.cashIn!=null?b.cashIn:null; /* the savings collected: "cash in" when savings is not written separately */
 const isGroupRec=e=>!!(e&&e.type!=='loan'&&(e.bookRef||e.fineRef)); /* a VSLA book loan belongs to its member */
-const OLM_BOOK_REV=15;
+const OLM_BOOK_REV=16;
 const OLM_NOTE5='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": cash in is the savings collected (95,400) and cash out is the 7 loans given that day (95,400, recorded under each member). The Cash Book also shows Social Fund 2,100 (recorded per member from the register) and School Feeding 2,100 that day.';
 const OLM_NOTE4='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": cash in is the savings collected (95,400) and cash out is the 7 loans given that day (95,400, recorded under each member). No Social Fund or School Feeding figures are written for Olchoro.';
 const OLM_NOTE3='Written as "Initial 20/7/2026: cash in 95,400, cash out 95,400": 95,400 deposited in the bank and 95,400 withdrawn from the bank (both on the Cash Book). The 7 loans of 20 July (95,400) were given from it. No separate savings, Social Fund or School Feeding figures are written for Olchoro.';
 const OLM_LOAN_DUE={'OLM-001':'2026-10-17','OLM-002':'2026-10-17','OLM-003':'2026-10-17','OLM-005':'2026-10-17','OLM-007':'2026-10-17','OLM-010':'2026-10-17','OLM-014':'2026-10-17',
   'OLM-004':'2026-11-17','OLM-013':'2026-11-17','OLM-018':'2026-11-17','OLM-011':'2026-10-17','OLM-017':'2026-10-17'}; /* Olchoro loan pages */
-const OLM_LOAN_INTEREST={'OLM-013':200,'OLM-018':290}; /* Silal, Naisuaku: interest as written, confirmed by the client */
+const OLM_LOAN_INTEREST={}; /* a fixed interest amount for a loan, if a loan page ever differs from the group's rate (none: 10% for all) */
 const OLM_LOAN_GUARANTOR={'OLM-018':'OLM-014'}; /* Naisuaku: guarantor Mariamu Nkoitoi (written on her loan page) */
 const OLM_PHONE_FIX={'OLM-051':['01xx xxx 577','07xx xxx 140'],'OLM-010':['Not added','07xx xxx 675'],'OLM-062':['Not added','07xx xxx 395'],'OLM-001':['Not added','07xx xxx 844'],'OLM-002':['Not added','01xx xxx 872'],'OLM-003':['Not added','01xx xxx 121'],'OLM-004':['Not added','07xx xxx 976'],'OLM-005':['Not added','07xx xxx 090'],'OLM-006':['Not added','01xx xxx 089'],'OLM-007':['Not added','07xx xxx 345'],'OLM-008':['Not added','07xx xxx 705'],'OLM-009':['Not added','07xx xxx 316'],'OLM-011':['Not added','07xx xxx 298'],'OLM-012':['Not added','07xx xxx 892'],'OLM-013':['Not added','07xx xxx 462'],'OLM-014':['Not added','07xx xxx 111'],'OLM-015':['Not added','07xx xxx 690'],'OLM-016':['Not added','07xx xxx 843'],'OLM-017':['Not added','07xx xxx 143'],'OLM-018':['Not added','07xx xxx 960'],'OLM-019':['Not added','07xx xxx 697'],'OLM-020':['Not added','07xx xxx 961'],'OLM-021':['Not added','07xx xxx 488'],'OLM-022':['Not added','07xx xxx 971'],'OLM-023':['Not added','07xx xxx 772'],'OLM-024':['Not added','07xx xxx 736'],'OLM-025':['Not added','07xx xxx 618'],'OLM-026':['Not added','07xx xxx 329'],'OLM-027':['Not added','01xx xxx 125'],'OLM-028':['Not added','07xx xxx 256'],'OLM-029':['Not added','01xx xxx 151'],'OLM-030':['Not added','07xx xxx 991'],'OLM-031':['Not added','01xx xxx 314'],'OLM-032':['Not added','01xx xxx 559'],'OLM-033':['Not added','07xx xxx 530'],'OLM-034':['Not added','07xx xxx 486'],'OLM-035':['Not added','01xx xxx 465'],'OLM-036':['Not added','07xx xxx 667'],'OLM-037':['Not added','07xx xxx 034'],'OLM-038':['Not added','01xx xxx 613'],'OLM-039':['Not added','07xx xxx 689'],'OLM-040':['Not added','07xx xxx 453'],'OLM-041':['Not added','07xx xxx 745'],'OLM-063':['Not added','07xx xxx 322'],'OLM-064':['Not added','07xx xxx 236'],'OLM-065':['Not added','07xx xxx 488'],'OLM-066':['Not added','07xx xxx 278'],'OLM-067':['Not added','07xx xxx 736'],'OLM-068':['Not added','07xx xxx 473'],'OLM-069':['Not added','07xx xxx 359'],'OLM-070':['Not added','07xx xxx 046'],'OLM-071':['Not added','07xx xxx 878'],'OLM-072':['Not added','07xx xxx 230'],'OLM-073':['Not added','07xx xxx 537'],'OLM-074':['Not added','07xx xxx 115'],'OLM-075':['Not added','07xx xxx 103'],'OLM-076':['Not added','07xx xxx 793'],'OLM-077':['Not added','07xx xxx 523'],'OLM-078':['Not added','01xx xxx 523'],'OLM-079':['Not added','07xx xxx 046'],'OLM-080':['Not added','07xx xxx 997'],'OLM-081':['Not added','07xx xxx 255'],'OLM-082':['Not added','01xx xxx 287']};
 const OLM_PHONE_NOTE={};
@@ -5553,14 +5553,14 @@ function applyOlchoroRegister(st){
 }
 {const f=applyOlemonchoRoster;applyOlemonchoRoster=function(st){const r=f(st);applyOlchoroRegister(r);return postVslaBooks(r)}}
 {const f=ensureV07Data;ensureV07Data=function(){f.apply(this,arguments);if(S&&S.chama&&S.olemonchoRoster&&S.olchoroRev!==OLC_REV){applyOlchoroRegister(S);postVslaBooks(S)}}}
-/* Olemoncho's loan rules as the client set them: borrow up to your own savings; repay any time, in full within
-   3 months. Interest and the on-time limit bonus are not decided yet, so they stay "pending". */
-const OLM_LOAN_RULES_REV=2;
+/* Olemoncho's loan rules as the client set them: 10% interest; repay any time, in full by the due date (at most 3 months).
+   The loan limit and the on-time limit bonus are not decided yet, so they stay "pending". */
+const OLM_LOAN_RULES_REV=3;
 function setOlemonchoLoanRules(st){
   const r=(st.rules||{})[OLM_GID];if(!r)return st;r.loans=r.loans||{};
-  Object.assign(r.loans,{enabled:true,maxMonths:3,repaymentFrequency:FLEX_FREQ,limitMultiple:1,interestRate:10,interestMethod:'Flat'});
+  Object.assign(r.loans,{enabled:true,maxMonths:3,repaymentFrequency:FLEX_FREQ,limitMultiple:null,interestRate:10,interestMethod:'Flat'});
   const mx=(st.audit||[]).reduce((a,x)=>Math.max(a,+String(x.id).split('-')[1]||0),0);
-  st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:OLM_GID,action:'Loan rules set',target:OLM_GID,detail:'Loan limit = the member\'s own savings (1×); 10% interest on the amount taken; repay any time, in full by exactly 3 months after the meeting; on-time bonus pending',kind:'settings',memberId:'',status:'Completed',reason:'Set from the client\'s instructions',prev:'',next:''});
+  st.audit.push({id:'AU-'+String(mx+1).padStart(5,'0'),ts:nowStamp(),userId:'system',role:'System',chamaId:st.chama.chamaId,groupId:OLM_GID,action:'Loan rules set',target:OLM_GID,detail:'10% interest on the amount taken; repay any time, in full by the due date (at most 3 months after the meeting); loan limit and on-time bonus not decided yet (pending)',kind:'settings',memberId:'',status:'Completed',reason:'Set from the client\'s instructions',prev:'',next:''});
   st.olemonchoLoanRulesRev=OLM_LOAN_RULES_REV;return st;
 }
 {const f=applyOlemonchoRoster;applyOlemonchoRoster=function(st){const r=f(st);r.olemonchoBookRev=OLM_BOOK_REV;setOlemonchoLoanRules(r);return postVslaBooks(r,{audit:true})}}
@@ -5612,7 +5612,7 @@ function vbLoansCard(){
 {const f=loansView;loansView=function(){const h=f.apply(this,arguments),c=vbLoansCard();return c?afterHeader(h,c):h}}
 /* the Loans page: the group's loan rules in one line, so members see how the limit and deadline work */
 {const f=repayBenefitsCard;repayBenefitsCard=function(){const L=rules().loans||{};if(L.repaymentFrequency!==FLEX_FREQ)return f.apply(this,arguments);
-  return notice(`A member can borrow up to <b>${isNum(L.limitMultiple)&&+L.limitMultiple===1?'what she has saved':isNum(L.limitMultiple)?L.limitMultiple+'× her savings':'her loan limit'}</b>. Repay any time, in part or in full, but the whole loan${isNum(L.interestRate)?` plus ${L.interestRate}% interest`:' (and interest, rate pending)'} is due within <b>${isNum(L.maxMonths)?L.maxMonths:3} months</b> of the meeting it was given. Repaying on time raises the next loan limit${isNum(L.onTimeBonusPct)?` by ${L.onTimeBonusPct}%`:' (how much is pending)'}. Guarantors must be members of the borrower's own VSLA.`,{ic:'info',tone:'teal',title:'Loan rules.'})+'<div style="height:16px"></div>'}}
+  return notice(`${isNum(L.limitMultiple)?`A member can borrow up to <b>${+L.limitMultiple===1?'what she has saved':L.limitMultiple+'× her savings'}</b>.`:'The loan limit is <b>not decided yet</b> (pending).'} Repay any time, in part or in full, but the whole loan${isNum(L.interestRate)?` plus ${L.interestRate}% interest`:' (and interest, rate pending)'} is due by the date on the loan, at most <b>${isNum(L.maxMonths)?L.maxMonths:3} months</b> after the meeting it was given. Repaying on time raises the next loan limit${isNum(L.onTimeBonusPct)?` by ${L.onTimeBonusPct}%`:' (how much is pending)'}. Guarantors must be members of the borrower's own VSLA.`,{ic:'info',tone:'teal',title:'Loan rules.'})+'<div style="height:16px"></div>'}}
 loansViewObj.render=loansView; /* the router holds this reference */
 {const f=loanAppsView;loanAppsView=function(){const h=f.apply(this,arguments),L=bookLoanRows();if(!L.length||UI.role==='Member')return h;
   const a=sum(L.filter(x=>x.m.vslaBook.loan!=null),x=>+x.m.vslaBook.loan);

@@ -16,6 +16,12 @@ Built for the **HPF Micro Enterprise Program** (Human Practice Foundation): thre
 | `assets/photos/` | Programme photos used on the landing page, demo screen, dashboard and Meetings page |
 | `supabase-schema.sql` | Database tables for the optional Supabase connection |
 
+## New in v0.9.19
+- **Olchoro interest:** 10% for every loan, as the loan pages' totals show (Silal 12,000 + 1,200 = 13,200; Naiswaku
+  12,900 + 1,290 = 14,190).
+- **Olemoncho loan limit: pending.** The book's loans are larger than members' own savings, so the "up to your own
+  savings" limit is removed until the group sets its rule. Interest 10%; due by the date on the loan (at most 3 months).
+
 ## New in v0.9.18
 - **Olchoro: Kisunyunye Nkoitoi 1 and 2.** The two members named Kisunyunye Nkoitoi are now "Kisunyunye Nkoitoi 1"
   (known as Mum Sampeyian, member 6) and "Kisunyunye Nkoitoi 2" (known as Mum Sipilon, member 7: the 10,000 loan and the
